@@ -1,5 +1,6 @@
 # depslib dependency file v1.0
-1398156336 source:/home/fabien/PROJET-GTK/TP/TP-GTK/simple.c
+1398598512 source:/home/fabien/PROJET-GTK/Exemples_code/GtkEntry_saisie_de_texte/main.c
+	<stdlib.h>
 	<gtk/gtk.h>
 
 1395331889 /usr/include/gtk-2.0/gtk/gtk.h
@@ -869,6 +870,9 @@
 1396533895 /usr/include/glib-2.0/gio/goutputstream.h
 	<gio/giotypes.h>
 
+1396533895 /usr/include/glib-2.0/gio/gbytesicon.h
+	<gio/giotypes.h>
+
 1396533895 /usr/include/glib-2.0/gio/gcancellable.h
 	<gio/giotypes.h>
 
@@ -1057,6 +1061,9 @@
 1396533895 /usr/include/glib-2.0/gio/gpollableutils.h
 	<gio/gio.h>
 
+1396533895 /usr/include/glib-2.0/gio/gpropertyaction.h
+	<gio/giotypes.h>
+
 1396533895 /usr/include/glib-2.0/gio/gproxy.h
 	<gio/giotypes.h>
 
@@ -1131,6 +1138,12 @@
 	<gio/gproxyresolver.h>
 
 1396533895 /usr/include/glib-2.0/gio/gtask.h
+	<gio/giotypes.h>
+
+1396533895 /usr/include/glib-2.0/gio/gsubprocess.h
+	<gio/giotypes.h>
+
+1396533895 /usr/include/glib-2.0/gio/gsubprocesslauncher.h
 	<gio/giotypes.h>
 
 1396533895 /usr/include/glib-2.0/gio/gtcpconnection.h
@@ -1232,6 +1245,9 @@
 
 1396533895 /usr/include/glib-2.0/gio/gdbusmenumodel.h
 	<gio/gdbusconnection.h>
+
+1396533895 /usr/include/glib-2.0/gio/gnotification.h
+	<gio/giotypes.h>
 
 1395331883 /usr/include/gtk-2.0/gdk/gdkscreen.h
 	<cairo.h>
@@ -1891,14 +1907,6 @@
 1395331889 /usr/include/gtk-2.0/gtk/gtkitem.h
 	<gtk/gtkbin.h>
 
-1364252618 /usr/include/gtk-2.0/gtk/ubuntumenuproxy.h
-	<gtk/gtkwidget.h>
-	<gtk/gtktypeutils.h>
-
-1364252618 /usr/include/gtk-2.0/gtk/ubuntumenuproxymodule.h
-	<glib-object.h>
-	<gmodule.h>
-
 1395331889 /usr/include/gtk-2.0/gtk/gtkclipboard.h
 	<gtk/gtkselection.h>
 
@@ -2448,28 +2456,4 @@
 
 1395331889 /usr/include/gtk-2.0/gtk/gtktipsquery.h
 	<gtk/gtk.h>
-
-1398158577 source:/home/fabien/PROJET-GTK/TP/TP-GTK/tp.c
-	<stdlib.h>
-	<gtk/gtk.h>
-
-1398556761 source:/home/fabien/PROJET-GTK/TP/TP-GTK/tp2.c
-	<stdlib.h>
-	<gtk/gtk.h>
-	<string.h>
-
-1396533895 /usr/include/glib-2.0/gio/gbytesicon.h
-	<gio/giotypes.h>
-
-1396533895 /usr/include/glib-2.0/gio/gpropertyaction.h
-	<gio/giotypes.h>
-
-1396533895 /usr/include/glib-2.0/gio/gsubprocess.h
-	<gio/giotypes.h>
-
-1396533895 /usr/include/glib-2.0/gio/gsubprocesslauncher.h
-	<gio/giotypes.h>
-
-1396533895 /usr/include/glib-2.0/gio/gnotification.h
-	<gio/giotypes.h>
 
