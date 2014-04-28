@@ -1,5 +1,12 @@
 # depslib dependency file v1.0
-1398598647 source:/home/fabien/PROJET-GTK/Exemples_code/GtkEntry_saisie_de_texte/main.c
+1398665808 source:/home/fabien/PROJET-GTK/Exemples_code/Correction_TP/callbacks.c
+	"callbacks.h"
+
+1398665814 /home/fabien/PROJET-GTK/Exemples_code/Correction_TP/callbacks.h
+	"donnees.h"
+	<gtk/gtk.h>
+
+1398665795 /home/fabien/PROJET-GTK/Exemples_code/Correction_TP/donnees.h
 	<stdlib.h>
 	<gtk/gtk.h>
 
@@ -2456,4 +2463,14 @@
 
 1395331889 /usr/include/gtk-2.0/gtk/gtktipsquery.h
 	<gtk/gtk.h>
+
+1398665801 source:/home/fabien/PROJET-GTK/Exemples_code/Correction_TP/donnees.c
+	<stdlib.h>
+	"donnees.h"
+	"callbacks.h"
+
+1398665782 source:/home/fabien/PROJET-GTK/Exemples_code/Correction_TP/main.c
+	<gtk/gtk.h>
+	"donnees.h"
+	"callbacks.h"
 
