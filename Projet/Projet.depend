@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1398598647 source:/home/fabien/PROJET-GTK/Exemples_code/GtkEntry_saisie_de_texte/main.c
+1398671439 source:/home/fabien/PROJET-GTK/Projet/main.c
 	<stdlib.h>
 	<gtk/gtk.h>
 
