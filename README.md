@@ -1,3 +1,3 @@
 PROJET-GTK
 ==========
-by Fabien and Xavier
+Made by Fabien and Xavier 
