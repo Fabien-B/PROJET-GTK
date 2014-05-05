@@ -1,5 +1,3 @@
-; Ce fichier ASCII de POI a été généré sur 15/05/2010 par PoiEdit, ©2002-2008 by Dnote Software (http://www.dnote.nl). Tous droits réservés.
-
 1.83250, 50.14306, "ABBEVILLE (LFOI)"
 0.59056, 44.17472, "AGEN LA GARENNE (LFBA)"
 -0.24528, 43.70944, "AIRE SUR L’ADOUR (LFDA)"
