@@ -3,7 +3,6 @@
 #include <string.h>
 #ifndef INTERFACE_H_INCLUDED
 #define INTERFACE_H_INCLUDED
-//#include "interface.c"
 
 
 typedef struct file_opener{
@@ -33,16 +32,13 @@ typedef struct balise{
     double longsec;
     int dirlong;        //1 si est, -1 si ouest
     GtkWidget* coch;
+    struct balise * ptsuiv;
 }balise;
 
 
 void init_interface();
 void APropos(GtkWidget* widget);
-void recuperer_chemin(GtkWidget *bouton, file_opener *donnees);
-void creer_file_selection(file_opener *donnees);
-void charger_fichiers(file_opener *donnees);
-void lancer_boite(GtkWidget *bouton, file_opener *donnees);
-void combo_selected(GtkWidget *widget,file_opener *donnees);
+
 
 
 

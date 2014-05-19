@@ -2456,7 +2456,7 @@
 1395331889 /usr/include/gtk-2.0/gtk/gtktipsquery.h
 	<gtk/gtk.h>
 
-1400539761 /home/fabien/PROJET-GTK/Projet/interface.h
+1400542194 /home/fabien/PROJET-GTK/Projet/interface.h
 	<stdlib.h>
 	<gtk/gtk.h>
 	<string.h>
@@ -2466,6 +2466,14 @@
 1398881787 /home/fabien/PROJET-GTK/Projet/interface.c
 	"interface.h"
 
-1400539217 source:/home/fabien/PROJET-GTK/Projet/interface.c
+1400543430 source:/home/fabien/PROJET-GTK/Projet/interface.c
 	"interface.h"
+	"ouverture_fichiers.h"
+
+1400542194 /home/fabien/PROJET-GTK/Projet/ouverture_fichiers.h
+	"interface.h"
+
+1400542499 source:/home/fabien/PROJET-GTK/Projet/ouverture_fichiers.c
+	"interface.h"
+	"ouverture_fichiers.h"
 
