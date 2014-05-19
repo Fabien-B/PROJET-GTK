@@ -35,7 +35,7 @@ void init_interface(int argc, char *argv[])
     gtk_init(&argc,&argv);
 
     Window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(Window), "Le projet de ouf!!!");
+    gtk_window_set_title(GTK_WINDOW(Window), "GATI");
     gtk_window_set_default_size(GTK_WINDOW(Window), 320, 400);
     g_signal_connect(G_OBJECT(Window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
@@ -108,7 +108,7 @@ void init_interface(int argc, char *argv[])
 void APropos(GtkWidget* widget)
 {
     GtkWidget* APropos_box;
-    APropos_box = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "Coded by Fabien, called 'The Master'...");
+    APropos_box = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "The GATIP, 'The GNU Air Traffic Indicator' est un software devellopé dans le cadre d'un projet étudiant.");
     gtk_dialog_run(GTK_DIALOG(APropos_box));
     gtk_widget_destroy(APropos_box);
 }
@@ -144,13 +144,256 @@ void recuperer_chemin(GtkWidget *bouton, file_opener *donnees)
 
 void charger_fichiers(file_opener *donnees)
 {
+
     if(donnees->what_file==0)
     {
         g_print("aérodrome: %s\n",donnees->ptchemin);
+
+        int i,j;
+        FILE * fic=NULL;
+        fic=fopen(donnees->ptchemin,"r");
+        char ligne[50];
+        if(fic!=NULL)
+        {
+
+            i=0;
+            do
+            {
+                char chainetempo[20]; //initialisation d'une chaine de caractères temporaire
+
+                j=0;
+                int j0=0;
+                aerodrome * nouveau=malloc(sizeof(aerodrome));
+                fscanf(fic,"%[^\n]",ligne);
+       // printf("%s\n",ligne);
+                //fgetc(fic);
+
+                while(ligne[j]!=',')        //------------------------ lecture de la latitude ---------------------------//
+                {
+                    chainetempo[j-j0]=ligne[j];
+                    j++;
+                }
+                chainetempo[j-j0]='\0';
+
+                int k;
+                for(k=0;k<strlen(chainetempo);k++) //remplacement du caractère '.' par ',' ...
+                {
+                    if(chainetempo[k]=='.')
+                    {
+                        chainetempo[k]=',';
+                    }
+                }
+                sscanf(chainetempo, "%lf", &nouveau->latitude); //et conversion de la chaine de caractère en double
+        printf("latitude=%lf\n",nouveau->latitude);
+
+
+                j+=2;                      //------------------------ lecture de la longitude ---------------------------//
+                j0=j;
+                while(ligne[j]!=',')
+                {
+                    chainetempo[j-j0]=ligne[j];
+                    j++;
+                }
+                chainetempo[j-j0]='\0';
+
+                for(k=0;k<strlen(chainetempo);k++)
+                {
+                    if(chainetempo[k]=='.')
+                    {
+                        chainetempo[k]=',';
+                    }
+                }
+                sscanf(chainetempo, "%lf", &nouveau->longitude);
+        printf("longitude=%lf\n",nouveau->longitude);
+
+
+                j+=3;                      //------------------------ lecture du nom de l'aérodrome ---------------------------//
+                j0=j;
+                while(ligne[j]!='(')
+                {
+                    nouveau->nom[j-j0]=ligne[j];
+                    j++;
+                }
+                nouveau->nom[j-j0-1]='\0';
+                printf("nom=%s\n",nouveau->nom);
+
+                j+=1;                      //------------------------ lecture du code OACI ---------------------------//
+                j0=j;
+                while(ligne[j]!=')')
+                {
+                    nouveau->oaci[j-j0]=ligne[j];
+                    j++;
+                }
+                nouveau->oaci[j-j0]='\0';
+                printf("oaci=%s\n",nouveau->oaci);
+
+        printf("\n\n\n\n\n");
+
+
+
+            i++;
+            }while(fgetc(fic)!=EOF);
+        fclose(fic);
+        }
     }
+
+
     if(donnees->what_file==1)
     {
-        g_print("balises: %s\n",donnees->ptchemin);
+    g_print("balises: %s\n",donnees->ptchemin);
+
+        int i,j;
+        FILE * fic=NULL;
+        fic=fopen(donnees->ptchemin,"r");
+        char ligne[50];
+        if(fic!=NULL)
+        {
+
+            i=0;
+            do
+            {
+                char chainetempo[20]; //initialisation d'une chaine de caractères temporaire
+
+                j=0;
+                int j0=0;
+                balise * nouveau=malloc(sizeof(balise));
+                fscanf(fic,"%[^\n]",ligne);
+       printf("%s\n",ligne);
+
+                while(ligne[j]!=' ')                        //Nom
+                {
+                    nouveau->nom[j-j0]=ligne[j];
+                    j++;
+                }
+                nouveau->nom[j-j0]='\0';
+
+                j++;                                        //degres latitude
+                j0=j;
+                while(j<j0+2)
+                {
+                    chainetempo[j-j0]=ligne[j];
+                    j++;
+                }
+                chainetempo[j-j0]='\0';
+                sscanf(chainetempo, "%d", &nouveau->latdeg);
+
+                j+=2;                                        //minutes latitude
+                j0=j;
+                while(j<j0+2)
+                {
+                    chainetempo[j-j0]=ligne[j];
+                    j++;
+                }
+                chainetempo[j-j0]='\0';
+                sscanf(chainetempo, "%d", &nouveau->latmin);
+
+                j+=1;                                         //secondes latitude
+                j0=j;
+                while(j<j0+4)
+                {
+                    chainetempo[j-j0]=ligne[j];
+                    j++;
+                }
+                chainetempo[j-j0]='\0';
+                int k;
+                for(k=0;k<strlen(chainetempo);k++)
+                {
+                    if(chainetempo[k]=='.')
+                    {
+                        chainetempo[k]=',';
+                    }
+                }
+                sscanf(chainetempo, "%lf", &nouveau->latsec);
+
+                if(ligne[j+2]=='N')                                        //latitude nord ou sud
+                {
+                    nouveau->dirlat=1;
+                }
+                else
+                {
+                    nouveau->dirlat=-1;
+                }
+
+                j+=3;
+                j0=j;
+
+                while(j<j0+4)                                        //longitude degres
+                {
+                    chainetempo[j-j0]=ligne[j];
+                    j++;
+                }
+                chainetempo[j-j0]='\0';
+                sscanf(chainetempo, "%d", &nouveau->longdeg);
+
+                j+=2;                                        //longitude minutes
+                j0=j;
+                while(j<j0+2)
+                {
+                    chainetempo[j-j0]=ligne[j];
+                    j++;
+                }
+                chainetempo[j-j0]='\0';
+                sscanf(chainetempo, "%d", &nouveau->longmin);
+
+                j+=1;                                        //longitude secondes
+                j0=j;
+                while(j<j0+4)
+                {
+                    chainetempo[j-j0]=ligne[j];
+                    j++;
+                }
+                chainetempo[j-j0]='\0';
+                for(k=0;k<strlen(chainetempo);k++)
+                {
+                    if(chainetempo[k]=='.')
+                    {
+                        chainetempo[k]=',';
+                    }
+                }
+                sscanf(chainetempo, "%lf", &nouveau->longsec);
+
+                if(ligne[j+2]=='E')                                        //longitude est ou ouest
+                {
+                    nouveau->dirlong=1;
+                }
+                else
+                {
+                    nouveau->dirlong=-1;
+                }
+
+        printf("%s %d°%d'%lf [%d] %d°%d'%lf [%d]",nouveau->nom,nouveau->latdeg,nouveau->latmin,nouveau->latsec,nouveau->dirlat,nouveau->longdeg,nouveau->longmin,nouveau->longsec,nouveau->dirlong);
+        printf("\n\n\n\n\n");
+
+            i++;
+            }while(fgetc(fic)!=EOF);
+        fclose(fic);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
     if(donnees->what_file==2)
     {
@@ -226,3 +469,5 @@ void combo_selected(GtkWidget *widget,file_opener *donnees)
 
   g_free(text);
 }
+
+

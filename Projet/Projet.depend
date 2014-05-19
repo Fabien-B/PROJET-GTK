@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1399139628 source:/home/fabien/PROJET-GTK/Projet/main.c
+1400536018 source:/home/fabien/PROJET-GTK/Projet/main.c
 	"interface.h"
 
 1395331889 /usr/include/gtk-2.0/gtk/gtk.h
@@ -2456,7 +2456,7 @@
 1395331889 /usr/include/gtk-2.0/gtk/gtktipsquery.h
 	<gtk/gtk.h>
 
-1399252955 /home/fabien/PROJET-GTK/Projet/interface.h
+1400539761 /home/fabien/PROJET-GTK/Projet/interface.h
 	<stdlib.h>
 	<gtk/gtk.h>
 	<string.h>
@@ -2466,6 +2466,6 @@
 1398881787 /home/fabien/PROJET-GTK/Projet/interface.c
 	"interface.h"
 
-1399279797 source:/home/fabien/PROJET-GTK/Projet/interface.c
+1400539217 source:/home/fabien/PROJET-GTK/Projet/interface.c
 	"interface.h"
 

@@ -5,19 +5,35 @@
 #define INTERFACE_H_INCLUDED
 //#include "interface.c"
 
-/*typedef struct{
-char *chemin_aerodromes;
-char *chemin_balises;
-char *vols;
-int what_file;
-GtkWidget *file_selection;
-}file_pack;*/
 
-typedef struct{
+typedef struct file_opener{
 char *ptchemin;
 GtkWidget *file_selection;
 int what_file;
 }file_opener;
+
+typedef struct aerodrome{
+    double latitude;
+    double longitude;
+    char nom[20];
+    char oaci[4];
+    int affichage;
+    GtkWidget* coch;
+    struct aerodrome * ptsuiv;
+}aerodrome;
+
+typedef struct balise{
+    char nom[10];
+    int latdeg;
+    int latmin;
+    double latsec;
+    int dirlat;         //1 si nord, -1 si sud
+    int longdeg;
+    int longmin;
+    double longsec;
+    int dirlong;        //1 si est, -1 si ouest
+    GtkWidget* coch;
+}balise;
 
 
 void init_interface();
