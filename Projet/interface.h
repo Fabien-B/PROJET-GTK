@@ -5,14 +5,6 @@
 #define INTERFACE_H_INCLUDED
 
 
-typedef struct file_opener{
-char *ptchemin;
-GtkWidget *file_selection;
-int what_file;
-aerodrome *debutaero;
-balise * debutbalises;
-}file_opener;
-
 typedef struct aerodrome{
     double latitude;
     double longitude;
@@ -37,6 +29,13 @@ typedef struct balise{
     struct balise * ptsuiv;
 }balise;
 
+typedef struct file_opener{
+char *ptchemin;
+GtkWidget *file_selection;
+int what_file;
+aerodrome *debutaero;
+balise * debutbalises;
+}file_opener;
 
 void init_interface();
 void APropos(GtkWidget* widget);

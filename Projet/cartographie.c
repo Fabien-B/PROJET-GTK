@@ -20,7 +20,7 @@ gboolean expose_cb (GtkWidget *canvas, GdkEventExpose *event, file_opener * donn
 void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
 {
     GdkPoint points[4];
-    GdkFont * font=gdk_font_load("6x9");//6x9
+    GdkFont * font=gdk_font_load("10x20");//6x9
     // Tester les différetes tailles
     // polices disponibles sous c:\windows\fonts sous windows, /usr/share/fonts/X11/misc sous linux
 
@@ -45,7 +45,7 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
     gdk_draw_point (carte,gc, 40, 40);
 
     //dessine une ligne (segment) :
-    gdk_draw_line (carte, gc, 0, 0, 50, 50);
+   // gdk_draw_line (carte, gc, 0, 0, 50, 50);
 
 
 //    gc.set_fill(couleur);
@@ -62,10 +62,10 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
     gdk_draw_points(carte, gc, points, 3);
 
     // dessine un segment :
-    gdk_draw_line(carte, gc, 100,100,150, 150);
+   // gdk_draw_line(carte, gc, 100,100,150, 150);
 
     //dessine plusieurs segments :
-    gdk_draw_lines(carte, gc, points, 3);
+  //  gdk_draw_lines(carte, gc, points, 3);
 
     //gdk_draw_rectangle(carte, gc, TRUE, 10, 10, 50, 50);
     //gdk_draw_polygon(carte, gc, TRUE, points, 4);
@@ -74,7 +74,7 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
     // affichage de texte
     char *tes="test";
     gdk_draw_string(carte, font, gc, 50, 50, tes);
-    gdk_draw_text (carte, font, gc, 100,100, "bonjour tout le de" , 20);
+    gdk_draw_text (carte, font, gc, 100,100, "Carte" , 5);
 
     gdk_font_unref(font);
 }
