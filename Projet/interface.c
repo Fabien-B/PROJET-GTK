@@ -1,5 +1,6 @@
 #include "interface.h"
 #include "ouverture_fichiers.h"
+#include "cartographie.h"
 
 void init_interface(int argc, char *argv[])
 {
@@ -28,9 +29,15 @@ void init_interface(int argc, char *argv[])
     file_opener *donnees=g_malloc(sizeof(file_opener));
         donnees->ptchemin=NULL;
         donnees->file_selection=NULL;
+        donnees->debutaero=NULL;
+        donnees->debutbalises=NULL;
 
 
-    gtk_init(&argc,&argv);
+ // Initialisation de Gtk+
+    g_log_set_handler ("Gtk", G_LOG_LEVEL_WARNING, (GLogFunc) gtk_false, NULL);
+    gtk_init (&argc, &argv);
+    g_log_set_handler ("Gtk", G_LOG_LEVEL_WARNING, g_log_default_handler, NULL);
+
 
     Window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(Window), "GATI");
@@ -84,9 +91,11 @@ void init_interface(int argc, char *argv[])
     work_zr = gtk_vbox_new(FALSE, 0);
     gtk_box_pack_start(GTK_BOX(work_zone), work_zr, FALSE, FALSE, 0);
 
-    carte=gtk_drawing_area_new ();
-    gtk_widget_set_size_request (carte, 100, 200);
-    gtk_box_pack_start(GTK_BOX(work_zl), carte, FALSE, FALSE, 0);
+//Création de la carte
+
+    carte = gtk_drawing_area_new ();
+    gtk_drawing_area_size (GTK_DRAWING_AREA(carte), 400,400);
+    gtk_box_pack_start (GTK_BOX (work_zl), carte, TRUE, TRUE, 0);
 
 
 
@@ -97,6 +106,8 @@ void init_interface(int argc, char *argv[])
     curseur=gtk_hscale_new_with_range (5,200 ,100);
     gtk_container_add(GTK_CONTAINER(hbox_curseur), curseur);
 
+// Gère le rafraichissement
+    g_signal_connect (G_OBJECT (carte), "expose-event", G_CALLBACK (expose_cb), donnees);
 
     gtk_widget_show_all(Window);
 }

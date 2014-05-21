@@ -9,6 +9,8 @@ typedef struct file_opener{
 char *ptchemin;
 GtkWidget *file_selection;
 int what_file;
+aerodrome *debutaero;
+balise * debutbalises;
 }file_opener;
 
 typedef struct aerodrome{
