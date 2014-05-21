@@ -1,6 +1,7 @@
 # depslib dependency file v1.0
-1398790373 source:/home/fabien/PROJET-GTK/Exemples_code/menu/main.c
+1400582959 source:/home/fabien/PROJET-GTK/Exemples_code/menu/main.c
 	<stdlib.h>
+	<stdio.h>
 	<gtk/gtk.h>
 
 1395331889 /usr/include/gtk-2.0/gtk/gtk.h

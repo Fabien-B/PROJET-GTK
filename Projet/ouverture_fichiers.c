@@ -116,7 +116,7 @@ void charger_fichiers(file_opener *donnees)
             int cond;
             do
             {
-                char chainetempo[20]; //initialisation d'une chaine de caractères temporaire
+                char chainetempo[60]; //initialisation d'une chaine de caractères temporaire
 
                 j=0;
                 int j0=0;

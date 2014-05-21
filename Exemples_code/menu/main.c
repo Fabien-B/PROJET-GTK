@@ -1,118 +1,187 @@
+
 #include <stdlib.h>
+#include <stdio.h>
 #include <gtk/gtk.h>
 
-void OnQuitter(GtkWidget* widget, gpointer data);
-void OnAbout(GtkWidget* widget, gpointer data);
+enum {
+    BMP_COLUMN,
+    TEXT_COLUMN,
+    N_COLUMN,
+    TOGGLE_COLUMN
+};
+
+/* Utilisateurs Visual C++ : il faut ajouter gdk_pixbuf-2.0.lib dans les options du linker */
 
 int main(int argc, char **argv)
 {
     GtkWidget *pWindow;
-    GtkWidget *pVBox;
-    GtkWidget *pMenuBar;
-    GtkWidget *pMenu;
-    GtkWidget *pMenuItem;
+    GtkWidget *pTreeView;
+    GtkWidget *pScrollbar;
+    GtkTreeStore *pTreeStore;
+    GtkTreeViewColumn *pColumn;
+    GtkCellRenderer *pCellRenderer;
+    GdkPixbuf *pPixBufA;
+    GdkPixbuf *pPixBufB;
+    gchar *sTexte;
+    gint i;
 
     gtk_init(&argc, &argv);
 
-    /* Création de la fenêtre */
+    /* Creation de la fenetre principale */
     pWindow = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(pWindow), "GtkMenu");
     gtk_window_set_default_size(GTK_WINDOW(pWindow), 320, 200);
+    gtk_window_set_title(GTK_WINDOW(pWindow), "GtkTreeView et GtkTreeStore");
     g_signal_connect(G_OBJECT(pWindow), "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
-    /* Création de la GtkVBox */
-    pVBox = gtk_vbox_new(FALSE, 0);
-    gtk_container_add(GTK_CONTAINER(pWindow), pVBox);
+    /* Creation du modele */
+    pTreeStore = gtk_tree_store_new(N_COLUMN, GDK_TYPE_PIXBUF, G_TYPE_STRING);
 
-    /**** Création du menu ****/
+    sTexte = g_malloc(16);
 
-    /* ETAPE 1 */
-    pMenuBar = gtk_menu_bar_new();
-    /** Premier sous-menu **/
-    /* ETAPE 2 */
-    pMenu = gtk_menu_new();
-    /* ETAPE 3 */
-    pMenuItem = gtk_menu_item_new_with_label("Nouveau");
-    gtk_menu_shell_append(GTK_MENU_SHELL(pMenu), pMenuItem);
+    /* Chargement des images */
+    pPixBufA = gdk_pixbuf_new_from_file("./icon_computer.png", NULL);
+    pPixBufB = gdk_pixbuf_new_from_file("./icon_directory.png", NULL);
 
-    pMenuItem = gtk_menu_item_new_with_label("Ouvrir");
-    gtk_menu_shell_append(GTK_MENU_SHELL(pMenu), pMenuItem);
+    /* Insertion des elements */
 
-    pMenuItem = gtk_menu_item_new_with_label("Enregistrer");
-    gtk_menu_shell_append(GTK_MENU_SHELL(pMenu), pMenuItem);
 
-    pMenuItem = gtk_menu_item_new_with_label("Fermer");
-    gtk_menu_shell_append(GTK_MENU_SHELL(pMenu), pMenuItem);
 
-    pMenuItem = gtk_menu_item_new_with_label("Quitter");
-    g_signal_connect(G_OBJECT(pMenuItem), "activate", G_CALLBACK(OnQuitter),(GtkWidget*) pWindow);
-    gtk_menu_shell_append(GTK_MENU_SHELL(pMenu), pMenuItem);
-    /* ETAPE 4 */
-    pMenuItem = gtk_menu_item_new_with_label("Fichier");
-    /* ETAPE 5 */
-    gtk_menu_item_set_submenu(GTK_MENU_ITEM(pMenuItem), pMenu);
-    /* ETAPE 6 */
-    gtk_menu_shell_append(GTK_MENU_SHELL(pMenuBar), pMenuItem);
 
-    /** Second sous-menu **/
-    /* ETAPE 2 */
-    pMenu = gtk_menu_new();
-    /* ETAPE 3 */
-    pMenuItem = gtk_menu_item_new_with_label("A propos de...");
-    g_signal_connect(G_OBJECT(pMenuItem), "activate", G_CALLBACK(OnAbout),(GtkWidget*) pWindow);
-    gtk_menu_shell_append(GTK_MENU_SHELL(pMenu), pMenuItem);
-    /* ETAPE 4 */
-    pMenuItem = gtk_menu_item_new_with_label("?");
-    /* ETAPE 5 */
-    gtk_menu_item_set_submenu(GTK_MENU_ITEM(pMenuItem), pMenu);
-    /* ETAPE 6 */
-    gtk_menu_shell_append(GTK_MENU_SHELL(pMenuBar), pMenuItem);
 
-    /* Ajout du menu a la fenetre */
-    gtk_box_pack_start(GTK_BOX(pVBox), pMenuBar, FALSE, FALSE, 0);
+        GtkTreeIter pIter11;
+        GtkTreeIter pIter21;
+        gint j;
+
+        sprintf(sTexte, "Aérodromes");
+
+        /* Creation de la nouvelle ligne */
+        gtk_tree_store_append(pTreeStore, &pIter11, NULL);
+
+        /* Mise a jour des donnees */
+        gtk_tree_store_set(pTreeStore, &pIter11,
+            BMP_COLUMN, pPixBufA,
+            TEXT_COLUMN, sTexte,
+            -1);
+
+        for(j = 0 ; j < 2 ; ++j)
+        {
+            sprintf(sTexte, "Repertoire %d", j);
+
+            /* Creation de la nouvelle ligne enfant */
+            gtk_tree_store_append(pTreeStore, &pIter21, &pIter11);
+
+
+
+                gtk_tree_store_set(pTreeStore, &pIter21,
+            TEXT_COLUMN, sTexte,
+            TOGGLE_COLUMN, TRUE,
+            -1);
+        }
+
+
+
+
+        GtkTreeIter pIter12;
+        GtkTreeIter pIter22;
+
+        sprintf(sTexte, "Balises");
+
+        /* Creation de la nouvelle ligne */
+        gtk_tree_store_append(pTreeStore, &pIter12, NULL);
+
+        /* Mise a jour des donnees */
+        gtk_tree_store_set(pTreeStore, &pIter12,
+            BMP_COLUMN, pPixBufA,
+            TEXT_COLUMN, sTexte,
+            -1);
+
+        for(j = 0 ; j < 2 ; ++j)
+        {
+            sprintf(sTexte, "Repertoire %d", j);
+
+            /* Creation de la nouvelle ligne enfant */
+            gtk_tree_store_append(pTreeStore, &pIter22, &pIter12);
+
+
+
+                gtk_tree_store_set(pTreeStore, &pIter22,
+            TEXT_COLUMN, sTexte,
+            TOGGLE_COLUMN, TRUE,
+            -1);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    g_free(sTexte);
+
+    g_object_unref(pPixBufA);
+    g_object_unref(pPixBufB);
+
+    /* Creation de la vue */
+    pTreeView = gtk_tree_view_new_with_model(GTK_TREE_MODEL(pTreeStore));
+
+
+
+
+
+
+    /* Creation de la première colonne*/
+    pCellRenderer = gtk_cell_renderer_toggle_new();
+    pColumn = gtk_tree_view_column_new_with_attributes("CheckBox",
+        pCellRenderer,
+        "active", TOGGLE_COLUMN,
+        NULL);
+
+    /* Ajout de la colonne à la vue */
+    gtk_tree_view_append_column(GTK_TREE_VIEW(pTreeView), pColumn);
+
+
+
+
+
+    /* Creation de la deuxième colonne */
+
+            pCellRenderer = gtk_cell_renderer_text_new();
+    pColumn = gtk_tree_view_column_new_with_attributes("Label",
+        pCellRenderer,
+        "text", TEXT_COLUMN,
+        NULL);
+
+
+
+
+
+    /* Ajout de la colonne à la vue */
+    gtk_tree_view_append_column(GTK_TREE_VIEW(pTreeView), pColumn);
+
+
+
+
+    /* Ajout de la vue a la fenetre */
+    pScrollbar = gtk_scrolled_window_new(NULL, NULL);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(pScrollbar),
+        GTK_POLICY_AUTOMATIC,
+        GTK_POLICY_AUTOMATIC);
+    gtk_container_add(GTK_CONTAINER(pScrollbar), pTreeView);
+    gtk_container_add(GTK_CONTAINER(pWindow), pScrollbar);
 
     gtk_widget_show_all(pWindow);
 
     gtk_main();
 
     return EXIT_SUCCESS;
-}
-
-void OnQuitter(GtkWidget* widget, gpointer data)
-{
-    GtkWidget *pQuestion;
-
-    pQuestion = gtk_message_dialog_new(GTK_WINDOW(data),
-        GTK_DIALOG_MODAL,
-        GTK_MESSAGE_QUESTION,
-        GTK_BUTTONS_YES_NO,
-        "Voulez vous vraiment\n"
-        "quitter le programme?");
-
-    switch(gtk_dialog_run(GTK_DIALOG(pQuestion)))
-    {
-        case GTK_RESPONSE_YES:
-            gtk_main_quit();
-            break;
-        case GTK_RESPONSE_NONE:
-        case GTK_RESPONSE_NO:
-            gtk_widget_destroy(pQuestion);
-            break;
-    }
-}
-
-void OnAbout(GtkWidget* widget, gpointer data)
-{
-    GtkWidget *pAbout;
-
-    pAbout = gtk_message_dialog_new(GTK_WINDOW(data),
-        GTK_DIALOG_MODAL,
-        GTK_MESSAGE_INFO,
-        GTK_BUTTONS_OK,
-        "Cours GTK+ 2.0\n"
-        "http://gtk.developpez.com");
-
-    gtk_dialog_run(GTK_DIALOG(pAbout));
-
-    gtk_widget_destroy(pAbout);
 }
