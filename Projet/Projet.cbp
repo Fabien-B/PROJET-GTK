@@ -23,6 +23,10 @@
 		<Linker>
 			<Add option="`pkg-config gtk+-2.0 --libs`" />
 		</Linker>
+		<Unit filename="cartographie.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="cartographie.h" />
 		<Unit filename="interface.c">
 			<Option compilerVar="CC" />
 		</Unit>

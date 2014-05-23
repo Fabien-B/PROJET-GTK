@@ -20,10 +20,9 @@ int main(int argc, char **argv)
     GtkTreeStore *pTreeStore;
     GtkTreeViewColumn *pColumn;
     GtkCellRenderer *pCellRenderer;
-    GdkPixbuf *pPixBufA;
-    GdkPixbuf *pPixBufB;
+
     gchar *sTexte;
-    gint i;
+
 
     gtk_init(&argc, &argv);
 
@@ -38,11 +37,6 @@ int main(int argc, char **argv)
 
     sTexte = g_malloc(16);
 
-    /* Chargement des images */
-    pPixBufA = gdk_pixbuf_new_from_file("./icon_computer.png", NULL);
-    pPixBufB = gdk_pixbuf_new_from_file("./icon_directory.png", NULL);
-
-    /* Insertion des elements */
 
 
 
@@ -57,11 +51,12 @@ int main(int argc, char **argv)
         /* Creation de la nouvelle ligne */
         gtk_tree_store_append(pTreeStore, &pIter11, NULL);
 
-        /* Mise a jour des donnees */
-        gtk_tree_store_set(pTreeStore, &pIter11,
-            BMP_COLUMN, pPixBufA,
+
+            gtk_tree_store_set(pTreeStore, &pIter11,
             TEXT_COLUMN, sTexte,
+            TOGGLE_COLUMN, TRUE,
             -1);
+
 
         for(j = 0 ; j < 2 ; ++j)
         {
@@ -91,8 +86,8 @@ int main(int argc, char **argv)
 
         /* Mise a jour des donnees */
         gtk_tree_store_set(pTreeStore, &pIter12,
-            BMP_COLUMN, pPixBufA,
             TEXT_COLUMN, sTexte,
+            TOGGLE_COLUMN, TRUE,
             -1);
 
         for(j = 0 ; j < 2 ; ++j)
@@ -113,23 +108,9 @@ int main(int argc, char **argv)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
     g_free(sTexte);
 
-    g_object_unref(pPixBufA);
-    g_object_unref(pPixBufB);
+
 
     /* Creation de la vue */
     pTreeView = gtk_tree_view_new_with_model(GTK_TREE_MODEL(pTreeStore));
@@ -141,7 +122,7 @@ int main(int argc, char **argv)
 
     /* Creation de la première colonne*/
     pCellRenderer = gtk_cell_renderer_toggle_new();
-    pColumn = gtk_tree_view_column_new_with_attributes("CheckBox",
+    pColumn = gtk_tree_view_column_new_with_attributes("coucou!",
         pCellRenderer,
         "active", TOGGLE_COLUMN,
         NULL);
@@ -171,7 +152,21 @@ int main(int argc, char **argv)
 
 
 
-    /* Ajout de la vue a la fenetre */
+
+
+
+
+
+//    g_signal_connect(G_OBJECT(pToggleBtn), "toggled", G_CALLBACK(OnToggle), NULL);
+
+
+
+
+
+
+
+
+//     Ajout de la vue a la fenetre
     pScrollbar = gtk_scrolled_window_new(NULL, NULL);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(pScrollbar),
         GTK_POLICY_AUTOMATIC,
@@ -185,3 +180,35 @@ int main(int argc, char **argv)
 
     return EXIT_SUCCESS;
 }
+
+
+
+
+/*
+void OnToggle(GtkWidget *pToggle, gpointer data)
+{
+    gboolean bEtat;
+    gboolean bInconsistent;
+    gchar *sLabel;
+    gchar *sLabelUtf8;
+
+    // Récupération de l'état du bouton
+    bEtat = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pToggle));
+    // Recuperation de l aspect du bouton
+    bInconsistent = gtk_toggle_button_get_inconsistent(GTK_TOGGLE_BUTTON(pToggle));
+
+    // Construction du label du bouton
+    sLabel = g_strdup_printf("Etat : %s - Aspect : %s",
+        bEtat ? "Enfoncé" : "Relâché",
+        bInconsistent ? "Modifié" : "Normal");
+    // Encodage du label en UTF8
+    sLabelUtf8 = g_locale_to_utf8(sLabel, -1, NULL, NULL, NULL);
+
+    // Modification du label du bouton
+    gtk_button_set_label(GTK_BUTTON(pToggle), sLabelUtf8);
+
+    // Les chaînes sLabel et sLabelUtf8 n'ont plus d'utilité
+    g_free(sLabel);
+    g_free(sLabelUtf8);
+}
+*/

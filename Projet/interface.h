@@ -10,7 +10,9 @@ typedef struct aerodrome{
     double longitude;
     char nom[20];
     char oaci[4];
-    int affichage;
+    int affichage;      //1 si affichage activé, 0 sinon <=====> ne serviras peut être à rien, info à récupérer sur la case à cocher quand elle seras là.
+    int pos_x;          //positions x et y sur la zone de dessin, à recalculer quand la zone change de taille
+    int pos_y;
     GtkWidget* coch;
     struct aerodrome * ptsuiv;
 }aerodrome;
@@ -25,6 +27,8 @@ typedef struct balise{
     int longmin;
     double longsec;
     int dirlong;        //1 si est, -1 si ouest
+    int pos_x;          //positions x et y sur la zone de dessin, à recalculer quand la zone change de taille
+    int pos_y;
     GtkWidget* coch;
     struct balise * ptsuiv;
 }balise;

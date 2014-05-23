@@ -110,7 +110,7 @@ void charger_fichiers(file_opener *donnees)
         if(fic!=NULL)
         {
             aerodrome * nouveau=malloc(sizeof(aerodrome));
-            aerodrome *debutaero=nouveau;
+            donnees->debutaero=nouveau;
             nouveau->ptsuiv=NULL;
             i=0;
             int cond;
@@ -201,7 +201,7 @@ void charger_fichiers(file_opener *donnees)
 
             printf("\n\n\n\n\n\n\n"); /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            aerodrome *ptcurr=debutaero;
+            aerodrome *ptcurr=donnees->debutaero;
             while(ptcurr->ptsuiv!=NULL)
             {
                 printf("%s\n",ptcurr->nom);
@@ -229,7 +229,7 @@ void charger_fichiers(file_opener *donnees)
         if(fic!=NULL)
         {
             balise * nouveau=malloc(sizeof(balise));
-            balise * debutbal=nouveau;
+            donnees->debutbalises=nouveau;
             nouveau->ptsuiv=NULL;
             i=0;
             int cond;
@@ -359,14 +359,14 @@ void charger_fichiers(file_opener *donnees)
             cond=0;
 
 
-            printf("\n\n\n\n\n\n\n");/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-            balise *ptcurr=debutbal;
-            while(ptcurr->ptsuiv!=NULL)
-            {
-                printf("%s\n",ptcurr->nom);
-                ptcurr=ptcurr->ptsuiv;
-            }//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            printf("\n\n\n\n\n\n\n");/////////////////////////////////////////////
+                                                                                //
+            balise *ptcurr=donnees->debutbalises;                               //
+            while(ptcurr->ptsuiv!=NULL)                                         // sert à rien, c'est pour vérifier que le chainage marche correctement.
+            {                                                                   //
+                printf("%s\n",ptcurr->nom);                                     //
+                ptcurr=ptcurr->ptsuiv;                                          //
+            }/////////////////////////////////////////////////////////////////////
 
             }
 
