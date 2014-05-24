@@ -101,7 +101,7 @@ void charger_fichiers(file_opener *donnees)
 
     if(donnees->what_file==0)
     {
-        g_print("aérodrome: %s\n",donnees->ptchemin);
+    //g_print("aérodrome: %s\n",donnees->ptchemin);
 
         int i,j;
         FILE * fic=NULL;
@@ -120,7 +120,6 @@ void charger_fichiers(file_opener *donnees)
 
                 j=0;
                 int j0=0;
-//                aerodrome * nouveau=malloc(sizeof(aerodrome));
                 fscanf(fic,"%[^\n]",ligne);
 
                 while(ligne[j]!=',')        //------------------------ lecture de la latitude ---------------------------//
@@ -139,7 +138,7 @@ void charger_fichiers(file_opener *donnees)
                     }
                 }
                 sscanf(chainetempo, "%lf", &nouveau->latitude); //et conversion de la chaine de caractère en double
-        printf("latitude=%lf\n",nouveau->latitude);
+        //printf("latitude=%lf\n",nouveau->latitude);
 
 
                 j+=2;                      //------------------------ lecture de la longitude ---------------------------//
@@ -159,7 +158,7 @@ void charger_fichiers(file_opener *donnees)
                     }
                 }
                 sscanf(chainetempo, "%lf", &nouveau->longitude);
-        printf("longitude=%lf\n",nouveau->longitude);
+        //printf("longitude=%lf\n",nouveau->longitude);
 
 
                 j+=3;                      //------------------------ lecture du nom de l'aérodrome ---------------------------//
@@ -170,7 +169,7 @@ void charger_fichiers(file_opener *donnees)
                     j++;
                 }
                 nouveau->nom[j-j0-1]='\0';
-                printf("nom=%s\n",nouveau->nom);
+        //printf("nom=%s\n",nouveau->nom);
 
                 j+=1;                      //------------------------ lecture du code OACI ---------------------------//
                 j0=j;
@@ -180,16 +179,17 @@ void charger_fichiers(file_opener *donnees)
                     j++;
                 }
                 nouveau->oaci[j-j0]='\0';
-                printf("oaci=%s\n",nouveau->oaci);
+        //printf("oaci=%s\n",nouveau->oaci);
 
-        printf("\n\n\n\n\n");
+        //printf("\n\n\n\n\n");
 
 
-
+            nouveau->affichage=0; //non affiché par défault
             i++;
             if(fgetc(fic)!=EOF)
             {
                 cond=1;
+
                 nouveau->ptsuiv=malloc(sizeof(aerodrome));
                 nouveau=nouveau->ptsuiv;
                 nouveau->ptsuiv=NULL;
@@ -199,7 +199,7 @@ void charger_fichiers(file_opener *donnees)
             cond=0;
 
 
-            printf("\n\n\n\n\n\n\n"); /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+           /* printf("\n\n\n\n\n\n\n"); /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
             aerodrome *ptcurr=donnees->debutaero;
             while(ptcurr->ptsuiv!=NULL)
@@ -207,7 +207,7 @@ void charger_fichiers(file_opener *donnees)
                 printf("%s\n",ptcurr->nom);
                 ptcurr=ptcurr->ptsuiv;
             }/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+*/
             }
 
             }while(cond);
@@ -220,7 +220,7 @@ void charger_fichiers(file_opener *donnees)
 
     if(donnees->what_file==1)
     {
-    g_print("balises: %s\n",donnees->ptchemin);
+    //g_print("balises: %s\n",donnees->ptchemin);
 
         int i,j;
         FILE * fic=NULL;
@@ -235,12 +235,13 @@ void charger_fichiers(file_opener *donnees)
             int cond;
             do
             {
+                nouveau->affichage=0;
                 char chainetempo[20]; //initialisation d'une chaine de caractères temporaire
 
                 j=0;
                 int j0=0;
                 fscanf(fic,"%[^\n]",ligne);
-       printf("%s\n",ligne);
+       //printf("%s\n",ligne);
 
                 while(ligne[j]!=' ')                        //Nom
                 {
@@ -343,9 +344,10 @@ void charger_fichiers(file_opener *donnees)
                     nouveau->dirlong=-1;
                 }
 
-        printf("%s %d°%d'%lf [%d] %d°%d'%lf [%d]",nouveau->nom,nouveau->latdeg,nouveau->latmin,nouveau->latsec,nouveau->dirlat,nouveau->longdeg,nouveau->longmin,nouveau->longsec,nouveau->dirlong);
-        printf("\n\n\n\n\n");
+       // printf("%s %d°%d'%lf [%d] %d°%d'%lf [%d]",nouveau->nom,nouveau->latdeg,nouveau->latmin,nouveau->latsec,nouveau->dirlat,nouveau->longdeg,nouveau->longmin,nouveau->longsec,nouveau->dirlong);
+       // printf("\n\n\n\n\n");
 
+            nouveau->affichage=0; //non affiché par défault
             i++;
             if(fgetc(fic)!=EOF)
             {
@@ -358,8 +360,7 @@ void charger_fichiers(file_opener *donnees)
             {
             cond=0;
 
-
-            printf("\n\n\n\n\n\n\n");/////////////////////////////////////////////
+           /* printf("\n\n\n\n\n\n\n");/////////////////////////////////////////////
                                                                                 //
             balise *ptcurr=donnees->debutbalises;                               //
             while(ptcurr->ptsuiv!=NULL)                                         // sert à rien, c'est pour vérifier que le chainage marche correctement.
@@ -367,7 +368,7 @@ void charger_fichiers(file_opener *donnees)
                 printf("%s\n",ptcurr->nom);                                     //
                 ptcurr=ptcurr->ptsuiv;                                          //
             }/////////////////////////////////////////////////////////////////////
-
+*/
             }
 
             }while(cond);

@@ -45,7 +45,7 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
     gdk_draw_point (carte,gc, 40, 40);
 
     //dessine une ligne (segment) :
-   // gdk_draw_line (carte, gc, 0, 0, 50, 50);
+    //gdk_draw_line (carte, gc, 0, 0, 400, 400);
 
 
 //    gc.set_fill(couleur);

@@ -2456,7 +2456,7 @@
 1399912912 /usr/include/gtk-2.0/gtk/gtktipsquery.h
 	<gtk/gtk.h>
 
-1400841966 /home/fabien/PROJET-GTK/Projet/interface.h
+1400931682 /home/fabien/PROJET-GTK/Projet/interface.h
 	<stdlib.h>
 	<gtk/gtk.h>
 	<string.h>
@@ -2466,15 +2466,16 @@
 1398881787 /home/fabien/PROJET-GTK/Projet/interface.c
 	"interface.h"
 
-1400694247 source:/home/fabien/PROJET-GTK/Projet/interface.c
+1400934603 source:/home/fabien/PROJET-GTK/Projet/interface.c
 	"interface.h"
 	"ouverture_fichiers.h"
 	"cartographie.h"
+	"filtrage.h"
 
 1400542194 /home/fabien/PROJET-GTK/Projet/ouverture_fichiers.h
 	"interface.h"
 
-1400694822 source:/home/fabien/PROJET-GTK/Projet/ouverture_fichiers.c
+1400933972 source:/home/fabien/PROJET-GTK/Projet/ouverture_fichiers.c
 	"interface.h"
 	"ouverture_fichiers.h"
 
@@ -2506,11 +2507,18 @@
 	"ouverture_fichiers.h"
 	"cartographie.h"
 
-1400841733 source:/home/fabien/PROJET-GTK/Projet/cartographie.c
+1400865941 source:/home/fabien/PROJET-GTK/Projet/cartographie.c
 	"interface.h"
 	"ouverture_fichiers.h"
 	"cartographie.h"
 
 1400694247 /home/fabien/PROJET-GTK/Projet/cartographie.h
 	"interface.h"
+
+1400933292 /home/fabien/PROJET-GTK/Projet/filtrage.h
+	"interface.h"
+
+1400936839 source:/home/fabien/PROJET-GTK/Projet/filtrage.c
+	"interface.h"
+	"filtrage.h"
 

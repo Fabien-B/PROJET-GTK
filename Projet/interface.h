@@ -8,11 +8,11 @@
 typedef struct aerodrome{
     double latitude;
     double longitude;
-    char nom[20];
+    char nom[40];
     char oaci[4];
-    int affichage;      //1 si affichage activé, 0 sinon <=====> ne serviras peut être à rien, info à récupérer sur la case à cocher quand elle seras là.
     int pos_x;          //positions x et y sur la zone de dessin, à recalculer quand la zone change de taille
     int pos_y;
+    int affichage;      //1 si affichage activé, 0 sinon
     GtkWidget* coch;
     struct aerodrome * ptsuiv;
 }aerodrome;
@@ -29,9 +29,19 @@ typedef struct balise{
     int dirlong;        //1 si est, -1 si ouest
     int pos_x;          //positions x et y sur la zone de dessin, à recalculer quand la zone change de taille
     int pos_y;
+    int affichage;      //1 si affichage activé, 0 sinon
     GtkWidget* coch;
     struct balise * ptsuiv;
 }balise;
+
+
+typedef struct pdv{
+    char nom[40];
+    int affichage;      //1 si affichage activé, 0 sinon
+    GtkWidget* coch;
+    struct pdv * ptsuiv;
+}pdv;
+
 
 typedef struct file_opener{
 char *ptchemin;
@@ -39,12 +49,11 @@ GtkWidget *file_selection;
 int what_file;
 aerodrome *debutaero;
 balise * debutbalises;
+pdv *debutpdv;
 }file_opener;
 
 void init_interface();
 void APropos(GtkWidget* widget);
-
-
 
 
 

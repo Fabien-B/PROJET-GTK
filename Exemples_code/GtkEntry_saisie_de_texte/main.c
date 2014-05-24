@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <gtk/gtk.h>
 
-//void OnToggle(GtkWidget *pToggle, gpointer data);
-//void OnEtatBtn(GtkWidget *pWidget, gpointer pToggle);
-//void OnAspectBtn(GtkWidget *pWidget, gpointer pToggle);
+void OnToggle(GtkWidget *pToggle, gpointer data);
+void OnEtatBtn(GtkWidget *pWidget, gpointer pToggle);
+void OnAspectBtn(GtkWidget *pWidget, gpointer pToggle);
 
 int main(int argc, char **argv)
 {
@@ -25,8 +25,8 @@ int main(int argc, char **argv)
     /* Création du label du bouton */
     sLabel = g_locale_to_utf8("Etat : Relâché - Aspect : Normal", -1, NULL, NULL, NULL);
     /* Création du bouton GtkToggleButton */
-   // pToggleBtn = gtk_check_button_new_with_label(sLabel);
-    pToggleBtn = gtk_check_button_new();
+    pToggleBtn = gtk_check_button_new_with_label(sLabel);
+    //pToggleBtn = gtk_check_button_new();
     /* Le label sLabel n'est plus utile */
     g_free(sLabel);
 
@@ -46,7 +46,7 @@ int main(int argc, char **argv)
     return EXIT_SUCCESS;
 }
 
-/*void OnEtatBtn(GtkWidget *pWidget, gpointer pToggle)
+void OnEtatBtn(GtkWidget *pWidget, gpointer pToggle)
 {
     gboolean bEtat;
 
@@ -69,9 +69,9 @@ void OnAspectBtn(GtkWidget *pEtatBtn, gpointer pToggle)
 
     // On émet le signal "toggle" pour changer le texte du bouton /
     gtk_toggle_button_toggled(GTK_TOGGLE_BUTTON(pToggle));
-}*/
+}
 
-/*void OnToggle(GtkWidget *pToggle, gpointer data)
+void OnToggle(GtkWidget *pToggle, gpointer data)
 {
     gboolean bEtat;
     gboolean bInconsistent;
@@ -96,4 +96,4 @@ void OnAspectBtn(GtkWidget *pEtatBtn, gpointer pToggle)
     // Les chaînes sLabel et sLabelUtf8 n'ont plus d'utilité
     g_free(sLabel);
     g_free(sLabelUtf8);
-}*/
+}

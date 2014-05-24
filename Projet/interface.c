@@ -1,6 +1,7 @@
 #include "interface.h"
 #include "ouverture_fichiers.h"
 #include "cartographie.h"
+#include "filtrage.h"
 
 void init_interface(int argc, char *argv[])
 {
@@ -25,12 +26,14 @@ void init_interface(int argc, char *argv[])
     GtkWidget *hbox_curseur;
     GtkWidget *label_curseur;
     GtkWidget *curseur;
+    GtkWidget *filtre_button;
 
     file_opener *donnees=g_malloc(sizeof(file_opener));
         donnees->ptchemin=NULL;
         donnees->file_selection=NULL;
         donnees->debutaero=NULL;
         donnees->debutbalises=NULL;
+        donnees->debutpdv=NULL;
 
 
  // Initialisation de Gtk+
@@ -106,6 +109,10 @@ void init_interface(int argc, char *argv[])
     curseur=gtk_hscale_new_with_range (5,200 ,100);
     gtk_container_add(GTK_CONTAINER(hbox_curseur), curseur);
 
+    filtre_button=gtk_button_new_with_label("Filtres");
+    gtk_box_pack_start(GTK_BOX(work_zr),filtre_button,FALSE,FALSE,0);
+    g_signal_connect(GTK_BUTTON(filtre_button),"clicked",G_CALLBACK(filtres),donnees);
+
 // Gère le rafraichissement
     g_signal_connect (G_OBJECT (carte), "expose-event", G_CALLBACK (expose_cb), donnees);
 
@@ -122,6 +129,4 @@ void APropos(GtkWidget* widget)
     gtk_dialog_run(GTK_DIALOG(APropos_box));
     gtk_widget_destroy(APropos_box);
 }
-
-
 
