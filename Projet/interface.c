@@ -27,6 +27,7 @@ void init_interface(int argc, char *argv[])
     GtkWidget *label_curseur;
     GtkWidget *curseur;
     GtkWidget *filtre_button;
+    GtkWidget *voir_pdv_button;
 
     file_opener *donnees=g_malloc(sizeof(file_opener));
         donnees->ptchemin=NULL;
@@ -113,6 +114,10 @@ void init_interface(int argc, char *argv[])
     gtk_box_pack_start(GTK_BOX(work_zr),filtre_button,FALSE,FALSE,0);
     g_signal_connect(GTK_BUTTON(filtre_button),"clicked",G_CALLBACK(filtres),donnees);
 
+    voir_pdv_button=gtk_button_new_with_label("voir les plans de vols");
+    gtk_box_pack_start(GTK_BOX(work_zr),voir_pdv_button,FALSE,FALSE,0);
+    g_signal_connect(GTK_BUTTON(voir_pdv_button),"clicked",G_CALLBACK(voir_pdv),donnees);
+
 // Gère le rafraichissement
     g_signal_connect (G_OBJECT (carte), "expose-event", G_CALLBACK (expose_cb), donnees);
 
@@ -130,3 +135,81 @@ void APropos(GtkWidget* widget)
     gtk_widget_destroy(APropos_box);
 }
 
+void voir_pdv(GtkWidget *bouton, file_opener* donnees)
+{
+    GtkWidget *pdvw;
+    GtkWidget* box;
+    GtkWidget *scrollbar;
+
+    //init fenêtre
+    pdvw = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+
+    gtk_window_set_title(GTK_WINDOW(pdvw), "Plans de vols");
+    gtk_window_set_default_size(GTK_WINDOW(pdvw), 10, 500);
+    gtk_window_set_position(GTK_WINDOW(pdvw),GTK_WIN_POS_CENTER);
+
+    //init scrollbar
+    scrollbar = gtk_scrolled_window_new(NULL, NULL);
+    gtk_container_add(GTK_CONTAINER(pdvw),scrollbar);
+
+    //création et ajout d'une boite dans la fenètre scroll
+    box=gtk_hbox_new(FALSE,0);
+    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrollbar), box);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollbar), GTK_POLICY_NEVER, GTK_POLICY_ALWAYS); //Never: désactive la barre, Always, l'inverse
+
+    if(donnees->debutpdv!=NULL)
+    {
+        char texte[3000];
+        texte[0]='\0';
+
+        pdv *pdv_current=donnees->debutpdv;
+
+        while(pdv_current!=NULL)
+        {
+            sprintf(texte,"%s\n\n%s\n\tNiveau de vol:FL%d\n",texte,pdv_current->nom,pdv_current->altitude);
+            pt_pass* passage=pdv_current->pass_debut;
+
+            while(passage->ptsuiv!=NULL)
+            {
+                if(passage->type_point==0)
+                {
+                    aerodrome* pdvae=passage->point;
+                    sprintf(texte,"%s\n\t%s",texte,pdvae->nom);
+                    //printf("aero:  %s\n",pdvae->nom);
+                }
+                if(passage->type_point==1)
+                {
+                    balise* pdvbal=passage->point;
+                    sprintf(texte,"%s\n\t%s",texte,pdvbal->nom);
+                    //printf("bali:  %s\n",pdvbal->nom);
+                }
+
+                passage=passage->ptsuiv;
+
+            }
+             sprintf(texte,"%s\n---------------",texte);
+
+
+
+
+            pdv_current=pdv_current->ptsuiv;
+        }
+
+
+
+
+
+
+
+    GtkWidget* label;
+    label=gtk_label_new(texte);
+    gtk_container_add(GTK_CONTAINER(box), label);
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+
+
+    }
+
+
+        gtk_widget_show_all(pdvw);  //afficher la fenètre
+
+}

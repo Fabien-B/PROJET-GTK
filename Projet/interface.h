@@ -8,7 +8,7 @@
 typedef struct aerodrome{
     double latitude;
     double longitude;
-    char nom[40];
+    char nom[100];
     char oaci[4];
     int pos_x;          //positions x et y sur la zone de dessin, à recalculer quand la zone change de taille
     int pos_y;
@@ -35,8 +35,17 @@ typedef struct balise{
 }balise;
 
 
+typedef struct pt_pass{
+    void *point;
+    int type_point;
+    struct pt_pass * ptsuiv;
+}pt_pass;
+
 typedef struct pdv{
-    char nom[40];
+    char nom[100];
+    int altitude;
+    pt_pass *pass_debut;
+    pt_pass *pass_fin;
     int affichage;      //1 si affichage activé, 0 sinon
     GtkWidget* coch;
     struct pdv * ptsuiv;
@@ -54,7 +63,7 @@ pdv *debutpdv;
 
 void init_interface();
 void APropos(GtkWidget* widget);
-
+void voir_pdv(GtkWidget *bouton, file_opener* donnees);
 
 
 

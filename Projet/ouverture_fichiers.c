@@ -83,7 +83,7 @@ void combo_selected(GtkWidget *widget,file_opener *donnees)
   {
     donnees->what_file=2;
   }
-    g_print("%d\n",donnees->what_file);
+    //g_print("%d\n",donnees->what_file);
 
   g_free(text);
 }
@@ -103,7 +103,7 @@ void charger_fichiers(file_opener *donnees)
     {
     //g_print("aérodrome: %s\n",donnees->ptchemin);
 
-        int i,j;
+        int j;
         FILE * fic=NULL;
         fic=fopen(donnees->ptchemin,"r");
         char ligne[50];
@@ -112,7 +112,6 @@ void charger_fichiers(file_opener *donnees)
             aerodrome * nouveau=malloc(sizeof(aerodrome));
             donnees->debutaero=nouveau;
             nouveau->ptsuiv=NULL;
-            i=0;
             int cond;
             do
             {
@@ -121,6 +120,7 @@ void charger_fichiers(file_opener *donnees)
                 j=0;
                 int j0=0;
                 fscanf(fic,"%[^\n]",ligne);
+        //printf("%s\n",ligne);
 
                 while(ligne[j]!=',')        //------------------------ lecture de la latitude ---------------------------//
                 {
@@ -185,7 +185,7 @@ void charger_fichiers(file_opener *donnees)
 
 
             nouveau->affichage=0; //non affiché par défault
-            i++;
+
             if(fgetc(fic)!=EOF)
             {
                 cond=1;
@@ -222,7 +222,7 @@ void charger_fichiers(file_opener *donnees)
     {
     //g_print("balises: %s\n",donnees->ptchemin);
 
-        int i,j;
+        int j;
         FILE * fic=NULL;
         fic=fopen(donnees->ptchemin,"r");
         char ligne[50];
@@ -231,7 +231,7 @@ void charger_fichiers(file_opener *donnees)
             balise * nouveau=malloc(sizeof(balise));
             donnees->debutbalises=nouveau;
             nouveau->ptsuiv=NULL;
-            i=0;
+
             int cond;
             do
             {
@@ -348,7 +348,6 @@ void charger_fichiers(file_opener *donnees)
        // printf("\n\n\n\n\n");
 
             nouveau->affichage=0; //non affiché par défault
-            i++;
             if(fgetc(fic)!=EOF)
             {
                 cond=1;
@@ -378,11 +377,180 @@ void charger_fichiers(file_opener *donnees)
 //_____________________________________________________________________________plan de vols_________________________________________________________________________________________________
 
     }
+//__________________________________________________________________________________________________________________________________________________________________________________________
+//_____________________________________________________________________________plans de vols________________________________________________________________________________________________
     if(donnees->what_file==2)
     {
-        g_print("plan de vols: %s\n",donnees->ptchemin);
-    }
 
+        int j=0;
+        FILE * fic=NULL;
+        fic=fopen(donnees->ptchemin,"r");
+        char ligne[50];
+        if(fic!=NULL)
+        {
+
+            int j0=0;
+            pdv * nouveau=malloc(sizeof(pdv));
+            donnees->debutpdv=nouveau;
+            nouveau->ptsuiv=NULL;
+            nouveau->pass_debut=NULL;
+            nouveau->pass_fin=NULL;
+            int cond;
+            do      //tant qu'on est pas arrivé à la fin du fichier.
+            {
+
+                char chainetempo[60]; //initialisation d'une chaine de caractères temporaire
+                char type[60];
+
+                fscanf(fic,"%[^\n]",nouveau->nom);  //récupération du nom du PDV
+//printf("%s\n",nouveau->nom);
+                fgetc(fic);      //pour passer à la ligne suivante
+                fscanf(fic,"%d",&nouveau->altitude);
+//printf("%d\n",nouveau->altitude);
+                fgetc(fic);
+
+                fscanf(fic,"%[^\n]",ligne);
+
+
+
+                nouveau->pass_debut=malloc(sizeof(pt_pass));
+                pt_pass* pass_current=nouveau->pass_debut;
+                pass_current->point=NULL;
+
+
+                do
+                {
+                    fgetc(fic);
+                    j=0;
+                    while(ligne[j]!=' ')        //------------------------ lecture du type de point (aérodrome ou balise) ---------------------------//
+                    {
+                        type[j]=ligne[j];
+                        j++;
+
+                    }
+                    type[j]='\0';
+//printf("%s\n",type);
+
+
+
+
+                    if(!strcmp(type,"OACI"))        //------------------------ si le point suivant est un aérodrome ---------------------------//
+                    {
+//g_print("Aero   :");
+
+
+
+                        pass_current->type_point=0;     //indique que c'est un aérodrome
+                        j+=2;
+                        j0=j;
+
+                        while(ligne[j]!='"')
+                        {
+                            chainetempo[j-j0]=ligne[j];
+                            j++;
+                        }
+                        chainetempo[j-j0]='\0';
+//printf("%s    ===    ",chainetempo);
+
+
+                        if(donnees->debutaero!=NULL)
+                        {
+                            aerodrome* pt_current=donnees->debutaero;
+
+                            while(pt_current!=NULL)
+                            {
+
+                                if(!strcmp(chainetempo,pt_current->oaci))
+                                {
+                                    pass_current->point=pt_current;
+//printf("%s sélectionné\n",pt_current->oaci);
+                                }
+                                pt_current=pt_current->ptsuiv;
+                            }
+
+                        }
+
+                    }
+
+
+                    if(!strcmp(type,"balise"))            //------------------------ si le point suivant est une balise---------------------------//
+                    {
+//g_print("Balise :");
+
+
+                        pass_current->type_point=1;     //indique que c'est une balise
+                        j+=2;
+                        j0=j;
+
+                        while(ligne[j]!='"')
+                        {
+                            chainetempo[j-j0]=ligne[j];
+                            j++;
+                        }
+                        chainetempo[j-j0]='\0';
+//printf("%s    ===    ",chainetempo);
+
+
+                        if(donnees->debutbalises!=NULL)
+                        {
+                            balise* pt_current=donnees->debutbalises;
+
+                            while(pt_current!=NULL)
+                            {
+
+                                if(!strcmp(chainetempo,pt_current->nom))
+                                {
+                                    pass_current->point=pt_current;
+//printf("%s sélectionné\n",pt_current->nom);
+                                }
+                                pt_current=pt_current->ptsuiv;
+                            }
+                        }
+                    }
+
+                    nouveau->affichage=0; //non affiché par défault
+
+
+
+                    pass_current->ptsuiv=malloc(sizeof(pt_pass));
+                    pass_current=pass_current->ptsuiv;
+                    pass_current->ptsuiv=NULL;
+                    pass_current->point=NULL;
+
+
+
+
+
+                    fscanf(fic,"%[^\n]",ligne);
+
+
+
+                }while(strcmp(ligne,";"));
+                fgetc(fic);
+
+//printf("\n\n\n\n\n");
+
+
+            if(fgetc(fic)!=EOF)
+            {
+                cond=1;
+                nouveau->ptsuiv=malloc(sizeof(pdv));
+                nouveau=nouveau->ptsuiv;
+                nouveau->ptsuiv=NULL;
+            }
+            else
+            {
+            cond=0;
+            }
+            }while(cond);
+        fclose(fic);
+
+
+
+
+        }
+
+    }
 
 
     donnees->file_selection=NULL;

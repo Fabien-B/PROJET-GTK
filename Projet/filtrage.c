@@ -9,7 +9,8 @@ void filtres(GtkWidget* button, file_opener* donnees)
     GtkWidget* boxaero;
     GtkWidget* boxbalises;
     GtkWidget* boxpdv;
-
+    GtkWidget* box1;
+    GtkWidget* actualiserbt;
     //init fenêtre
     filw = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
@@ -22,9 +23,17 @@ void filtres(GtkWidget* button, file_opener* donnees)
     gtk_container_add(GTK_CONTAINER(filw),scrollbar);
 
     //création et ajout d'une boite dans la fenètre scroll
-    box=gtk_hbox_new(FALSE,0);
-    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrollbar), box);
+    box1=gtk_vbox_new(FALSE,0);
+    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrollbar), box1);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollbar), GTK_POLICY_NEVER, GTK_POLICY_ALWAYS); //Never: désactive la barre, Always, l'inverse
+
+    actualiserbt=gtk_button_new_with_label("Actualiser l'affichage");
+    gtk_box_pack_start(GTK_BOX(box1),actualiserbt,FALSE,FALSE,0);
+    //callback ici
+
+    box=gtk_hbox_new(FALSE,0);
+    gtk_box_pack_start(GTK_BOX(box1), box, FALSE, FALSE, 0);
+
 
     boxaero=gtk_vbox_new(FALSE,0);      //3 boites pour les aérodromes, les balises et les plan de vols
     boxbalises=gtk_vbox_new(FALSE,0);
@@ -112,10 +121,12 @@ if(donnees->debutpdv!=NULL)
     g_signal_connect(G_OBJECT(is), "clicked", G_CALLBACK(invert_selection_pdv), donnees);
 
     pdv* pt_current=donnees->debutpdv;
-    while(pt_current->ptsuiv!=NULL)                 //création et initialisation des checkbox
+    while(pt_current!=NULL)                 //création et initialisation des checkbox
     {
+
         char label[100];
-        sprintf(label,"%s\n",pt_current->nom);
+
+        sprintf(label,"%s\n", pt_current->nom);
         pt_current->coch=gtk_check_button_new_with_label(label);
         gtk_box_pack_start(GTK_BOX(boxpdv),pt_current->coch,FALSE,FALSE,0);
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pt_current->coch), (pt_current->affichage));
@@ -227,7 +238,7 @@ void select_all_pdv(GtkWidget* button, file_opener* donnees)       //fonction po
 
     if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pt_current->coch)))       //on se base sur l'état du 1er pour savoir si on coche ou on décoche
     {
-        while(pt_current->ptsuiv!=NULL)
+        while(pt_current!=NULL)
         {
             gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pt_current->coch), (FALSE));
             pt_current->affichage=0;
@@ -236,7 +247,7 @@ void select_all_pdv(GtkWidget* button, file_opener* donnees)       //fonction po
     }
     else
     {
-        while(pt_current->ptsuiv!=NULL)
+        while(pt_current!=NULL)
             {
                 gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pt_current->coch), (TRUE));
                 pt_current->affichage=1;
@@ -249,7 +260,7 @@ void select_all_pdv(GtkWidget* button, file_opener* donnees)       //fonction po
 void invert_selection_pdv(GtkWidget* button, file_opener* donnees)     //inverser la sélection des plans de vols
 {
     pdv* pt_current=donnees->debutpdv;
-    while(pt_current->ptsuiv!=NULL)
+    while(pt_current!=NULL)
         {
             gboolean bEtat;
             bEtat = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pt_current->coch));
