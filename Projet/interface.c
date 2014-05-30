@@ -2,6 +2,7 @@
 #include "ouverture_fichiers.h"
 #include "cartographie.h"
 #include "filtrage.h"
+#include "ajouts_utilisateur.h"
 
 void init_interface(int argc, char *argv[])
 {
@@ -11,7 +12,6 @@ void init_interface(int argc, char *argv[])
     GtkWidget *work_zone;
     GtkWidget *work_zl;
     GtkWidget *work_zr;
-    GtkWidget *carte;
 
     GtkWidget *menu_bar;
     GtkWidget *Fichier_menu;
@@ -28,6 +28,8 @@ void init_interface(int argc, char *argv[])
     GtkWidget *curseur;
     GtkWidget *filtre_button;
     GtkWidget *voir_pdv_button;
+    GtkWidget *ajouter_pdv_button;
+
 
     file_opener *donnees=g_malloc(sizeof(file_opener));
         donnees->ptchemin=NULL;
@@ -35,6 +37,7 @@ void init_interface(int argc, char *argv[])
         donnees->debutaero=NULL;
         donnees->debutbalises=NULL;
         donnees->debutpdv=NULL;
+        donnees->finpdv=NULL;
 
 
  // Initialisation de Gtk+
@@ -97,9 +100,9 @@ void init_interface(int argc, char *argv[])
 
 //Création de la carte
 
-    carte = gtk_drawing_area_new ();
-    gtk_drawing_area_size (GTK_DRAWING_AREA(carte), 400,400);
-    gtk_box_pack_start (GTK_BOX (work_zl), carte, TRUE, TRUE, 0);
+    donnees->carte = gtk_drawing_area_new ();
+    gtk_drawing_area_size (GTK_DRAWING_AREA(donnees->carte), 440,443);
+    gtk_box_pack_start (GTK_BOX (work_zl), donnees->carte, TRUE, TRUE, 0);
 
 
 
@@ -118,8 +121,20 @@ void init_interface(int argc, char *argv[])
     gtk_box_pack_start(GTK_BOX(work_zr),voir_pdv_button,FALSE,FALSE,0);
     g_signal_connect(GTK_BUTTON(voir_pdv_button),"clicked",G_CALLBACK(voir_pdv),donnees);
 
+    ajouter_pdv_button=gtk_button_new_with_label("Ajouter un plan de vol");
+    gtk_box_pack_start(GTK_BOX(work_zr),ajouter_pdv_button,FALSE,FALSE,0);
+//    g_signal_connect(GTK_BUTTON(ajouter_pdv_button),"clicked",G_CALLBACK(ajouter_plan_de_vol),donnees);
+
 // Gère le rafraichissement
-    g_signal_connect (G_OBJECT (carte), "expose-event", G_CALLBACK (expose_cb), donnees);
+    g_signal_connect (G_OBJECT (donnees->carte), "expose-event", G_CALLBACK (expose_cb), donnees);
+
+// Debug rapide
+     GtkWidget * rapide_file_button;
+
+    rapide_file_button=gtk_button_new_with_label("Chargement rapide");
+    gtk_box_pack_start(GTK_BOX(work_zr),rapide_file_button,FALSE,FALSE,0);
+    g_signal_connect(GTK_BUTTON(rapide_file_button),"clicked",G_CALLBACK(rapide_file),donnees);
+
 
     gtk_widget_show_all(Window);
 }
@@ -145,7 +160,7 @@ void voir_pdv(GtkWidget *bouton, file_opener* donnees)
     pdvw = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
     gtk_window_set_title(GTK_WINDOW(pdvw), "Plans de vols");
-    gtk_window_set_default_size(GTK_WINDOW(pdvw), 10, 500);
+    gtk_window_set_default_size(GTK_WINDOW(pdvw), 250, 500);
     gtk_window_set_position(GTK_WINDOW(pdvw),GTK_WIN_POS_CENTER);
 
     //init scrollbar
@@ -174,13 +189,13 @@ void voir_pdv(GtkWidget *bouton, file_opener* donnees)
                 if(passage->type_point==0)
                 {
                     aerodrome* pdvae=passage->point;
-                    sprintf(texte,"%s\n\t%s",texte,pdvae->nom);
+                    sprintf(texte,"%s\n\t%s  ",texte,pdvae->nom);
                     //printf("aero:  %s\n",pdvae->nom);
                 }
                 if(passage->type_point==1)
                 {
                     balise* pdvbal=passage->point;
-                    sprintf(texte,"%s\n\t%s",texte,pdvbal->nom);
+                    sprintf(texte,"%s\n\t%s  ",texte,pdvbal->nom);
                     //printf("bali:  %s\n",pdvbal->nom);
                 }
 
@@ -208,8 +223,49 @@ void voir_pdv(GtkWidget *bouton, file_opener* donnees)
 
 
     }
+    else
+    {
+        GtkWidget* lab;
+        lab=gtk_label_new("  Aucun plan de vol n'a été chargé !");
+        gtk_box_pack_start(GTK_BOX(box),lab,FALSE,FALSE,0);
+    }
 
 
         gtk_widget_show_all(pdvw);  //afficher la fenètre
 
 }
+
+
+void rapide_file(GtkWidget * widget, file_opener * donnees)
+{
+donnees->what_file=0;
+donnees->ptchemin="aerodromes_fr.txt";
+
+charger_fichiers(donnees);
+
+donnees->what_file=1;
+donnees->ptchemin="balises_fr.txt";
+
+charger_fichiers(donnees);
+
+
+donnees->what_file=2;
+donnees->ptchemin="PDV.txt";
+
+charger_fichiers(donnees);
+
+}
+
+
+void redessiner(GtkWidget * carte) // force le rafraichissement
+{
+gtk_widget_queue_draw(carte);
+}
+
+void redessiner_widget(GtkWidget* button, GtkWidget * carte) // force le rafraichissement
+{
+gtk_widget_queue_draw(carte);
+}
+
+
+

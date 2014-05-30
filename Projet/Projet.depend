@@ -2456,7 +2456,7 @@
 1399912912 /usr/include/gtk-2.0/gtk/gtktipsquery.h
 	<gtk/gtk.h>
 
-1401376027 /home/fabien/PROJET-GTK/Projet/interface.h
+1401382043 /home/fabien/PROJET-GTK/Projet/interface.h
 	<stdlib.h>
 	<gtk/gtk.h>
 	<string.h>
@@ -2466,46 +2466,49 @@
 1398881787 /home/fabien/PROJET-GTK/Projet/interface.c
 	"interface.h"
 
-1401379521 source:/home/fabien/PROJET-GTK/Projet/interface.c
+1401383093 source:/home/fabien/PROJET-GTK/Projet/interface.c
 	"interface.h"
 	"ouverture_fichiers.h"
 	"cartographie.h"
 	"filtrage.h"
+	"ajouts_utilisateur.h"
 
 1400542194 /home/fabien/PROJET-GTK/Projet/ouverture_fichiers.h
 	"interface.h"
 
-1401378591 source:/home/fabien/PROJET-GTK/Projet/ouverture_fichiers.c
+1401384384 source:/home/fabien/PROJET-GTK/Projet/ouverture_fichiers.c
 	"interface.h"
 	"ouverture_fichiers.h"
 
-1400684893 source:/home/xavier/0/PROJET-GTK/Projet/main.c
+1400536018 source:/home/xavier/0/PROJET-GTK/Projet/main.c
 	"interface.h"
 
-1400692056 /home/xavier/0/PROJET-GTK/Projet/interface.h
+1401437662 /home/xavier/0/PROJET-GTK/Projet/interface.h
 	<stdlib.h>
 	<gtk/gtk.h>
 	<string.h>
 
-1400691464 source:/home/xavier/0/PROJET-GTK/Projet/ouverture_fichiers.c
+1401440202 source:/home/xavier/0/PROJET-GTK/Projet/ouverture_fichiers.c
 	"interface.h"
 	"ouverture_fichiers.h"
 
-1400684893 /home/xavier/0/PROJET-GTK/Projet/ouverture_fichiers.h
+1401429480 /home/xavier/0/PROJET-GTK/Projet/ouverture_fichiers.h
 	"interface.h"
 
-1400686032 source:/home/xavier/0/PROJET-GTK/Projet/cartographie.c
-	"interface.h"
-	"ouverture_fichiers.h"
-	"cartographie.h"
-
-1400685813 /home/xavier/0/PROJET-GTK/Projet/cartographie.h
-	"interface.h"
-
-1400691650 source:/home/xavier/0/PROJET-GTK/Projet/interface.c
+1401443651 source:/home/xavier/0/PROJET-GTK/Projet/cartographie.c
 	"interface.h"
 	"ouverture_fichiers.h"
 	"cartographie.h"
+
+1400694247 /home/xavier/0/PROJET-GTK/Projet/cartographie.h
+	"interface.h"
+
+1401444049 source:/home/xavier/0/PROJET-GTK/Projet/interface.c
+	"interface.h"
+	"ouverture_fichiers.h"
+	"cartographie.h"
+	"filtrage.h"
+	"ajouts_utilisateur.h"
 
 1400865941 source:/home/fabien/PROJET-GTK/Projet/cartographie.c
 	"interface.h"
@@ -2518,7 +2521,99 @@
 1400933292 /home/fabien/PROJET-GTK/Projet/filtrage.h
 	"interface.h"
 
-1401380595 source:/home/fabien/PROJET-GTK/Projet/filtrage.c
-	"interface.h"
+1401382662 source:/home/fabien/PROJET-GTK/Projet/filtrage.c
 	"filtrage.h"
+
+1401384293 source:/home/fabien/PROJET-GTK/Projet/ajouts_utilisateur.c
+	"ajouts_utilisateur.h"
+
+1401382887 /home/fabien/PROJET-GTK/Projet/ajouts_utilisateur.h
+	"interface.h"
+
+1401382662 source:/media/xavier/CLEF 64/PROJET-GTK-Fabien-29-05-2014/Projet/filtrage.c
+	"filtrage.h"
+
+1400933292 /media/xavier/CLEF 64/PROJET-GTK-Fabien-29-05-2014/Projet/filtrage.h
+	"interface.h"
+
+1401429003 /media/xavier/CLEF 64/PROJET-GTK-Fabien-29-05-2014/Projet/interface.h
+	<stdlib.h>
+	<gtk/gtk.h>
+	<string.h>
+
+1401383093 source:/media/xavier/CLEF 64/PROJET-GTK-Fabien-29-05-2014/Projet/interface.c
+	"interface.h"
+	"ouverture_fichiers.h"
+	"cartographie.h"
+	"filtrage.h"
+	"ajouts_utilisateur.h"
+
+1400542194 /media/xavier/CLEF 64/PROJET-GTK-Fabien-29-05-2014/Projet/ouverture_fichiers.h
+	"interface.h"
+
+1400694247 /media/xavier/CLEF 64/PROJET-GTK-Fabien-29-05-2014/Projet/cartographie.h
+	"interface.h"
+
+1401382887 /media/xavier/CLEF 64/PROJET-GTK-Fabien-29-05-2014/Projet/ajouts_utilisateur.h
+	"interface.h"
+
+1400536018 source:/media/xavier/CLEF 64/PROJET-GTK-Fabien-29-05-2014/Projet/main.c
+	"interface.h"
+
+1401384384 source:/media/xavier/CLEF 64/PROJET-GTK-Fabien-29-05-2014/Projet/ouverture_fichiers.c
+	"interface.h"
+	"ouverture_fichiers.h"
+
+1401428683 source:/media/xavier/CLEF 64/PROJET-GTK-Fabien-29-05-2014/Projet/cartographie.c
+	"interface.h"
+	"ouverture_fichiers.h"
+	"cartographie.h"
+
+1401436161 source:/home/xavier/Bureau/PROJET-GTK-Fabien-29-05-2014/Projet/cartographie.c
+	"interface.h"
+	"ouverture_fichiers.h"
+	"cartographie.h"
+
+1401437662 /home/xavier/Bureau/PROJET-GTK-Fabien-29-05-2014/Projet/interface.h
+	<stdlib.h>
+	<gtk/gtk.h>
+	<string.h>
+
+1401429480 /home/xavier/Bureau/PROJET-GTK-Fabien-29-05-2014/Projet/ouverture_fichiers.h
+	"interface.h"
+
+1400694247 /home/xavier/Bureau/PROJET-GTK-Fabien-29-05-2014/Projet/cartographie.h
+	"interface.h"
+
+1401437276 source:/home/xavier/Bureau/PROJET-GTK-Fabien-29-05-2014/Projet/filtrage.c
+	"filtrage.h"
+
+1400933292 /home/xavier/Bureau/PROJET-GTK-Fabien-29-05-2014/Projet/filtrage.h
+	"interface.h"
+
+1401436077 source:/home/xavier/Bureau/PROJET-GTK-Fabien-29-05-2014/Projet/interface.c
+	"interface.h"
+	"ouverture_fichiers.h"
+	"cartographie.h"
+	"filtrage.h"
+	"ajouts_utilisateur.h"
+
+1401382887 /home/xavier/Bureau/PROJET-GTK-Fabien-29-05-2014/Projet/ajouts_utilisateur.h
+	"interface.h"
+
+1400536018 source:/home/xavier/Bureau/PROJET-GTK-Fabien-29-05-2014/Projet/main.c
+	"interface.h"
+
+1401436247 source:/home/xavier/Bureau/PROJET-GTK-Fabien-29-05-2014/Projet/ouverture_fichiers.c
+	"interface.h"
+	"ouverture_fichiers.h"
+
+1401437276 source:/home/xavier/0/PROJET-GTK/Projet/filtrage.c
+	"filtrage.h"
+
+1400933292 /home/xavier/0/PROJET-GTK/Projet/filtrage.h
+	"interface.h"
+
+1401382887 /home/xavier/0/PROJET-GTK/Projet/ajouts_utilisateur.h
+	"interface.h"
 

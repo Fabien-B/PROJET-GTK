@@ -1,4 +1,3 @@
-#include "interface.h"
 #include "filtrage.h"
 
 void filtres(GtkWidget* button, file_opener* donnees)
@@ -29,7 +28,7 @@ void filtres(GtkWidget* button, file_opener* donnees)
 
     actualiserbt=gtk_button_new_with_label("Actualiser l'affichage");
     gtk_box_pack_start(GTK_BOX(box1),actualiserbt,FALSE,FALSE,0);
-    //callback ici
+    g_signal_connect(G_OBJECT(actualiserbt), "clicked", G_CALLBACK(redessiner_widget), donnees->carte);
 
     box=gtk_hbox_new(FALSE,0);
     gtk_box_pack_start(GTK_BOX(box1), box, FALSE, FALSE, 0);
@@ -69,6 +68,7 @@ if(donnees->debutaero!=NULL)
         gtk_box_pack_start(GTK_BOX(boxaero),pt_current->coch,FALSE,FALSE,0);
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pt_current->coch), (pt_current->affichage));
         g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(check_aero), pt_current);
+        g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(redessiner_widget), donnees->carte);
         pt_current=pt_current->ptsuiv;
     }
 
@@ -99,6 +99,7 @@ if(donnees->debutbalises!=NULL)
         gtk_box_pack_start(GTK_BOX(boxbalises),pt_current->coch,FALSE,FALSE,0);
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pt_current->coch), (pt_current->affichage));
         g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(check_balise), pt_current);
+        g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(redessiner_widget), donnees->carte);
         pt_current=pt_current->ptsuiv;
     }
 
@@ -171,6 +172,7 @@ void select_all_aero(GtkWidget* button, file_opener* donnees)       //fonction p
             {
                 gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pt_current->coch), (TRUE));
                 pt_current->affichage=1;
+                //printf("ok\n");
                 pt_current=pt_current->ptsuiv;
             }
     }

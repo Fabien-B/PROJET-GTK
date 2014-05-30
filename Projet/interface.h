@@ -9,35 +9,37 @@ typedef struct aerodrome{
     double latitude;
     double longitude;
     char nom[100];
-    char oaci[4];
-    int pos_x;          //positions x et y sur la zone de dessin, à recalculer quand la zone change de taille
-    int pos_y;
+    char oaci[5];
+    double pos_x;          //positions x et y sur la zone de dessin, à recalculer quand la zone change de taille
+    double pos_y;
     int affichage;      //1 si affichage activé, 0 sinon
     GtkWidget* coch;
     struct aerodrome * ptsuiv;
+    struct aerodrome * pt_aero_current;
 }aerodrome;
 
 typedef struct balise{
     char nom[10];
-    int latdeg;
-    int latmin;
+    double latdeg;
+    double latmin;
     double latsec;
     int dirlat;         //1 si nord, -1 si sud
-    int longdeg;
-    int longmin;
+    double longdeg;
+    double longmin;
     double longsec;
     int dirlong;        //1 si est, -1 si ouest
-    int pos_x;          //positions x et y sur la zone de dessin, à recalculer quand la zone change de taille
-    int pos_y;
+    double pos_x;          //positions x et y sur la zone de dessin, à recalculer quand la zone change de taille
+    double pos_y;
     int affichage;      //1 si affichage activé, 0 sinon
     GtkWidget* coch;
     struct balise * ptsuiv;
+    struct balise * pt_balise_current;
 }balise;
 
 
 typedef struct pt_pass{
     void *point;
-    int type_point;
+    int type_point; // 0 aérodrome et 1 balise
     struct pt_pass * ptsuiv;
 }pt_pass;
 
@@ -57,13 +59,21 @@ char *ptchemin;
 GtkWidget *file_selection;
 int what_file;
 aerodrome *debutaero;
-balise * debutbalises;
+balise *debutbalises;
 pdv *debutpdv;
+pdv *finpdv;
+GtkWidget *carte;
 }file_opener;
 
 void init_interface();
 void APropos(GtkWidget* widget);
 void voir_pdv(GtkWidget *bouton, file_opener* donnees);
+void redessiner(GtkWidget * carte);
+void redessiner_widget(GtkWidget* button, GtkWidget * carte);
+
+
+void rapide_file(GtkWidget * widget, file_opener * donnees);
+
 
 
 
