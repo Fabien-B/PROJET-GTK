@@ -63,6 +63,7 @@ void init_interface(int argc, char *argv[])
     Fichier_menu = gtk_menu_new();
         MI2_Nouveau = gtk_menu_item_new_with_label("Nouveau");
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Nouveau);
+            g_signal_connect(G_OBJECT(MI2_Nouveau), "activate", G_CALLBACK(liberer_memoire), donnees);
         MI2_Ouvrir = gtk_menu_item_new_with_label("Ouvrir");
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Ouvrir);
                 //g_signal_connect(G_OBJECT(MI2_Ouvrir), "activate", G_CALLBACK(creer_file_selection), donnees);
@@ -188,15 +189,34 @@ void voir_pdv(GtkWidget *bouton, file_opener* donnees)
             {
                 if(passage->type_point==0)
                 {
-                    aerodrome* pdvae=passage->point;
+                    if(passage->point!=NULL)
+                    {
+                        aerodrome* pdvae=passage->point;
                     sprintf(texte,"%s\n\t%s  ",texte,pdvae->nom);
                     //printf("aero:  %s\n",pdvae->nom);
+                    }
+                    else
+                    {
+                        sprintf(texte,"%s\n\tPoint introuvable  ",texte);
+                    }
+
+
+
                 }
                 if(passage->type_point==1)
                 {
-                    balise* pdvbal=passage->point;
-                    sprintf(texte,"%s\n\t%s  ",texte,pdvbal->nom);
-                    //printf("bali:  %s\n",pdvbal->nom);
+
+                    if(passage->point!=NULL)
+                    {
+                        balise* pdvbal=passage->point;
+                        sprintf(texte,"%s\n\t%s  ",texte,pdvbal->nom);
+                        //printf("bali:  %s\n",pdvbal->nom);
+                    }
+                    else
+                    {
+                        sprintf(texte,"%s\nPoint non trouvé  ",texte);
+                    }
+
                 }
 
                 passage=passage->ptsuiv;

@@ -602,5 +602,46 @@ void conversion(file_opener *donnees)
 }
 
 
+void liberer_memoire(GtkWidget *bouton, file_opener *donnees)
+{
+    aerodrome* pt_current_aero= donnees->debutaero;
+    while(pt_current_aero!=NULL)
+    {
+        aerodrome* pt2=pt_current_aero->ptsuiv;
+        free(pt_current_aero);
+        pt_current_aero=pt2;
+    }
+    donnees->debutaero=NULL;
+
+    balise* pt_current_balises= donnees->debutbalises;
+    while(pt_current_balises!=NULL)
+    {
+        balise* pt2=pt_current_balises->ptsuiv;
+        free(pt_current_balises);
+        pt_current_balises=pt2;
+    }
+    donnees->debutbalises=NULL;
+
+    pdv* pt_current_pvd=donnees->debutpdv;
+    while(pt_current_pvd!=NULL)
+    {
+        pdv* pt2=pt_current_pvd->ptsuiv;
+
+        pt_pass* pass_current=pt_current_pvd->pass_debut;
+        while(pass_current!=NULL)
+        {
+            pt_pass* pass2=pass_current->ptsuiv;
+            free(pass_current);
+            pass_current=pass2;
+        }
+
+        free(pt_current_pvd);
+        pt_current_pvd=pt2;
+
+    }
+    donnees->debutpdv=NULL;
+
+    redessiner(donnees->carte);
+}
 
 
