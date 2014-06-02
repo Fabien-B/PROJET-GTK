@@ -66,6 +66,120 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
         pt_balise = pt_balise->ptsuiv;
         }
     }
+
+
+
+    if(donnees->debutpdv!=NULL) // Rentre si un plan de vol est chargé
+    {
+//printf("boucle : 1\n");
+    pdv * pt_pdv_current=donnees->debutpdv;
+
+        while(pt_pdv_current!=NULL) // Parcours tous les plans de vol
+        {
+       // printf("boucle : 2\n");
+
+
+            if(pt_pdv_current->affichage==1) // Vérifie si le plan de vol doit être affiché
+            {
+           // printf("boucle : 3\n");
+
+
+            int x1=-9,x2=0,y1=0,y2=0; // Variables de stockage des coordonnées pour les points de passage
+
+            pt_pass * pt_pass_current = pt_pdv_current->pass_debut;
+
+                if(x1==-9 && pt_pass_current->ptsuiv!=NULL) // Cas du premier point
+                {
+                //printf("boucle : 4, point de type = %d\n",pt_pass_current->type_point);
+
+                    if(pt_pass_current->type_point==0) // Si le point est un aérodrome
+                    {
+                        aerodrome * pass_aerodrome = pt_pass_current->point;
+                        //printf("\n AERODROME 1 \n");
+
+                        x1 = (pass_aerodrome->pos_x) * 440;
+                        y1 = (pass_aerodrome->pos_y) * 443;
+                        //printf("recup x = %d, y = %d\n",x1,y1);
+
+                        // Affichage de l'aérodrome
+                        gdk_draw_string(carte,font,gc, 440*(pass_aerodrome->pos_x) + 2,443*(pass_aerodrome->pos_y) + 7, pass_aerodrome->oaci);
+                        gdk_draw_point(carte,gc, 440*(pass_aerodrome->pos_x),443*(pass_aerodrome->pos_y));
+                    }
+
+                    if(pt_pass_current->type_point==1) // Si le point est une balise
+                    {
+                        balise * pass_balise = pt_pass_current->point;
+                       // printf("\n BALISE 1 \n");
+
+                        x1 = (pass_balise->pos_x) * 440;
+                        y1 = (pass_balise->pos_y) * 443;
+                       // printf("recup x = %d, y = %d\n",x1,y1);
+
+                        // Affichage de la balise
+                        gdk_draw_string(carte,font,gc, 440*(pass_balise->pos_x) + 2,443*(pass_balise->pos_y) + 7, pass_balise->nom);
+                        gdk_draw_point(carte,gc, 440*(pass_balise->pos_x),443*(pass_balise->pos_y));
+                    }
+
+                pt_pass_current = pt_pass_current->ptsuiv;
+
+                }
+                else
+                {
+                printf("Parcours incorrect");
+                }
+
+                while(pt_pass_current->ptsuiv!=NULL) // Parcours de tous les points de passage
+                {
+               // printf("boucle : 5\n");
+
+
+                        if(pt_pass_current->type_point==0) // Si le point est un aérodrome
+                    {
+                    aerodrome * pass_aerodrome = pt_pass_current->point;
+                   // printf("\n AERODROME \n");
+                    x2 = (pass_aerodrome->pos_x) * 440;
+                    y2 = (pass_aerodrome->pos_y) * 443;
+                  //  printf("recup x = %d, y = %d\n",x2,y2);
+
+                    // Affichage de l'aerodrome
+                    gdk_draw_string(carte,font,gc, 440*(pass_aerodrome->pos_x) + 2,443*(pass_aerodrome->pos_y) + 7, pass_aerodrome->oaci);
+                    gdk_draw_point(carte,gc, 440*(pass_aerodrome->pos_x),443*(pass_aerodrome->pos_y));
+                    }
+
+                    if(pt_pass_current->type_point==1) // Si le point est une balise
+                    {
+                    balise * pass_balise = pt_pass_current->point;
+                  //  printf("\n BALISE \n");
+
+                    x2 = (pass_balise->pos_x) * 440;
+                    y2 = (pass_balise->pos_y) * 443;
+                   // printf("recup x = %d, y = %d\n",x2,y2);
+
+                    // Affichage de la balise
+                    gdk_draw_string(carte,font,gc, 440*(pass_balise->pos_x) + 2,443*(pass_balise->pos_y) + 7, pass_balise->nom);
+                    gdk_draw_point(carte,gc, 440*(pass_balise->pos_x),443*(pass_balise->pos_y));
+                    }
+
+                    gdk_draw_line(carte, gc, x1,y1,x2,y2);
+
+
+                    // Le point 2 devient le point 1
+                    x1=x2;
+                    y1=y2;
+                    pt_pass_current = pt_pass_current->ptsuiv;
+                }
+
+
+            }
+            else
+            {
+           // printf("affichage refusé car affichage = %d \n",pt_pdv_current->affichage);
+            }
+        pt_pdv_current=pt_pdv_current->ptsuiv;
+        }
+   // printf("\nFIN PLAN DE VOL \n\n");
+    }
+
     gdk_font_unref(font);
 }
 

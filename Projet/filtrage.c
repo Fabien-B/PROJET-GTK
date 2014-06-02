@@ -132,6 +132,7 @@ if(donnees->debutpdv!=NULL)
         gtk_box_pack_start(GTK_BOX(boxpdv),pt_current->coch,FALSE,FALSE,0);
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pt_current->coch), (pt_current->affichage));
         g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(check_pdv), pt_current);
+        g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(redessiner_widget), donnees->carte);
         pt_current=pt_current->ptsuiv;
     }
 

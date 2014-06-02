@@ -15,7 +15,6 @@ typedef struct aerodrome{
     int affichage;      //1 si affichage activé, 0 sinon
     GtkWidget* coch;
     struct aerodrome * ptsuiv;
-    struct aerodrome * pt_aero_current;
 }aerodrome;
 
 typedef struct balise{
@@ -33,7 +32,6 @@ typedef struct balise{
     int affichage;      //1 si affichage activé, 0 sinon
     GtkWidget* coch;
     struct balise * ptsuiv;
-    struct balise * pt_balise_current;
 }balise;
 
 
