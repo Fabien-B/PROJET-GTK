@@ -4,6 +4,8 @@
 #ifndef INTERFACE_H_INCLUDED
 #define INTERFACE_H_INCLUDED
 
+#define XCARTE 440
+#define YCARTE 443
 
 typedef struct aerodrome{
     double latitude;
@@ -43,9 +45,11 @@ typedef struct pt_pass{
 
 typedef struct pdv{
     char nom[100];
+    int heure;
+    int minute;
     int altitude;
+    int vitesse;
     pt_pass *pass_debut;
-    pt_pass *pass_fin;
     int affichage;      //1 si affichage activé, 0 sinon
     GtkWidget* coch;
     struct pdv * ptsuiv;

@@ -35,8 +35,8 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
           //  printf("go avec x = %lf et y = %lf\n",pt_aero->pos_x,pt_aero->pos_y);
 
               //  printf("IF aero : Je change pas car affichage = %d\n", pt_aero->affichage);
-            gdk_draw_string(carte,font,gc, 440*(pt_aero->pos_x),443*(pt_aero->pos_y) + 3, pt_aero->oaci);
-            gdk_draw_point(carte,gc, 440*(pt_aero->pos_x),443*(pt_aero->pos_y));
+            gdk_draw_string(carte,font,gc, XCARTE*(pt_aero->pos_x),YCARTE*(pt_aero->pos_y) + 3, pt_aero->oaci);
+            gdk_draw_point(carte,gc, XCARTE*(pt_aero->pos_x),YCARTE*(pt_aero->pos_y));
             }
             else
             {
@@ -56,8 +56,8 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
             if(pt_balise->affichage==1)
             {
              //   printf("IF balise : Je change car affichage = %d\n", pt_balise->affichage);
-                gdk_draw_string(carte,font,gc, 440*(pt_balise->pos_x),443*(pt_balise->pos_y) + 3, pt_balise->nom);
-                gdk_draw_point(carte,gc, 440*(pt_balise->pos_x),443*(pt_balise->pos_y));
+                gdk_draw_string(carte,font,gc, XCARTE*(pt_balise->pos_x),YCARTE*(pt_balise->pos_y) + 3, pt_balise->nom);
+                gdk_draw_point(carte,gc, XCARTE*(pt_balise->pos_x),YCARTE*(pt_balise->pos_y));
             }
             else
             {
@@ -97,13 +97,13 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
                         aerodrome * pass_aerodrome = pt_pass_current->point;
                         //printf("\n AERODROME 1 \n");
 
-                        x1 = (pass_aerodrome->pos_x) * 440;
-                        y1 = (pass_aerodrome->pos_y) * 443;
+                        x1 = (pass_aerodrome->pos_x) * XCARTE;
+                        y1 = (pass_aerodrome->pos_y) * YCARTE;
                         //printf("recup x = %d, y = %d\n",x1,y1);
 
                         // Affichage de l'aérodrome
-                        gdk_draw_string(carte,font,gc, 440*(pass_aerodrome->pos_x) + 2,443*(pass_aerodrome->pos_y) + 7, pass_aerodrome->oaci);
-                        gdk_draw_point(carte,gc, 440*(pass_aerodrome->pos_x),443*(pass_aerodrome->pos_y));
+                        gdk_draw_string(carte,font,gc, XCARTE*(pass_aerodrome->pos_x) + 2,YCARTE*(pass_aerodrome->pos_y) + 7, pass_aerodrome->oaci);
+                        gdk_draw_point(carte,gc, XCARTE*(pass_aerodrome->pos_x),YCARTE*(pass_aerodrome->pos_y));
                     }
 
                     if(pt_pass_current->type_point==1) // Si le point est une balise
@@ -111,13 +111,13 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
                         balise * pass_balise = pt_pass_current->point;
                        // printf("\n BALISE 1 \n");
 
-                        x1 = (pass_balise->pos_x) * 440;
-                        y1 = (pass_balise->pos_y) * 443;
+                        x1 = (pass_balise->pos_x) * XCARTE;
+                        y1 = (pass_balise->pos_y) * YCARTE;
                        // printf("recup x = %d, y = %d\n",x1,y1);
 
                         // Affichage de la balise
-                        gdk_draw_string(carte,font,gc, 440*(pass_balise->pos_x) + 2,443*(pass_balise->pos_y) + 7, pass_balise->nom);
-                        gdk_draw_point(carte,gc, 440*(pass_balise->pos_x),443*(pass_balise->pos_y));
+                        gdk_draw_string(carte,font,gc, XCARTE*(pass_balise->pos_x) + 2,YCARTE*(pass_balise->pos_y) + 7, pass_balise->nom);
+                        gdk_draw_point(carte,gc, XCARTE*(pass_balise->pos_x),YCARTE*(pass_balise->pos_y));
                     }
 
                 pt_pass_current = pt_pass_current->ptsuiv;
@@ -137,13 +137,13 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
                     {
                     aerodrome * pass_aerodrome = pt_pass_current->point;
                    // printf("\n AERODROME \n");
-                    x2 = (pass_aerodrome->pos_x) * 440;
-                    y2 = (pass_aerodrome->pos_y) * 443;
+                    x2 = (pass_aerodrome->pos_x) * XCARTE;
+                    y2 = (pass_aerodrome->pos_y) * YCARTE;
                   //  printf("recup x = %d, y = %d\n",x2,y2);
 
                     // Affichage de l'aerodrome
-                    gdk_draw_string(carte,font,gc, 440*(pass_aerodrome->pos_x) + 2,443*(pass_aerodrome->pos_y) + 7, pass_aerodrome->oaci);
-                    gdk_draw_point(carte,gc, 440*(pass_aerodrome->pos_x),443*(pass_aerodrome->pos_y));
+                    gdk_draw_string(carte,font,gc, XCARTE*(pass_aerodrome->pos_x) + 2,YCARTE*(pass_aerodrome->pos_y) + 7, pass_aerodrome->oaci);
+                    gdk_draw_point(carte,gc, XCARTE*(pass_aerodrome->pos_x),YCARTE*(pass_aerodrome->pos_y));
                     }
 
                     if(pt_pass_current->type_point==1) // Si le point est une balise
@@ -151,13 +151,13 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
                     balise * pass_balise = pt_pass_current->point;
                   //  printf("\n BALISE \n");
 
-                    x2 = (pass_balise->pos_x) * 440;
-                    y2 = (pass_balise->pos_y) * 443;
+                    x2 = (pass_balise->pos_x) * XCARTE;
+                    y2 = (pass_balise->pos_y) * YCARTE;
                    // printf("recup x = %d, y = %d\n",x2,y2);
 
                     // Affichage de la balise
-                    gdk_draw_string(carte,font,gc, 440*(pass_balise->pos_x) + 2,443*(pass_balise->pos_y) + 7, pass_balise->nom);
-                    gdk_draw_point(carte,gc, 440*(pass_balise->pos_x),443*(pass_balise->pos_y));
+                    gdk_draw_string(carte,font,gc, XCARTE*(pass_balise->pos_x) + 2,YCARTE*(pass_balise->pos_y) + 7, pass_balise->nom);
+                    gdk_draw_point(carte,gc, XCARTE*(pass_balise->pos_x),YCARTE*(pass_balise->pos_y));
                     }
 
                     gdk_draw_line(carte, gc, x1,y1,x2,y2);

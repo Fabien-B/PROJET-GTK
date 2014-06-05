@@ -21,6 +21,7 @@ void init_interface(int argc, char *argv[])
     GtkWidget *MI2_APropos;
     GtkWidget *MI2_Nouveau;
     GtkWidget *MI2_Ouvrir;
+    GtkWidget *MI2_Enregistrer;
     GtkWidget *MI2_Quitter;
 //
     GtkWidget *hbox_curseur;
@@ -48,7 +49,7 @@ void init_interface(int argc, char *argv[])
 
     Window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(Window), "GATI");
-    gtk_window_set_default_size(GTK_WINDOW(Window), 320, 400);
+    gtk_window_set_default_size(GTK_WINDOW(Window), 32, 40);
     g_signal_connect(G_OBJECT(Window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
 
 
@@ -66,8 +67,10 @@ void init_interface(int argc, char *argv[])
             g_signal_connect(G_OBJECT(MI2_Nouveau), "activate", G_CALLBACK(liberer_memoire), donnees);
         MI2_Ouvrir = gtk_menu_item_new_with_label("Ouvrir");
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Ouvrir);
-                //g_signal_connect(G_OBJECT(MI2_Ouvrir), "activate", G_CALLBACK(creer_file_selection), donnees);
                         g_signal_connect(G_OBJECT(MI2_Ouvrir), "activate", G_CALLBACK(lancer_boite), donnees);
+        MI2_Enregistrer = gtk_menu_item_new_with_label("Enregistrer");
+        gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Enregistrer);
+                        g_signal_connect(G_OBJECT(MI2_Enregistrer), "activate", G_CALLBACK(creer_file_save_selection), donnees);
         MI2_Quitter = gtk_menu_item_new_with_label("Quitter");
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Quitter);
             g_signal_connect(G_OBJECT(MI2_Quitter), "activate", G_CALLBACK(gtk_main_quit), NULL);
@@ -102,7 +105,7 @@ void init_interface(int argc, char *argv[])
 //Création de la carte
 
     donnees->carte = gtk_drawing_area_new ();
-    gtk_drawing_area_size (GTK_DRAWING_AREA(donnees->carte), 440,443);
+    gtk_drawing_area_size (GTK_DRAWING_AREA(donnees->carte), XCARTE,YCARTE);
     gtk_box_pack_start (GTK_BOX (work_zl), donnees->carte, TRUE, TRUE, 0);
 
 
@@ -180,9 +183,9 @@ void voir_pdv(GtkWidget *bouton, file_opener* donnees)
 
         pdv *pdv_current=donnees->debutpdv;
 
-        while(pdv_current!=NULL)
+        while(pdv_current->ptsuiv!=NULL)
         {
-            sprintf(texte,"%s\n\n%s\n\tNiveau de vol:FL%d\n",texte,pdv_current->nom,pdv_current->altitude);
+            sprintf(texte,"%s\n\n%s\n\tHeure de départ: %02d:%02d\n\tNiveau de vol: FL%d\n",texte,pdv_current->nom,pdv_current->heure,pdv_current->minute,pdv_current->altitude);
             pt_pass* passage=pdv_current->pass_debut;
 
             while(passage->ptsuiv!=NULL)
@@ -270,7 +273,7 @@ charger_fichiers(donnees);
 
 
 donnees->what_file=2;
-donnees->ptchemin="PDV.txt";
+donnees->ptchemin="PVD_bon.txt";
 
 charger_fichiers(donnees);
 

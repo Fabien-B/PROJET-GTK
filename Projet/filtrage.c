@@ -122,7 +122,7 @@ if(donnees->debutpdv!=NULL)
     g_signal_connect(G_OBJECT(is), "clicked", G_CALLBACK(invert_selection_pdv), donnees);
 
     pdv* pt_current=donnees->debutpdv;
-    while(pt_current!=NULL)                 //création et initialisation des checkbox
+    while(pt_current->ptsuiv!=NULL)                 //création et initialisation des checkbox
     {
 
         char label[100];
@@ -241,7 +241,7 @@ void select_all_pdv(GtkWidget* button, file_opener* donnees)       //fonction po
 
     if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pt_current->coch)))       //on se base sur l'état du 1er pour savoir si on coche ou on décoche
     {
-        while(pt_current!=NULL)
+        while(pt_current->ptsuiv!=NULL)
         {
             gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pt_current->coch), (FALSE));
             pt_current->affichage=0;
@@ -250,7 +250,7 @@ void select_all_pdv(GtkWidget* button, file_opener* donnees)       //fonction po
     }
     else
     {
-        while(pt_current!=NULL)
+        while(pt_current->ptsuiv!=NULL)
             {
                 gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pt_current->coch), (TRUE));
                 pt_current->affichage=1;
@@ -263,7 +263,7 @@ void select_all_pdv(GtkWidget* button, file_opener* donnees)       //fonction po
 void invert_selection_pdv(GtkWidget* button, file_opener* donnees)     //inverser la sélection des plans de vols
 {
     pdv* pt_current=donnees->debutpdv;
-    while(pt_current!=NULL)
+    while(pt_current->ptsuiv!=NULL)
         {
             gboolean bEtat;
             bEtat = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pt_current->coch));

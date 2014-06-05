@@ -11,4 +11,8 @@ void lancer_boite(GtkWidget *bouton, file_opener *donnees);
 void combo_selected(GtkWidget *widget,file_opener *donnees);
 void liberer_memoire(GtkWidget *bouton, file_opener *donnees);
 
+void creer_file_save_selection(GtkWidget *bouton,file_opener *donnees);
+void recuperer_save_chemin(GtkWidget *bouton, file_opener *donnees);
+void sauver_fichiers(file_opener *donnees);
+
 #endif // OUVERTURE_FICHIERS_H_INCLUDED
