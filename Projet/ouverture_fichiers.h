@@ -15,4 +15,5 @@ void creer_file_save_selection(GtkWidget *bouton,file_opener *donnees);
 void recuperer_save_chemin(GtkWidget *bouton, file_opener *donnees);
 void sauver_fichiers(file_opener *donnees);
 
+void integrer_temps(pdv* pdv_deb);
 #endif // OUVERTURE_FICHIERS_H_INCLUDED

@@ -14,6 +14,6 @@ void check_aero(GtkWidget *pToggle, aerodrome* pt_current);
 void check_balise(GtkWidget *pToggle, balise* pt_current);
 void check_pdv(GtkWidget *pToggle, pdv* pt_current);
 
-
-
+void detection_conflits(GtkWidget *button,file_opener * donnees);
+void get_position_avion(position* pos, pdv* pdv_c,double t);
 #endif // FILTRAGE_H_INCLUDED

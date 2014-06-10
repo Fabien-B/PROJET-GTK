@@ -393,13 +393,15 @@ void charger_fichiers(file_opener *donnees)
             donnees->debutpdv=nouveau;
             nouveau->ptsuiv=NULL;
             nouveau->pass_debut=NULL;
-
             int cond;
+            char ligne[200];
+            fscanf(fic,"%[^\n]",ligne);
+            fgetc(fic);
             do
             {
-                char ligne[200];
+
                 char chainetempo[200];
-                fscanf(fic,"%[^\n]",ligne);
+
                 j=0;
                 int j0=0;
 
@@ -411,7 +413,7 @@ void charger_fichiers(file_opener *donnees)
                     j++;
                 }
                 nouveau->nom[j-j0]='\0';
-        printf("nom: %s\n",nouveau->nom);
+        //printf("nom: %s\n",nouveau->nom);
 
                 j+=1;                      //------------------------ lecture de l'heure ---------------------------//
                 j0=j;
@@ -455,7 +457,7 @@ void charger_fichiers(file_opener *donnees)
                 }
                 chainetempo[j-j0]='\0';
                 sscanf(chainetempo,"%d",&nouveau->vitesse);
-    printf("vitesse: %d\n",nouveau->vitesse);
+    //printf("vitesse: %d\n",nouveau->vitesse);
 
 
 
@@ -525,6 +527,10 @@ void charger_fichiers(file_opener *donnees)
 
                 nouveau->affichage=0; //non affiché par défault
 
+
+
+            fscanf(fic,"%[^\n]",ligne);
+
             if(fgetc(fic)!=EOF)
             {
                 cond=1;
@@ -542,6 +548,7 @@ void charger_fichiers(file_opener *donnees)
 
         fclose(fic);
         }
+        integrer_temps(donnees->debutpdv);
     }
 
 
@@ -685,7 +692,7 @@ printf("%s",donnees->ptchemin);
         {
             pdv* current=donnees->debutpdv;
 
-            while(current->ptsuiv!=NULL)
+            while(current!=NULL)
             {
                 fprintf(fic,"%s %02d:%02d %d %d",current->nom,current->heure,current->minute,current->altitude,current->vitesse);
 
@@ -717,3 +724,61 @@ printf("%s",donnees->ptchemin);
 
 }
 
+
+
+
+void integrer_temps(pdv* pdv_deb)
+{
+    pdv* pdv_current=pdv_deb;
+    while(pdv_current!=NULL)
+    {
+        pdv_current->temps_depart=60*pdv_current->heure+pdv_current->minute;
+//g_print("\n\nnouveau pdv\n");
+//g_print("\ndépart:%lf\n",pdv_current->temps_depart);
+        pt_pass* pass_current=pdv_current->pass_debut;
+        pass_current->temps=pdv_current->temps_depart;
+        while(pass_current->ptsuiv->ptsuiv!=NULL)
+        {
+            double x1,x2,y1,y2;
+            if(pass_current->type_point)
+            {
+                balise* pt=pass_current->point;
+                x1=pt->pos_x;
+                y1=pt->pos_y;
+            }
+            else
+            {
+                aerodrome* pt=pass_current->point;
+                x1=pt->pos_x;
+                y1=pt->pos_y;
+            }
+
+            if(pass_current->ptsuiv->type_point)
+            {
+                balise* pt=pass_current->ptsuiv->point;
+                x2=pt->pos_x;
+                y2=pt->pos_y;
+            }
+            else
+            {
+                aerodrome* pt=pass_current->ptsuiv->point;
+                x2=pt->pos_x;
+                y2=pt->pos_y;
+            }
+
+            double D=sqrt(pow((x2-x1)*680,2)+pow((y2-y1)*660,2));
+//g_print("D=%lf\n",D);
+            pass_current->ptsuiv->temps=pass_current->temps+D/pdv_current->vitesse*60;
+//g_print("t=%lf\n",pass_current->ptsuiv->temps);
+
+
+            pass_current=pass_current->ptsuiv;
+
+        }
+        pdv_current->temps_arrivee=pass_current->temps;
+//g_print("arrivée:%lf\n",pdv_current->temps_arrivee);
+        pdv_current=pdv_current->ptsuiv;
+    }
+
+
+}

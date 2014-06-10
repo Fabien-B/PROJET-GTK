@@ -23,14 +23,15 @@ void init_interface(int argc, char *argv[])
     GtkWidget *MI2_Ouvrir;
     GtkWidget *MI2_Enregistrer;
     GtkWidget *MI2_Quitter;
-//
+
     GtkWidget *hbox_curseur;
     GtkWidget *label_curseur;
     GtkWidget *curseur;
     GtkWidget *filtre_button;
     GtkWidget *voir_pdv_button;
     GtkWidget *ajouter_pdv_button;
-
+    GtkWidget *detect_conflits_button;
+    GtkWidget *parametres_button;
 
     file_opener *donnees=g_malloc(sizeof(file_opener));
         donnees->ptchemin=NULL;
@@ -39,7 +40,13 @@ void init_interface(int argc, char *argv[])
         donnees->debutbalises=NULL;
         donnees->debutpdv=NULL;
         donnees->finpdv=NULL;
+        donnees->distance_conflit=20;
+        donnees->deltat_conflits=5;
 
+
+    form_pdv* formulaire=malloc(sizeof(form_pdv));
+    formulaire->donnees=donnees;
+    formulaire->nb_pt_int=0;
 
  // Initialisation de Gtk+
     g_log_set_handler ("Gtk", G_LOG_LEVEL_WARNING, (GLogFunc) gtk_false, NULL);
@@ -114,7 +121,7 @@ void init_interface(int argc, char *argv[])
     gtk_box_pack_start(GTK_BOX(work_zl), hbox_curseur, TRUE, TRUE, 0);
     label_curseur=gtk_label_new("temps");
     gtk_box_pack_start(GTK_BOX(hbox_curseur), label_curseur, FALSE, FALSE, 0);
-    curseur=gtk_hscale_new_with_range (5,200 ,100);
+    curseur=gtk_hscale_new_with_range (0,200 ,5);
     gtk_container_add(GTK_CONTAINER(hbox_curseur), curseur);
 
     filtre_button=gtk_button_new_with_label("Filtres");
@@ -127,7 +134,16 @@ void init_interface(int argc, char *argv[])
 
     ajouter_pdv_button=gtk_button_new_with_label("Ajouter un plan de vol");
     gtk_box_pack_start(GTK_BOX(work_zr),ajouter_pdv_button,FALSE,FALSE,0);
-//    g_signal_connect(GTK_BUTTON(ajouter_pdv_button),"clicked",G_CALLBACK(ajouter_plan_de_vol),donnees);
+    g_signal_connect(GTK_BUTTON(ajouter_pdv_button),"clicked",G_CALLBACK(ajouter_plan_de_vol),formulaire);
+
+    detect_conflits_button=gtk_button_new_with_label("Détection des conflits");
+    gtk_box_pack_start(GTK_BOX(work_zr),detect_conflits_button,FALSE,FALSE,0);
+    g_signal_connect(GTK_BUTTON(detect_conflits_button),"clicked",G_CALLBACK(detection_conflits),donnees);
+
+    parametres_button=gtk_button_new_with_label("Paramètres");
+    gtk_box_pack_start(GTK_BOX(work_zr),parametres_button,FALSE,FALSE,0);
+    g_signal_connect(GTK_BUTTON(parametres_button),"clicked",G_CALLBACK(parametres),donnees);
+
 
 // Gère le rafraichissement
     g_signal_connect (G_OBJECT (donnees->carte), "expose-event", G_CALLBACK (expose_cb), donnees);
@@ -138,6 +154,8 @@ void init_interface(int argc, char *argv[])
     rapide_file_button=gtk_button_new_with_label("Chargement rapide");
     gtk_box_pack_start(GTK_BOX(work_zr),rapide_file_button,FALSE,FALSE,0);
     g_signal_connect(GTK_BUTTON(rapide_file_button),"clicked",G_CALLBACK(rapide_file),donnees);
+
+
 
 
     gtk_widget_show_all(Window);
@@ -182,12 +200,12 @@ void voir_pdv(GtkWidget *bouton, file_opener* donnees)
         texte[0]='\0';
 
         pdv *pdv_current=donnees->debutpdv;
-
-        while(pdv_current->ptsuiv!=NULL)
+//->ptsuiv
+        while(pdv_current!=NULL)
         {
-            sprintf(texte,"%s\n\n%s\n\tHeure de départ: %02d:%02d\n\tNiveau de vol: FL%d\n",texte,pdv_current->nom,pdv_current->heure,pdv_current->minute,pdv_current->altitude);
+            sprintf(texte,"%s\n\n%s\n\tHeure de départ: %02d:%02d\n\tNiveau de vol: FL%d\n\tvitesse: %d kt\n",texte,pdv_current->nom,pdv_current->heure,pdv_current->minute,pdv_current->altitude,pdv_current->vitesse);
             pt_pass* passage=pdv_current->pass_debut;
-
+g_print("-----------------------------------\n");
             while(passage->ptsuiv!=NULL)
             {
                 if(passage->type_point==0)
@@ -195,8 +213,10 @@ void voir_pdv(GtkWidget *bouton, file_opener* donnees)
                     if(passage->point!=NULL)
                     {
                         aerodrome* pdvae=passage->point;
-                    sprintf(texte,"%s\n\t%s  ",texte,pdvae->nom);
-                    //printf("aero:  %s\n",pdvae->nom);
+                        int h=passage->temps/60;
+                        int m=passage->temps-h*60;
+                    sprintf(texte,"%s\n\t%s  %02d:%02d    ",texte,pdvae->nom,h,m);
+printf("aero:  %s\n",pdvae->nom);
                     }
                     else
                     {
@@ -212,12 +232,14 @@ void voir_pdv(GtkWidget *bouton, file_opener* donnees)
                     if(passage->point!=NULL)
                     {
                         balise* pdvbal=passage->point;
-                        sprintf(texte,"%s\n\t%s  ",texte,pdvbal->nom);
-                        //printf("bali:  %s\n",pdvbal->nom);
+                        int h=passage->temps/60;
+                        int m=passage->temps-h*60;
+                        sprintf(texte,"%s\n\t%s  %02d:%02d    ",texte,pdvbal->nom,h,m);
+printf("bali:  %s\n",pdvbal->nom);
                     }
                     else
                     {
-                        sprintf(texte,"%s\nPoint non trouvé  ",texte);
+                        sprintf(texte,"%s\nPoint introuvable  ",texte);
                     }
 
                 }
@@ -292,3 +314,54 @@ gtk_widget_queue_draw(carte);
 
 
 
+
+
+void parametres(GtkWidget* bouton, file_opener* donnees)
+{
+    GtkWidget* boite;
+    GtkWidget* dist_conflits_label;
+    GtkWidget* dist_conflits_spin;
+    GtkWidget* delt_conflits_label;
+    GtkWidget* delt_conflits_spin;
+
+
+    boite = gtk_dialog_new_with_buttons("Paramètres",
+        NULL,
+        GTK_DIALOG_MODAL,
+        GTK_STOCK_OK,GTK_RESPONSE_OK,
+        GTK_STOCK_CANCEL,GTK_RESPONSE_CANCEL,
+        NULL);
+
+    dist_conflits_label = gtk_frame_new("Distance de détection des conflits (NM)");
+    dist_conflits_spin = gtk_spin_button_new_with_range(0, 100, 1);
+    gtk_container_add(GTK_CONTAINER(dist_conflits_label), dist_conflits_spin);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(boite)->vbox), dist_conflits_label, FALSE, FALSE, 0);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(dist_conflits_spin), donnees->distance_conflit);
+
+    delt_conflits_label = gtk_frame_new("granularité temporelle de détection des conflits (min)");
+    delt_conflits_spin = gtk_spin_button_new_with_range(0.0, 30, 0.5);
+    gtk_container_add(GTK_CONTAINER(delt_conflits_label), delt_conflits_spin);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(boite)->vbox), delt_conflits_label, FALSE, FALSE, 0);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(delt_conflits_spin), donnees->deltat_conflits);
+
+
+    gtk_widget_show_all(GTK_DIALOG(boite)->vbox);
+
+
+    switch (gtk_dialog_run(GTK_DIALOG(boite)))
+    {
+
+        case GTK_RESPONSE_OK:
+            donnees->distance_conflit=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(dist_conflits_spin));
+            donnees->deltat_conflits=gtk_spin_button_get_value(GTK_SPIN_BUTTON(delt_conflits_spin));
+
+            break;
+
+        case GTK_RESPONSE_CANCEL:
+        case GTK_RESPONSE_NONE:
+        default:
+
+            break;
+    }
+    gtk_widget_destroy(boite);
+}

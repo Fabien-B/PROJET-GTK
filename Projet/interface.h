@@ -1,11 +1,13 @@
 #include <stdlib.h>
 #include <gtk/gtk.h>
 #include <string.h>
+#include <math.h>
 #ifndef INTERFACE_H_INCLUDED
 #define INTERFACE_H_INCLUDED
 
-#define XCARTE 440
-#define YCARTE 443
+#define XCARTE 550
+#define YCARTE 554
+#define DISTANCE_CONFLIT 20
 
 typedef struct aerodrome{
     double latitude;
@@ -40,6 +42,7 @@ typedef struct balise{
 typedef struct pt_pass{
     void *point;
     int type_point; // 0 aérodrome et 1 balise
+    double temps;
     struct pt_pass * ptsuiv;
 }pt_pass;
 
@@ -52,6 +55,8 @@ typedef struct pdv{
     pt_pass *pass_debut;
     int affichage;      //1 si affichage activé, 0 sinon
     GtkWidget* coch;
+    double temps_depart;
+    double temps_arrivee;
     struct pdv * ptsuiv;
 }pdv;
 
@@ -64,15 +69,24 @@ aerodrome *debutaero;
 balise *debutbalises;
 pdv *debutpdv;
 pdv *finpdv;
+int distance_conflit;
+double deltat_conflits;
 GtkWidget *carte;
 }file_opener;
+
+typedef struct position{
+double x;
+double y;
+}position;
+
+
 
 void init_interface();
 void APropos(GtkWidget* widget);
 void voir_pdv(GtkWidget *bouton, file_opener* donnees);
+void parametres(GtkWidget* bouton, file_opener* donnees);
 void redessiner(GtkWidget * carte);
 void redessiner_widget(GtkWidget* button, GtkWidget * carte);
-
 
 void rapide_file(GtkWidget * widget, file_opener * donnees);
 

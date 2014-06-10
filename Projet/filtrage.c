@@ -122,7 +122,7 @@ if(donnees->debutpdv!=NULL)
     g_signal_connect(G_OBJECT(is), "clicked", G_CALLBACK(invert_selection_pdv), donnees);
 
     pdv* pt_current=donnees->debutpdv;
-    while(pt_current->ptsuiv!=NULL)                 //création et initialisation des checkbox
+    while(pt_current!=NULL)                 //création et initialisation des checkbox
     {
 
         char label[100];
@@ -241,7 +241,7 @@ void select_all_pdv(GtkWidget* button, file_opener* donnees)       //fonction po
 
     if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pt_current->coch)))       //on se base sur l'état du 1er pour savoir si on coche ou on décoche
     {
-        while(pt_current->ptsuiv!=NULL)
+        while(pt_current!=NULL)
         {
             gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pt_current->coch), (FALSE));
             pt_current->affichage=0;
@@ -250,7 +250,7 @@ void select_all_pdv(GtkWidget* button, file_opener* donnees)       //fonction po
     }
     else
     {
-        while(pt_current->ptsuiv!=NULL)
+        while(pt_current!=NULL)
             {
                 gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pt_current->coch), (TRUE));
                 pt_current->affichage=1;
@@ -263,7 +263,7 @@ void select_all_pdv(GtkWidget* button, file_opener* donnees)       //fonction po
 void invert_selection_pdv(GtkWidget* button, file_opener* donnees)     //inverser la sélection des plans de vols
 {
     pdv* pt_current=donnees->debutpdv;
-    while(pt_current->ptsuiv!=NULL)
+    while(pt_current!=NULL)
         {
             gboolean bEtat;
             bEtat = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(pt_current->coch));
@@ -319,4 +319,111 @@ void check_pdv(GtkWidget *pToggle, pdv* pt_current)          //mise à jour de l
         pt_current->affichage=0;
     }
 
+}
+
+
+
+void detection_conflits(GtkWidget *button, file_opener * donnees)
+{
+    position* pos1=malloc(sizeof(position));
+    position* pos2=malloc(sizeof(position));
+    pdv* pdv1=donnees->debutpdv;
+
+    while(pdv1!=NULL)
+    {
+        pdv* pdv2=pdv1->ptsuiv;
+        while(pdv2!=NULL)
+        {
+//g_print("pdv1:%s\npdv2:%s\n",pdv1->nom,pdv2->nom);
+            if(pdv1->altitude==pdv2->altitude) //on ne détecte les conflits que si les vols sont à la même altitude
+            {
+                double t;
+                for(t=0;t<1440;t+=donnees->deltat_conflits)
+                {
+                    get_position_avion(pos1,pdv1,t);
+                    get_position_avion(pos2,pdv2,t);
+                    if((pos1->x)>=0 && (pos2->x)>=0)  //si les avions sont en vols (x=-1 si les avions n'ont pas décolés ou déja aterris)
+                    {
+//g_print("x1=%lf,y1=%lf\n",pos1->x,pos1->y);
+//g_print("x2=%lf,y2=%lf\n",pos2->x,pos2->y);
+                        double D=sqrt(pow((pos2->x-pos1->x)*680,2)+pow((pos2->y-pos1->y)*660,2));
+//g_print("D=%lf\n",D);
+                        if(D<donnees->distance_conflit)
+                        {
+int h=t/60;
+int m=t-h*60;
+g_print("\n\nCONFLIT entre %s et %s à %d:%d à la position x=%lf, y=%lf\n\n\n",pdv1->nom,pdv2->nom,h,m,pos1->x,pos2->y);
+
+                        }
+                    }
+                }
+            }
+            pdv2=pdv2->ptsuiv;
+        }
+
+        pdv1=pdv1->ptsuiv;
+//g_print("\n\n\n\n");
+    }
+
+
+
+    free(pos1);
+    free(pos2);
+}
+
+void get_position_avion(position* pos, pdv* pdv_c,double t)
+{
+    if(t<pdv_c->temps_depart || t>pdv_c->temps_arrivee)
+    {
+        pos->x=-1;
+//g_print("Avion pas partis, ou déja arrivé\n");
+    }
+    else
+    {
+        pt_pass* pass_c=pdv_c->pass_debut;
+        while(t>pass_c->ptsuiv->temps)
+        {
+            pass_c=pass_c->ptsuiv;
+        }
+        double dt=t-pass_c->temps;
+
+
+        double x1,x2,y1,y2;
+
+            if(pass_c->type_point)
+            {
+                balise* pt=pass_c->point;
+                x1=pt->pos_x;
+                y1=pt->pos_y;
+            }
+            else
+            {
+                aerodrome* pt=pass_c->point;
+                x1=pt->pos_x;
+                y1=pt->pos_y;
+            }
+
+            if(pass_c->ptsuiv->type_point)
+            {
+                balise* pt=pass_c->ptsuiv->point;
+                x2=pt->pos_x;
+                y2=pt->pos_y;
+            }
+            else
+            {
+                aerodrome* pt=pass_c->ptsuiv->point;
+                x2=pt->pos_x;
+                y2=pt->pos_y;
+            }
+
+            double D=sqrt(pow((x2-x1)*680,2)+pow((y2-y1)*660,2));
+
+
+        double d=pdv_c->vitesse/60*dt;
+
+        pos->x=x1+d/D*(x2-x1);
+        pos->y=y1+d/D*(y2-y1);
+
+//g_print("Avion en vol\n");
+    }
 }
