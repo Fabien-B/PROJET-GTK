@@ -33,6 +33,8 @@ void init_interface(int argc, char *argv[])
     GtkWidget *detect_conflits_button;
     GtkWidget *parametres_button;
 
+    GtkObject *adj2;
+
     file_opener *donnees=g_malloc(sizeof(file_opener));
         donnees->ptchemin=NULL;
         donnees->file_selection=NULL;
@@ -117,12 +119,25 @@ void init_interface(int argc, char *argv[])
 
 
 
+// Création du curseur temp (adjustment) et de son label
     hbox_curseur = gtk_hbox_new(FALSE, 0);
     gtk_box_pack_start(GTK_BOX(work_zl), hbox_curseur, TRUE, TRUE, 0);
-    label_curseur=gtk_label_new("temps");
+    label_curseur=gtk_label_new("Temps   ");
     gtk_box_pack_start(GTK_BOX(hbox_curseur), label_curseur, FALSE, FALSE, 0);
-    curseur=gtk_hscale_new_with_range (0,200 ,5);
-    gtk_container_add(GTK_CONTAINER(hbox_curseur), curseur);
+
+//  ( depart , min , max , ? , incrémentation clic en dehors du curseur , ? )
+    adj2 = gtk_adjustment_new (0.0, 0.0, 1440.0, 1.0, 5.0, 0.0);
+    gtk_signal_connect (GTK_OBJECT (adj2), "value_changed", GTK_SIGNAL_FUNC (recup_temps), donnees);
+    curseur = gtk_hscale_new (GTK_ADJUSTMENT (adj2));
+    gtk_scale_set_digits (GTK_SCALE (curseur), 0);
+    gtk_scale_set_draw_value(GTK_SCALE(curseur),FALSE);
+    gtk_box_pack_start (GTK_BOX (hbox_curseur), curseur, TRUE, TRUE, 0);
+    gtk_widget_show (curseur);
+
+    donnees->heure_label=gtk_label_new("   00:00");
+    gtk_box_pack_start(GTK_BOX(hbox_curseur),donnees->heure_label,FALSE,FALSE,0);
+//        gtk_range_set_update_policy (GTK_RANGE (curseur), GTK_UPDATE_DISCONTINUOUS);
+
 
     filtre_button=gtk_button_new_with_label("Filtres");
     gtk_box_pack_start(GTK_BOX(work_zr),filtre_button,FALSE,FALSE,0);
@@ -161,7 +176,21 @@ void init_interface(int argc, char *argv[])
     gtk_widget_show_all(Window);
 }
 
+void recup_temps(GtkAdjustment *adj, file_opener *donnees)
+{
+donnees->temps = adj->value;
+//printf("adj : %lf",adj->value);
+//printf("donnees temps : %lf\n", donnees->temps);
+redessiner(donnees->carte);
 
+    int h=donnees->temps/60;
+    int m=donnees->temps-h*60;
+    char lab_heure[10];
+    sprintf(lab_heure,"   %02d:%02d",h,m);
+    gtk_label_set_text(GTK_LABEL(donnees->heure_label),lab_heure);
+//    donnees->heure_label=gtk_label_new(lab_heure);
+//    gtk_box_pack_start(GTK_BOX(hbox_curseur),donnees->heure_label,TRUE,TRUE,0);
+}
 
 
 void APropos(GtkWidget* widget)
@@ -216,7 +245,7 @@ g_print("-----------------------------------\n");
                         int h=passage->temps/60;
                         int m=passage->temps-h*60;
                     sprintf(texte,"%s\n\t%s  %02d:%02d    ",texte,pdvae->nom,h,m);
-printf("aero:  %s\n",pdvae->nom);
+//printf("aero:  %s\n",pdvae->nom);
                     }
                     else
                     {
@@ -235,7 +264,7 @@ printf("aero:  %s\n",pdvae->nom);
                         int h=passage->temps/60;
                         int m=passage->temps-h*60;
                         sprintf(texte,"%s\n\t%s  %02d:%02d    ",texte,pdvbal->nom,h,m);
-printf("bali:  %s\n",pdvbal->nom);
+//printf("bali:  %s\n",pdvbal->nom);
                     }
                     else
                     {

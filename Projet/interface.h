@@ -6,7 +6,7 @@
 #define INTERFACE_H_INCLUDED
 
 #define XCARTE 550
-#define YCARTE 554
+#define YCARTE 660
 #define DISTANCE_CONFLIT 20
 
 typedef struct aerodrome{
@@ -62,21 +62,23 @@ typedef struct pdv{
 
 
 typedef struct file_opener{
-char *ptchemin;
-GtkWidget *file_selection;
-int what_file;
-aerodrome *debutaero;
-balise *debutbalises;
-pdv *debutpdv;
-pdv *finpdv;
-int distance_conflit;
-double deltat_conflits;
-GtkWidget *carte;
+    char *ptchemin;
+    GtkWidget *file_selection;
+    int what_file;
+    aerodrome *debutaero;
+    balise *debutbalises;
+    pdv *debutpdv;
+    pdv *finpdv;
+    int distance_conflit;
+    double deltat_conflits;
+    GtkWidget *carte;
+    GtkWidget *heure_label;
+    double temps;
 }file_opener;
 
 typedef struct position{
-double x;
-double y;
+    double x;
+    double y;
 }position;
 
 
@@ -87,6 +89,7 @@ void voir_pdv(GtkWidget *bouton, file_opener* donnees);
 void parametres(GtkWidget* bouton, file_opener* donnees);
 void redessiner(GtkWidget * carte);
 void redessiner_widget(GtkWidget* button, GtkWidget * carte);
+void recup_temps(GtkAdjustment* adj, file_opener* donnees);
 
 void rapide_file(GtkWidget * widget, file_opener * donnees);
 

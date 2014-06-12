@@ -23,6 +23,9 @@
 		<Linker>
 			<Add option="`pkg-config gtk+-2.0 --libs`" />
 		</Linker>
+		<Unit filename="ajouts_utilisateur.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="ajouts_utilisateur.h" />
 		<Unit filename="cartographie.c">
 			<Option compilerVar="CC" />
@@ -37,9 +40,6 @@
 		</Unit>
 		<Unit filename="interface.h" />
 		<Unit filename="main.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="ouverture_fichiers.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="ouverture_fichiers.h" />
