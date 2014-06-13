@@ -652,7 +652,7 @@ void liberer_memoire(GtkWidget *bouton, file_opener *donnees)
 
 void creer_file_save_selection(GtkWidget *bouton,file_opener *donnees)
 {
-    printf("azert\n");
+//printf("azert\n");
     donnees->file_selection = gtk_file_selection_new( g_locale_to_utf8( "Sélectionnez un fichier", -1, NULL, NULL, NULL) );
     gtk_widget_show(donnees->file_selection);
 

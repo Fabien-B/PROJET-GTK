@@ -140,12 +140,12 @@ void ajouter_pdv(GtkWidget* bouton,form_pdv* formulaire)
 {
 
 
-   g_print("%p   %p   %p\n",formulaire->donnees->debutaero,formulaire->donnees->debutbalises,formulaire->donnees->debutpdv);
+//g_print("%p   %p   %p\n",formulaire->donnees->debutaero,formulaire->donnees->debutbalises,formulaire->donnees->debutpdv);
 
     pdv* pdv_current;
     if(formulaire->donnees->finpdv!=NULL)
     {
-    g_print("SUITE\n");
+//g_print("SUITE\n");
         formulaire->donnees->finpdv->ptsuiv=malloc(sizeof(pdv));
         formulaire->donnees->finpdv=formulaire->donnees->finpdv->ptsuiv;
         pdv_current=formulaire->donnees->finpdv;
@@ -153,7 +153,7 @@ void ajouter_pdv(GtkWidget* bouton,form_pdv* formulaire)
     }
     else
     {
-    g_print("DEBUT PDV\n");fflush(stdout);
+//g_print("DEBUT PDV\n");fflush(stdout);
         formulaire->donnees->debutpdv=malloc(sizeof(pdv));
         pdv_current=formulaire->donnees->debutpdv;
         formulaire->donnees->finpdv=pdv_current;
@@ -164,20 +164,20 @@ void ajouter_pdv(GtkWidget* bouton,form_pdv* formulaire)
     const gchar *text;
     text = gtk_entry_get_text(GTK_ENTRY(formulaire->nom_entry));
     strcpy(pdv_current->nom,text);
-g_print("%s\n",pdv_current->nom);
+//g_print("%s\n",pdv_current->nom);
 
     pdv_current->heure=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(formulaire->spinh));
     pdv_current->minute=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(formulaire->spinm));
-g_print("%d:%d\n",pdv_current->heure,pdv_current->minute);
+//g_print("%d:%d\n",pdv_current->heure,pdv_current->minute);
 
 
     text = gtk_entry_get_text(GTK_ENTRY(formulaire->altitude_entry));
     sscanf(text, "%d", &pdv_current->altitude);
-g_print("%d\n",pdv_current->altitude);
+//g_print("%d\n",pdv_current->altitude);
 
      text = gtk_entry_get_text(GTK_ENTRY(formulaire->vitesse_entry));
     sscanf(text, "%d", &pdv_current->vitesse);
-g_print("%d\n",pdv_current->vitesse);
+//g_print("%d\n",pdv_current->vitesse);
 
 
     pdv_current->pass_debut=malloc(sizeof(pt_pass));

@@ -20,9 +20,9 @@ typedef struct form_pdv{
     GtkWidget *vitesse_entry;
     char vitesse[5];
     GtkWidget *vitesse_label;
-    GtkWidget *pass_entry[10];
-    char pass[10][10];
-    GtkWidget *pass_label[10];
+    GtkWidget *pass_entry[20];
+    char pass[20][20];
+    GtkWidget *pass_label[20];
     GtkWidget *ok_bouton;
     int nb_pt_int;
     file_opener* donnees;

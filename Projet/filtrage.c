@@ -338,7 +338,9 @@ void detection_conflits(GtkWidget *button, file_opener * donnees)
             if(pdv1->altitude==pdv2->altitude) //on ne détecte les conflits que si les vols sont à la même altitude
             {
                 double t;
-                for(t=0;t<1440;t+=donnees->deltat_conflits)
+                int conflit=0;
+                int memconflit=0;
+                for(t=0;t<TEMPS_SIMULATION;t+=donnees->deltat_conflits)
                 {
                     get_position_avion(pos1,pdv1,t);
                     get_position_avion(pos2,pdv2,t);
@@ -350,10 +352,14 @@ void detection_conflits(GtkWidget *button, file_opener * donnees)
 //g_print("D=%lf\n",D);
                         if(D<donnees->distance_conflit)
                         {
-int h=t/60;
-int m=t-h*60;
-g_print("\n\nCONFLIT entre %s et %s à %d:%d à la position x=%lf, y=%lf\n\n\n",pdv1->nom,pdv2->nom,h,m,pos1->x,pos2->y);
-
+                            conflit=1;
+                            if(conflit!=memconflit)
+                            {
+                                int h=t/60;
+                                int m=t-h*60;
+                                g_print("\n\nCONFLIT entre %s et %s à %d:%d à la position x=%lf, y=%lf\n\n\n",pdv1->nom,pdv2->nom,h,m,pos1->x,pos2->y);
+                            }
+                            memconflit=conflit;
                         }
                     }
                 }

@@ -3,6 +3,8 @@
 
 #include "interface.h"
 
+#define TEMPS_SIMULATION 1440       //en minutes
+
 void filtres(GtkWidget* button, file_opener* donnees);
 void select_all_aero(GtkWidget* button, file_opener* donnees);
 void select_all_balises(GtkWidget* button, file_opener* donnees);
