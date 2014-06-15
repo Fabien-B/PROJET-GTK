@@ -329,7 +329,7 @@ void detection_conflits(GtkWidget *button, file_opener * donnees)
     position* pos1=malloc(sizeof(position));
     position* pos2=malloc(sizeof(position));
     pdv* pdv1=donnees->debutpdv;
-
+int c;
     while(pdv1!=NULL)
     {
         pdv* pdv2=pdv1->ptsuiv;
@@ -339,12 +339,14 @@ void detection_conflits(GtkWidget *button, file_opener * donnees)
             if(pdv1->altitude==pdv2->altitude) //on ne détecte les conflits que si les vols sont à la même altitude
             {
                 double t;
-                int conflit=0;
+                int conf=0;
                 int memconflit=0;
                 for(t=0;t<TEMPS_SIMULATION;t+=donnees->deltat_conflits)
                 {
                     get_position_avion(pos1,pdv1,t);
                     get_position_avion(pos2,pdv2,t);
+                    double lat1=pos1->x;
+                    double long1=pos1->y;
                     pos1->x=conversion_lat(pos1->x,donnees);
                     pos1->y=conversion_longitude(pos1->y,donnees);
                     pos2->x=conversion_lat(pos2->x,donnees);
@@ -368,14 +370,23 @@ void detection_conflits(GtkWidget *button, file_opener * donnees)
 //g_print("D=%lf\n",D);
                         if(D<donnees->distance_conflit)
                         {
-                            conflit=1;
-                            if(conflit!=memconflit)
+                            conf=1;
+                            if(conf!=memconflit)
                             {
                                 int h=t/60;
                                 int m=t-h*60;
-                                g_print("\n\nCONFLIT entre %s et %s à %02d:%02d à la position x=%lf, y=%lf\n\n\n",pdv1->nom,pdv2->nom,h,m,pos1->x,pos2->y);
+                                conflit aaa=donnees->tab_conflits[c];
+                                aaa.pdv1=pdv1;
+                                aaa.pdv2=pdv2;
+                                aaa.latitude=lat1;
+                                aaa.longitude=long1;
+                                aaa.temps=donnees->temps;
+                                aaa.D=D;
+                                c++;
+                                g_print("CONFLIT entre %s et %s à %02d:%02d |%lf  %lf  D=%lf\n",(aaa.pdv1)->nom,aaa.pdv2->nom,h,m,aaa.latitude,aaa.longitude,aaa.D);
+                                //g_print("\n\nCONFLIT entre %s et %s à %02d:%02d à la position x=%lf, y=%lf\n\n\n",pdv1->nom,pdv2->nom,h,m,pos1->x,pos2->y);
                             }
-                            memconflit=conflit;
+                            memconflit=conf;
                         }
                     }
                 }
@@ -387,7 +398,7 @@ void detection_conflits(GtkWidget *button, file_opener * donnees)
 //g_print("\n\n\n\n");
     }
 
-
+    donnees->nb_conflits=c;
 
     free(pos1);
     free(pos2);

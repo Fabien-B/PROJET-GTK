@@ -30,6 +30,7 @@ void initialisation(int argc, char *argv[])
         donnees->dlong=16;
         donnees->xcarte=550;//550
         donnees->ycarte=660;//660
+        donnees->nb_conflits=0;
 
 
         form_pdv* formulaire=malloc(sizeof(form_pdv));
@@ -79,7 +80,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     GtkWidget *ajouter_pdv_button;
     GtkWidget *detect_conflits_button;
     GtkWidget *parametres_button;
-
+    GtkWidget *voir_conflits_button;
     GtkObject *adj2;
 
 
@@ -137,23 +138,23 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     donnees->carte = gtk_drawing_area_new ();
     gtk_drawing_area_size (GTK_DRAWING_AREA(donnees->carte), donnees->xcarte,donnees->ycarte);
     gtk_box_pack_start (GTK_BOX (work_zl), donnees->carte, TRUE, TRUE, 0);
-
+g_signal_connect(donnees->carte, "size-allocate", G_CALLBACK(my_getsizecarte), NULL);
 
 
 // Création du curseur temp (adjustment) et de son label
     hbox_curseur = gtk_hbox_new(FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(work_zl), hbox_curseur, TRUE, TRUE, 0);
+    gtk_box_pack_start(GTK_BOX(work_zl), hbox_curseur, FALSE, FALSE, 0);
     label_curseur=gtk_label_new("Temps   ");
     gtk_box_pack_start(GTK_BOX(hbox_curseur), label_curseur, FALSE, FALSE, 0);
 
 //  ( depart , min , max , ? , incrémentation clic en dehors du curseur , ? )
-    adj2 = gtk_adjustment_new (0.0, 0.0, 1440.0, 1.0, 5.0, 0.0);
+    adj2 = gtk_adjustment_new (donnees->temps, 0.0, 1440.0, 1.0, 5.0, 0.0);
     gtk_signal_connect (GTK_OBJECT (adj2), "value_changed", GTK_SIGNAL_FUNC (recup_temps), donnees);
     curseur = gtk_hscale_new (GTK_ADJUSTMENT (adj2));
     gtk_scale_set_digits (GTK_SCALE (curseur), 0);
     gtk_scale_set_draw_value(GTK_SCALE(curseur),FALSE);
     gtk_box_pack_start (GTK_BOX (hbox_curseur), curseur, TRUE, TRUE, 0);
-    //gtk_widget_show (curseur);
+g_signal_connect(hbox_curseur, "size-allocate", G_CALLBACK(my_getsizetemps), NULL);
 
     donnees->heure_label=gtk_label_new("   00:00");
     gtk_box_pack_start(GTK_BOX(hbox_curseur),donnees->heure_label,FALSE,FALSE,0);
@@ -178,8 +179,11 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
 
     parametres_button=gtk_button_new_with_label("Paramètres");
     gtk_box_pack_start(GTK_BOX(work_zr),parametres_button,FALSE,FALSE,0);
-//    g_signal_connect(GTK_BUTTON(parametres_button),"clicked",G_CALLBACK(parametres),donnees);
     g_signal_connect(GTK_BUTTON(parametres_button),"clicked",G_CALLBACK(parametres),formulaire);
+
+    voir_conflits_button=gtk_button_new_with_label("Voir les conflits");
+    gtk_box_pack_start(GTK_BOX(work_zr),voir_conflits_button,FALSE,FALSE,0);
+    g_signal_connect(GTK_BUTTON(voir_conflits_button),"clicked",G_CALLBACK(voir_conflits),donnees);
 
 
 // Gère le rafraichissement
@@ -194,7 +198,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
 
 
 
-
+g_signal_connect(donnees->Window, "size-allocate", G_CALLBACK(my_getsize), formulaire);
     gtk_widget_show_all(donnees->Window);
 }
 
@@ -233,28 +237,29 @@ void voir_pdv(GtkWidget *bouton, file_opener* donnees)
     pdvw = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
     gtk_window_set_title(GTK_WINDOW(pdvw), "Plans de vols");
-    gtk_window_set_default_size(GTK_WINDOW(pdvw), 250, 500);
+    gtk_window_set_default_size(GTK_WINDOW(pdvw), 100, 500);
     gtk_window_set_position(GTK_WINDOW(pdvw),GTK_WIN_POS_CENTER);
 
     //init scrollbar
     scrollbar = gtk_scrolled_window_new(NULL, NULL);
     gtk_container_add(GTK_CONTAINER(pdvw),scrollbar);
 
-    //création et ajout d'une boite dans la fenètre scroll
-    box=gtk_hbox_new(FALSE,0);
+ //création et ajout d'une boite dans la fenètre scroll
+    box=gtk_vbox_new(FALSE,50);
     gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrollbar), box);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollbar), GTK_POLICY_NEVER, GTK_POLICY_ALWAYS); //Never: désactive la barre, Always, l'inverse
 
     if(donnees->debutpdv!=NULL)
     {
-        char texte[3000];
-        texte[0]='\0';
+
 
         pdv *pdv_current=donnees->debutpdv;
 //->ptsuiv
         while(pdv_current!=NULL)
         {
-            sprintf(texte,"%s\n\n%s\n\tHeure de départ: %02d:%02d\n\tNiveau de vol: FL%d\n\tvitesse: %d kt\n",texte,pdv_current->nom,pdv_current->heure,pdv_current->minute,pdv_current->altitude,pdv_current->vitesse);
+            char texte[3000];
+            texte[0]='\0';
+            sprintf(texte,"%s\n\tHeure de départ: %02d:%02d\n\tNiveau de vol: FL%d\n\tvitesse: %d kt    \n",pdv_current->nom,pdv_current->heure,pdv_current->minute,pdv_current->altitude,pdv_current->vitesse);
             pt_pass* passage=pdv_current->pass_debut;
             while(passage->ptsuiv!=NULL)
             {
@@ -263,8 +268,9 @@ void voir_pdv(GtkWidget *bouton, file_opener* donnees)
                     if(passage->point!=NULL)
                     {
                         aerodrome* pdvae=passage->point;
-                        int h=passage->temps/60;
-                        int m=passage->temps-h*60;
+                        int k=(passage->temps/60);
+                        int h=k%24;
+                        int m=passage->temps-k*60;
                     sprintf(texte,"%s\n\t%s  %02d:%02d    ",texte,pdvae->nom,h,m);
 //printf("aero:  %s\n",pdvae->nom);
                     }
@@ -282,8 +288,9 @@ void voir_pdv(GtkWidget *bouton, file_opener* donnees)
                     if(passage->point!=NULL)
                     {
                         balise* pdvbal=passage->point;
-                        int h=passage->temps/60;
-                        int m=passage->temps-h*60;
+                        int k=(passage->temps/60);
+                        int h=k%24;
+                        int m=passage->temps-k*60;
                         sprintf(texte,"%s\n\t%s  %02d:%02d    ",texte,pdvbal->nom,h,m);
 //printf("bali:  %s\n",pdvbal->nom);
                     }
@@ -297,25 +304,17 @@ void voir_pdv(GtkWidget *bouton, file_opener* donnees)
                 passage=passage->ptsuiv;
 
             }
-             sprintf(texte,"%s\n---------------",texte);
+             sprintf(texte,"%s\n- - - - - - - - - - - - - -\n",texte);
 
-
-
-
-            pdv_current=pdv_current->ptsuiv;
-        }
-
-
-
-
-
-
+g_print("%s",texte);
 
     GtkWidget* label;
     label=gtk_label_new(texte);
-    gtk_container_add(GTK_CONTAINER(box), label);
-    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+    gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 0);
+    //gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
 
+            pdv_current=pdv_current->ptsuiv;
+        }
 
     }
     else
@@ -324,7 +323,6 @@ void voir_pdv(GtkWidget *bouton, file_opener* donnees)
         lab=gtk_label_new("  Aucun plan de vol n'a été chargé !");
         gtk_box_pack_start(GTK_BOX(box),lab,FALSE,FALSE,0);
     }
-
 
         gtk_widget_show_all(pdvw);  //afficher la fenètre
 
@@ -368,6 +366,7 @@ gtk_widget_queue_draw(carte);
 
 void parametres(GtkWidget* bouton, form_pdv* formulaire)
 {
+printf("D=%lf\n",formulaire->donnees->tab_conflits[0].D);
     //GtkWidget* boite;
     GtkWidget* dist_conflits_label;
     GtkWidget* dist_conflits_spin;
@@ -483,3 +482,95 @@ void visu_carte_default(GtkWidget* button, form_pdv* formulaire)
         creer_interface(donnees,formulaire);
         gtk_window_resize(GTK_WINDOW(donnees->Window), 10, 10);
 }
+
+
+
+
+
+void voir_conflits(GtkWidget *bouton, file_opener* donnees)
+{
+    GtkWidget *pdvw;
+    GtkWidget* box;
+    GtkWidget *scrollbar;
+
+    //init fenêtre
+    pdvw = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+
+    gtk_window_set_title(GTK_WINDOW(pdvw), "Conflits");
+    gtk_window_set_default_size(GTK_WINDOW(pdvw), 100, 500);
+    gtk_window_set_position(GTK_WINDOW(pdvw),GTK_WIN_POS_CENTER);
+
+    //init scrollbar
+    scrollbar = gtk_scrolled_window_new(NULL, NULL);
+    gtk_container_add(GTK_CONTAINER(pdvw),scrollbar);
+
+ //création et ajout d'une boite dans la fenètre scroll
+    box=gtk_vbox_new(FALSE,50);
+    gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrollbar), box);
+    gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollbar), GTK_POLICY_NEVER, GTK_POLICY_ALWAYS); //Never: désactive la barre, Always, l'inverse
+
+        int i=0;
+        while(i<donnees->nb_conflits)
+        {
+        conflit conf=donnees->tab_conflits[i];
+            char texte[300];
+            texte[0]='\0';
+            int k=(conf.temps/60);
+            int h=k%24;
+            int m=conf.temps-k*60;
+            sprintf(texte,"CONFLIT entre %s et %s à %02d:%02d |%lf  %lf  D=%lf\n",(conf.pdv1)->nom,conf.pdv2->nom,h,m,conf.latitude,conf.longitude,conf.D);
+
+             sprintf(texte,"%s\n- - - - - - - - - - - - - -\n",texte);
+
+//g_print("%s",texte);
+
+    GtkWidget* label;
+    label=gtk_label_new(texte);
+    gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 0);
+    //gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+
+        i++;
+        }
+
+
+        gtk_widget_show_all(pdvw);  //afficher la fenètre
+
+}
+
+
+
+
+void my_getsize(GtkWidget *widget, GtkAllocation *allocation, form_pdv* formulaire) {
+    printf("W: width = %d, height = %d\n", allocation->width, allocation->height);
+    file_opener* donnees=formulaire->donnees;
+    gtk_widget_set_size_request(donnees->carte, allocation->width-180, allocation->height-40);
+    if((allocation->height)<(allocation->width))
+    {
+        donnees->ycarte=allocation->height-27;
+        donnees->xcarte=donnees->ycarte/1.2;
+
+    }
+    else
+    {
+        donnees->xcarte=allocation->width-160;
+        donnees->ycarte=donnees->xcarte*1.2;
+    }
+
+/*
+    gtk_widget_destroy(donnees->mother_box);
+            creer_interface(donnees,formulaire);
+            gtk_window_resize(GTK_WINDOW(donnees->Window), 10, 10);
+    */
+
+}
+
+
+void my_getsizecarte(GtkWidget *widget, GtkAllocation *allocation, void *data) {
+    printf("Carte: width = %d, height = %d\n", allocation->width, allocation->height);
+
+}
+
+void my_getsizetemps(GtkWidget *widget, GtkAllocation *allocation, void *data) {
+    printf("Temps: width = %d, height = %d\n", allocation->width, allocation->height);
+}
+

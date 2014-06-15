@@ -61,6 +61,14 @@ typedef struct pdv{
     struct pdv * ptsuiv;
 }pdv;
 
+typedef struct conflit{
+    pdv* pdv1;
+    pdv* pdv2;
+    double temps;
+    double latitude;
+    double longitude;
+    double D;
+}conflit;
 
 typedef struct file_opener{
     char *ptchemin;
@@ -84,6 +92,9 @@ typedef struct file_opener{
     GtkWidget *Window;
     GtkWidget *mother_box;
     GtkWidget* boite;
+    conflit tab_conflits[10];
+    int nb_conflits;
+
 }file_opener;
 
 typedef struct form_pdv{
@@ -128,7 +139,10 @@ void recup_temps(GtkAdjustment* adj, file_opener* donnees);
 
 void rapide_file(GtkWidget * widget, file_opener * donnees);
 void visu_carte_default(GtkWidget* button, form_pdv* formulaire);
+void voir_conflits(GtkWidget *bouton, file_opener* donnees);
 
-
+void my_getsize(GtkWidget *widget, GtkAllocation *allocation, form_pdv* formulaire);
+void my_getsizecarte(GtkWidget *widget, GtkAllocation *allocation, void *data);
+void my_getsizetemps(GtkWidget *widget, GtkAllocation *allocation, void *data);
 
 #endif // INTERFACE_H_INCLUDED

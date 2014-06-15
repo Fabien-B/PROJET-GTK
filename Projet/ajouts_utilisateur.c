@@ -141,7 +141,7 @@ void ajouter_pdv(GtkWidget* bouton,form_pdv* formulaire)
 
 
 //g_print("%p   %p   %p\n",formulaire->donnees->debutaero,formulaire->donnees->debutbalises,formulaire->donnees->debutpdv);
-
+int cas;
     pdv* pdv_current;
     if(formulaire->donnees->finpdv!=NULL)
     {
@@ -150,6 +150,7 @@ void ajouter_pdv(GtkWidget* bouton,form_pdv* formulaire)
         formulaire->donnees->finpdv=formulaire->donnees->finpdv->ptsuiv;
         pdv_current=formulaire->donnees->finpdv;
         pdv_current->ptsuiv=NULL;
+        cas=0;
     }
     else
     {
@@ -158,6 +159,7 @@ void ajouter_pdv(GtkWidget* bouton,form_pdv* formulaire)
         pdv_current=formulaire->donnees->debutpdv;
         formulaire->donnees->finpdv=pdv_current;
         pdv_current->ptsuiv=NULL;
+        cas=1;
     }
 
 
@@ -185,10 +187,11 @@ void ajouter_pdv(GtkWidget* bouton,form_pdv* formulaire)
     pass_current->point=NULL;
     pass_current->ptsuiv=NULL;
     int i;
+    int er=0;
     for(i=0;i<formulaire->nb_pt_int+2;i++)
     {
         text = gtk_entry_get_text(GTK_ENTRY(formulaire->pass_entry[i]));
-
+            pass_current->type_point=-1;
                 if(formulaire->donnees->debutbalises!=NULL)
                 {
                     balise* pt_current=formulaire->donnees->debutbalises;
@@ -225,11 +228,38 @@ void ajouter_pdv(GtkWidget* bouton,form_pdv* formulaire)
 
                 }
 
+        if(pass_current->type_point==-1)
+        {
+            er++;
+        }
+
     pass_current->ptsuiv=malloc(sizeof(pt_pass));
     pass_current=pass_current->ptsuiv;
     pass_current->ptsuiv=NULL;
     pass_current->point=NULL;
 
+
+
+    }
+
+    if(er)
+    {
+        pass_current=pdv_current->pass_debut;
+        while(pass_current!=NULL)
+        {
+            pt_pass* pass2=pass_current->ptsuiv;
+            free(pass_current);
+            pass_current=pass2;
+        }
+        free(pdv_current);
+        if(cas)
+        {
+            formulaire->donnees->debutpdv=NULL;
+        }
+        else
+        {
+            formulaire->donnees->finpdv->ptsuiv=NULL;
+        }
 
     }
 
