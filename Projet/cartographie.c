@@ -25,28 +25,35 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
 
  /* ----------------------------------  CONTOUR FRANCE -------------------------------------- */
 
-    double contour[52][2]={{0.761080272727,0.247676},{0.759412909091,0.2539861875},{0.755343636364,0.2597690625},{0.749973272727,0.2628678125},
-                            {0.743332636364,0.2661723125},{0.735988545455,0.2690369375},{0.717142727273,0.272496},{0.690698090909,0.27756},
-                            {0.664294,0.2808645},{0.635493454545,0.2814653125},{0.610466,0.284469375},{0.581608727273,0.287001375},
-                            {0.561556909091,0.2926233125},{0.537243636364,0.2891879375},{0.505640818182,0.284166875},{0.487748818182,0.265234875},
-                            {0.449146363636,0.226439375},{0.410337727273,0.2171696875},{0.380760727273,0.169276125},{0.363941545455,0.139750375},
-                            {0.354465363636,0.097380125},{0.336070090909,0.0643353125},{0.327578727273,0.0931523125},{0.316845454545,0.0707505},
-                            {0.287682636364,0.0705901875},{0.262316818182,0.1648323125},{0.293963363636,0.1931564375},{0.282730181818,0.2709190625},
-                            {0.185582818182,0.2402984375},{0.186874818182,0.280123875},{0.225156909091,0.34810175},{0.158218545455,0.444232125},
-                            {0.0758867272727,0.459681625},{0.0608012727273,0.5194198125},{0.123058727273,0.5946075},{0.205001545455,0.7298766875},
-                            {0.250315272727,0.8699523125},{0.377882272727,0.8332168125},{0.508272181818,0.73159325},{0.484634181818,0.784465},
-                            {0.529590181818,0.7995711875},{0.585475818182,0.8048926875},{0.604299272727,0.7734785625},{0.719421636364,0.8466279375},
-                            {0.790847363636,0.7429444375},{0.745780909091,0.61454175},{0.792307272727,0.5499970625},{0.845854090909,0.5589234375},
-                            {0.843643545455,0.468972875},{0.820851181818,0.3989350625},{0.813518363636,0.32683725},{0.761080272727,0.247676}};
+    double contour[52][2]={{43.378117,-1.787184},{43.396458,-1.686221},{43.441220,-1.593695},{43.500294,-1.544115},
+                            {43.573341,-1.491243},{43.654126,-1.445409},{43.861430,-1.390064},{44.152321,-1.309040},
+                            {44.442766,-1.256168},{44.759572,-1.246555},{45.034874,-1.198490},{45.352304,-1.157978},
+                            {45.572874,-1.068027},{45.840320,-1.122993},{46.187951,-1.203330},{46.384763,-1.506242},
+                            {46.809390,-2.126970},{47.236285,-2.275285},{47.561632,-3.041582},{47.746643,-3.513994},
+                            {47.850881,-4.191918},{48.053229,-4.720635},{48.146634,-4.259563},{48.264700,-4.617992},
+                            {48.585491,-4.620557},{48.864515,-3.112683},{48.516403,-2.659497},{48.639968,-1.415295},
+                            {49.708589,-1.905225},{49.694377,-1.268018},{49.273274,-0.180372},{50.009596,1.357714},
+                            {50.915246,1.604906},{51.081186,2.560717},{50.396354,3.763720},{49.494983,5.928027},
+                            {48.996532,8.169237},{47.593295,7.581469},{46.159006,5.955492},{46.419024,6.801440},
+                            {45.924508,7.043139},{45.309766,7.128283},{45.102708,6.625657},{43.836362,7.796047},
+                            {43.050679,6.137111},{43.546410,4.082668},{43.034620,3.049953},{42.445605,3.192775},
+                            {42.469921,1.753566},{42.720637,0.632961},{42.801298,-0.520604},{43.378117,-1.787184}};
 
 
     int i;
+    double x1,x2,y1,y2;
+    x1=conversion_longitude(contour[0][1],donnees);
+    y1=conversion_lat(contour[0][0],donnees);
     for(i=0;i<51;i++)
     {
-        gdk_draw_line(carte, gc, contour[i][1]*XCARTE,contour[i][0]*YCARTE,contour[i+1][1]*XCARTE,contour[i+1][0]*YCARTE);
+        x2=conversion_longitude(contour[i+1][1],donnees);
+        y2=conversion_lat(contour[i+1][0],donnees);
+        gdk_draw_line(carte, gc, x1*donnees->xcarte,y1*donnees->ycarte,x2*donnees->xcarte,y2*donnees->ycarte);
+
+        x1=x2;
+        y1=y2;
     }
 
-//gdk_draw_string(carte,font,gc,0.5*YCARTE,0.5*YCARTE,"AA");
 
  /* ----------------------------------  AERODROMES -------------------------------------- */
 
@@ -63,10 +70,11 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
             if(pt_aero->affichage==1)
             {
           //  printf("go avec x = %lf et y = %lf\n",pt_aero->pos_x,pt_aero->pos_y);
-
+            double x=conversion_longitude(pt_aero->longitude,donnees);
+            double y=conversion_lat(pt_aero->latitude,donnees);
               //  printf("IF aero : Je change pas car affichage = %d\n", pt_aero->affichage);
-            gdk_draw_string(carte,font,gc, XCARTE*(pt_aero->pos_x)+2,YCARTE*(pt_aero->pos_y) + 7, pt_aero->oaci);
-            gdk_draw_point(carte,gc, XCARTE*(pt_aero->pos_x),YCARTE*(pt_aero->pos_y));
+            gdk_draw_string(carte,font,gc, donnees->xcarte*x+2,donnees->ycarte*y + 7, pt_aero->oaci);
+            gdk_draw_point(carte,gc, donnees->xcarte*x,donnees->ycarte*y);
             }
             else
             {
@@ -91,8 +99,10 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
             if(pt_balise->affichage==1)
             {
              //   printf("IF balise : Je change car affichage = %d\n", pt_balise->affichage);
-                gdk_draw_string(carte,font,gc, XCARTE*(pt_balise->pos_x)+2,YCARTE*(pt_balise->pos_y) + 7, pt_balise->nom);
-                gdk_draw_point(carte,gc, XCARTE*(pt_balise->pos_x),YCARTE*(pt_balise->pos_y));
+                double x=conversion_longitude(pt_balise->longitude,donnees);
+                double y=conversion_lat(pt_balise->latitude,donnees);
+                gdk_draw_string(carte,font,gc, donnees->xcarte*x+2,donnees->ycarte*y + 7, pt_balise->nom);
+                gdk_draw_point(carte,gc, donnees->xcarte*x,donnees->ycarte*y);
             }
             else
             {
@@ -123,14 +133,16 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
             position* loc_avion=malloc(sizeof(position));
 //            Position_avion(donnees,pt_pdv_current,loc_avion);
             get_position_avion(loc_avion,pt_pdv_current,donnees->temps);
-            loc_avion->x = loc_avion->x * XCARTE;
-            loc_avion->y = loc_avion->y * YCARTE;
+            loc_avion->x=conversion_lat(loc_avion->x,donnees)*donnees->ycarte;
+            loc_avion->y=conversion_longitude(loc_avion->y,donnees)*donnees->xcarte;
+           // loc_avion->x = loc_avion->x * donnees->xcarte;
+           // loc_avion->y = loc_avion->y * donnees->ycarte;
 //            printf("\n");
 //            g_print("%lf",loc_avion->x);
 //            g_print("%lf",loc_avion->y);
 
-            gdk_draw_point(carte,gc,loc_avion->x,loc_avion->y);
-            gdk_draw_string(carte,font,gc,loc_avion->x+2,loc_avion->y-1,pt_pdv_current->nom);
+            gdk_draw_point(carte,gc,loc_avion->y,loc_avion->x);
+            gdk_draw_string(carte,font,gc,loc_avion->y+2,loc_avion->x-1,pt_pdv_current->nom);
 
 
             int x1=-9,x2=0,y1=0,y2=0; // Variables de stockage des coordonnées pour les points de passage
@@ -145,28 +157,30 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
                     {
                         aerodrome * pass_aerodrome = pt_pass_current->point;
                         //printf("\n AERODROME 1 \n");
-
-                        x1 = (pass_aerodrome->pos_x) * XCARTE;
-                        y1 = (pass_aerodrome->pos_y) * YCARTE;
+                        x1=conversion_longitude(pass_aerodrome->longitude,donnees)* donnees->xcarte;
+                        y1=conversion_lat(pass_aerodrome->latitude,donnees)* donnees->ycarte;
+                        //x1 = (pass_aerodrome->pos_x) * donnees->xcarte;
+                        //y1 = (pass_aerodrome->pos_y) * donnees->ycarte;
                         //printf("recup x = %d, y = %d\n",x1,y1);
 
                         // Affichage de l'aérodrome
-                        gdk_draw_string(carte,font,gc, XCARTE*(pass_aerodrome->pos_x) + 2,YCARTE*(pass_aerodrome->pos_y) + 7, pass_aerodrome->oaci);
-                        gdk_draw_point(carte,gc, XCARTE*(pass_aerodrome->pos_x),YCARTE*(pass_aerodrome->pos_y));
+                        gdk_draw_string(carte,font,gc, x1 + 2,y1 + 7, pass_aerodrome->oaci);
+                        gdk_draw_point(carte,gc, x1,y1);
                     }
 
                     if(pt_pass_current->type_point==1) // Si le point est une balise
                     {
                         balise * pass_balise = pt_pass_current->point;
                        // printf("\n BALISE 1 \n");
-
-                        x1 = (pass_balise->pos_x) * XCARTE;
-                        y1 = (pass_balise->pos_y) * YCARTE;
+                        x1=conversion_longitude(pass_balise->longitude,donnees)* donnees->xcarte;
+                        y1=conversion_lat(pass_balise->latitude,donnees)* donnees->ycarte;
+                        //x1 = (pass_balise->pos_x) * donnees->xcarte;
+                        //y1 = (pass_balise->pos_y) * donnees->ycarte;
                        // printf("recup x = %d, y = %d\n",x1,y1);
 
                         // Affichage de la balise
-                        gdk_draw_string(carte,font,gc, XCARTE*(pass_balise->pos_x) + 2,YCARTE*(pass_balise->pos_y) + 7, pass_balise->nom);
-                        gdk_draw_point(carte,gc, XCARTE*(pass_balise->pos_x),YCARTE*(pass_balise->pos_y));
+                        gdk_draw_string(carte,font,gc, x1 + 2,y1 + 7, pass_balise->nom);
+                        gdk_draw_point(carte,gc, x1,y1);
                     }
 
                 pt_pass_current = pt_pass_current->ptsuiv;
@@ -186,13 +200,17 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
                     {
                     aerodrome * pass_aerodrome = pt_pass_current->point;
                    // printf("\n AERODROME \n");
-                    x2 = (pass_aerodrome->pos_x) * XCARTE;
-                    y2 = (pass_aerodrome->pos_y) * YCARTE;
+                    //x2 = (pass_aerodrome->pos_x) * donnees->xcarte;
+                   // y2 = (pass_aerodrome->pos_y) * donnees->ycarte;
+                    x2=conversion_longitude(pass_aerodrome->longitude,donnees)* donnees->xcarte;
+                    y2=conversion_lat(pass_aerodrome->latitude,donnees)* donnees->ycarte;
                   //  printf("recup x = %d, y = %d\n",x2,y2);
 
                     // Affichage de l'aerodrome
-                    gdk_draw_string(carte,font,gc, XCARTE*(pass_aerodrome->pos_x) + 2,YCARTE*(pass_aerodrome->pos_y) + 7, pass_aerodrome->oaci);
-                    gdk_draw_point(carte,gc, XCARTE*(pass_aerodrome->pos_x),YCARTE*(pass_aerodrome->pos_y));
+                    int x=conversion_longitude(pass_aerodrome->longitude,donnees)*donnees->xcarte;
+                    int y=conversion_lat(pass_aerodrome->latitude,donnees)*donnees->ycarte;
+                    gdk_draw_string(carte,font,gc, x + 2,y + 7, pass_aerodrome->oaci);
+                    gdk_draw_point(carte,gc, x,y);
                     }
 
                     if(pt_pass_current->type_point==1) // Si le point est une balise
@@ -200,13 +218,16 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
                     balise * pass_balise = pt_pass_current->point;
                   //  printf("\n BALISE \n");
 
-                    x2 = (pass_balise->pos_x) * XCARTE;
-                    y2 = (pass_balise->pos_y) * YCARTE;
+                   // x2 = (pass_balise->pos_x) * donnees->xcarte;
+                  //  y2 = (pass_balise->pos_y) * donnees->ycarte;
+                    x2=conversion_longitude(pass_balise->longitude,donnees)* donnees->xcarte;
+                    y2=conversion_lat(pass_balise->latitude,donnees)* donnees->ycarte;
                    // printf("recup x = %d, y = %d\n",x2,y2);
-
+                    int x=conversion_longitude(pass_balise->longitude,donnees)* donnees->xcarte;
+                    int y=conversion_lat(pass_balise->latitude,donnees)* donnees->ycarte;
                     // Affichage de la balise
-                    gdk_draw_string(carte,font,gc, XCARTE*(pass_balise->pos_x) + 2,YCARTE*(pass_balise->pos_y) + 7, pass_balise->nom);
-                    gdk_draw_point(carte,gc, XCARTE*(pass_balise->pos_x),YCARTE*(pass_balise->pos_y));
+                    gdk_draw_string(carte,font,gc, x + 2,y + 7, pass_balise->nom);
+                    gdk_draw_point(carte,gc, x,y);
                     }
 
 
@@ -358,8 +379,8 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
 //// Donne le pourcentage de chemin effectué entre les deux points de passage
 //double facteur_temps = (donnees->temps - pt_pass_previous->temps) / (pt_pass_current->temps - pt_pass_previous->temps);
 //
-//     loc->x = (loc->x + (delta_pass->x) * facteur_temps) * XCARTE ;
-//     loc->y = (loc->y + (delta_pass->y) * facteur_temps) * YCARTE ;
+//     loc->x = (loc->x + (delta_pass->x) * facteur_temps) * donnees->xcarte ;
+//     loc->y = (loc->y + (delta_pass->y) * facteur_temps) * donnees->ycarte ;
 //
 //    }
 //    else

@@ -3,7 +3,7 @@
 
 #include "interface.h"
 
-typedef struct form_pdv{
+/*typedef struct form_pdv{
     GtkWidget* wind;
     GtkWidget *nom_entry;
     char nom[10];
@@ -26,7 +26,7 @@ typedef struct form_pdv{
     GtkWidget *ok_bouton;
     int nb_pt_int;
     file_opener* donnees;
-}form_pdv;
+}form_pdv;*/
 
 void ajouter_plan_de_vol(GtkWidget* bouton,form_pdv* formulaire);
 void ajouter_pt_pass(GtkWidget* bouton,form_pdv* formulaire);

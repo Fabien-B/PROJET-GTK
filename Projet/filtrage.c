@@ -1,4 +1,5 @@
 #include "filtrage.h"
+#include "ouverture_fichiers.h"
 
 void filtres(GtkWidget* button, file_opener* donnees)
 {
@@ -9,7 +10,7 @@ void filtres(GtkWidget* button, file_opener* donnees)
     GtkWidget* boxbalises;
     GtkWidget* boxpdv;
     GtkWidget* box1;
-    GtkWidget* actualiserbt;
+    //GtkWidget* actualiserbt;
     //init fenêtre
     filw = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
@@ -26,9 +27,9 @@ void filtres(GtkWidget* button, file_opener* donnees)
     gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrollbar), box1);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollbar), GTK_POLICY_NEVER, GTK_POLICY_ALWAYS); //Never: désactive la barre, Always, l'inverse
 
-    actualiserbt=gtk_button_new_with_label("Actualiser l'affichage");
-    gtk_box_pack_start(GTK_BOX(box1),actualiserbt,FALSE,FALSE,0);
-    g_signal_connect(G_OBJECT(actualiserbt), "clicked", G_CALLBACK(redessiner_widget), donnees->carte);
+//    actualiserbt=gtk_button_new_with_label("Actualiser l'affichage");
+//    gtk_box_pack_start(GTK_BOX(box1),actualiserbt,FALSE,FALSE,0);
+//    g_signal_connect(G_OBJECT(actualiserbt), "clicked", G_CALLBACK(redessiner_widget), donnees->carte);
 
     box=gtk_hbox_new(FALSE,0);
     gtk_box_pack_start(GTK_BOX(box1), box, FALSE, FALSE, 0);
@@ -344,11 +345,26 @@ void detection_conflits(GtkWidget *button, file_opener * donnees)
                 {
                     get_position_avion(pos1,pdv1,t);
                     get_position_avion(pos2,pdv2,t);
-                    if((pos1->x)>=0 && (pos2->x)>=0)  //si les avions sont en vols (x=-1 si les avions n'ont pas décolés ou déja aterris)
+                    pos1->x=conversion_lat(pos1->x,donnees);
+                    pos1->y=conversion_longitude(pos1->y,donnees);
+                    pos2->x=conversion_lat(pos2->x,donnees);
+                    pos2->y=conversion_longitude(pos2->y,donnees);
+                    double etat1=donnees->latitude_max-donnees->dlat*pos1->x;
+                    double etat2=donnees->latitude_max-donnees->dlat*pos2->x;
+                     if(etat1>=0 && etat2>=0)  //si les avions sont en vols (etat=-1 si les avions n'ont pas décollés ou déja atterri)
+                     //if(pos1->x>=0 && pos2->x>=0)
                     {
 //g_print("x1=%lf,y1=%lf\n",pos1->x,pos1->y);
 //g_print("x2=%lf,y2=%lf\n",pos2->x,pos2->y);
-                        double D=sqrt(pow((pos2->x-pos1->x)*680,2)+pow((pos2->y-pos1->y)*660,2));
+                       // double D=sqrt(pow((pos2->x-pos1->x)*680,2)+pow((pos2->y-pos1->y)*660,2));
+
+                        double dlat=3340*3.14/180*(pos2->x-pos1->x);                             //distance projeté sur un méridien en NM,  rayon de la terre = 6371km = 3340NM
+                        double latm=(pos2->x+pos1->x)/2;
+                        double r=3340*cos(latm*3.14/180);
+                        double dlong=r*3.14*(pos2->y-pos1->y)/180.0;               //distance projeté sur l'autre axe en NM
+                        double D=sqrt(pow(dlat,2)+pow(dlong,2));                //distance entre les 2 points en NM (approximation: rayon de la terre infini)
+//g_print("D=%lf\n",D);
+
 //g_print("D=%lf\n",D);
                         if(D<donnees->distance_conflit)
                         {
@@ -357,7 +373,7 @@ void detection_conflits(GtkWidget *button, file_opener * donnees)
                             {
                                 int h=t/60;
                                 int m=t-h*60;
-                                g_print("\n\nCONFLIT entre %s et %s à %d:%d à la position x=%lf, y=%lf\n\n\n",pdv1->nom,pdv2->nom,h,m,pos1->x,pos2->y);
+                                g_print("\n\nCONFLIT entre %s et %s à %02d:%02d à la position x=%lf, y=%lf\n\n\n",pdv1->nom,pdv2->nom,h,m,pos1->x,pos2->y);
                             }
                             memconflit=conflit;
                         }
@@ -381,7 +397,7 @@ void get_position_avion(position* pos, pdv* pdv_c,double t)
 {
     if(t<pdv_c->temps_depart || t>pdv_c->temps_arrivee)
     {
-        pos->x=-1;
+        pos->x=-100;
 //g_print("Avion pas partis, ou déja arrivé\n");
     }
     else
@@ -394,42 +410,57 @@ void get_position_avion(position* pos, pdv* pdv_c,double t)
         double dt=t-pass_c->temps;
 
 
-        double x1,x2,y1,y2;
+       // double x1,x2,y1,y2;
+        double lat1,lat2,long1,long2;
 
             if(pass_c->type_point)
             {
                 balise* pt=pass_c->point;
-                x1=pt->pos_x;
-                y1=pt->pos_y;
+                lat1=pt->latitude;
+                long1=pt->longitude;
+                //x1=pt->pos_x;
+                //y1=pt->pos_y;
             }
             else
             {
                 aerodrome* pt=pass_c->point;
-                x1=pt->pos_x;
-                y1=pt->pos_y;
+                lat1=pt->latitude;
+                long1=pt->longitude;
+                //x1=pt->pos_x;
+                //y1=pt->pos_y;
             }
 
             if(pass_c->ptsuiv->type_point)
             {
                 balise* pt=pass_c->ptsuiv->point;
-                x2=pt->pos_x;
-                y2=pt->pos_y;
+                lat2=pt->latitude;
+                long2=pt->longitude;
+                //x2=pt->pos_x;
+                //y2=pt->pos_y;
             }
             else
             {
                 aerodrome* pt=pass_c->ptsuiv->point;
-                x2=pt->pos_x;
-                y2=pt->pos_y;
+                lat2=pt->latitude;
+                long2=pt->longitude;
+                //x2=pt->pos_x;
+                //y2=pt->pos_y;
             }
 
-            double D=sqrt(pow((x2-x1)*680,2)+pow((y2-y1)*660,2));
-
+            //double D=sqrt(pow((x2-x1)*680,2)+pow((y2-y1)*660,2));
+            double dlat=3340*3.14/180*(lat2-lat1);                             //distance projeté sur un méridien en NM,  rayon de la terre = 6371km = 3340NM
+            double latm=(lat1+lat2)/2;
+            double r=3340*cos(latm*3.14/180);
+            double dlong=r*3.14*(long2-long1)/180.0;               //distance projeté sur l'autre axe en NM
+            double D=sqrt(pow(dlat,2)+pow(dlong,2));
 
         double d=pdv_c->vitesse/60*dt;
 
-        pos->x=x1+d/D*(x2-x1);
-        pos->y=y1+d/D*(y2-y1);
+        pos->x=lat1+d/D*(lat2-lat1);
+        pos->y=long1+d/D*(long2-long1);                     //pas vraiment ça mais c'est compliqué...
+        //pos->x=x1+d/D*(x2-x1);
+        //pos->y=y1+d/D*(y2-y1);
 
-//g_print("Avion en vol\n");
+//g_print("%lf   %lf\n",pos->x,pos->y);
     }
 }

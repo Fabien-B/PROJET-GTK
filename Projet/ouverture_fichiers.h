@@ -16,4 +16,6 @@ void recuperer_save_chemin(GtkWidget *bouton, file_opener *donnees);
 void sauver_fichiers(file_opener *donnees);
 
 void integrer_temps(pdv* pdv_deb);
+double conversion_lat(double latitude, file_opener *donnees);
+double conversion_longitude(double longitude, file_opener *donnees);
 #endif // OUVERTURE_FICHIERS_H_INCLUDED

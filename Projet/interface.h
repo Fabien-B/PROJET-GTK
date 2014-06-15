@@ -4,7 +4,6 @@
 #include <math.h>
 #ifndef INTERFACE_H_INCLUDED
 #define INTERFACE_H_INCLUDED
-
 #define XCARTE 550
 #define YCARTE 660
 #define DISTANCE_CONFLIT 20
@@ -30,6 +29,8 @@ typedef struct balise{
     double longdeg;
     double longmin;
     double longsec;
+    double latitude;
+    double longitude;
     int dirlong;        //1 si est, -1 si ouest
     double pos_x;          //positions x et y sur la zone de dessin, à recalculer quand la zone change de taille
     double pos_y;
@@ -74,7 +75,41 @@ typedef struct file_opener{
     GtkWidget *carte;
     GtkWidget *heure_label;
     double temps;
+    double latitude_max;
+    double dlat;
+    double longitude_min;
+    double dlong;
+    int xcarte;
+    int ycarte;
+    GtkWidget *Window;
+    GtkWidget *mother_box;
+    GtkWidget* boite;
 }file_opener;
+
+typedef struct form_pdv{
+    GtkWidget* wind;
+    GtkWidget *nom_entry;
+    char nom[10];
+    GtkWidget *nom_label;
+    GtkWidget * hour_box;
+    GtkWidget * heure_label;
+    GtkWidget * spinh;
+    double heure;
+    GtkWidget * spinm;
+    double minutes;
+    GtkWidget *altitude_entry;
+    char altitude[5];
+    GtkWidget *altitude_label;
+    GtkWidget *vitesse_entry;
+    char vitesse[5];
+    GtkWidget *vitesse_label;
+    GtkWidget *pass_entry[40];
+    char pass[40][10];
+    GtkWidget *pass_label[10];
+    GtkWidget *ok_bouton;
+    int nb_pt_int;
+    file_opener* donnees;
+}form_pdv;
 
 typedef struct position{
     double x;
@@ -82,17 +117,17 @@ typedef struct position{
 }position;
 
 
-
-void init_interface();
+void initialisation(int argc, char *argv[]);
+void creer_interface(file_opener* donnees, form_pdv* formulaire);
 void APropos(GtkWidget* widget);
 void voir_pdv(GtkWidget *bouton, file_opener* donnees);
-void parametres(GtkWidget* bouton, file_opener* donnees);
+void parametres(GtkWidget* bouton, form_pdv* formulaire);
 void redessiner(GtkWidget * carte);
 void redessiner_widget(GtkWidget* button, GtkWidget * carte);
 void recup_temps(GtkAdjustment* adj, file_opener* donnees);
 
 void rapide_file(GtkWidget * widget, file_opener * donnees);
-
+void visu_carte_default(GtkWidget* button, form_pdv* formulaire);
 
 
 

@@ -344,6 +344,9 @@ void charger_fichiers(file_opener *donnees)
                     nouveau->dirlong=-1;
                 }
 
+                nouveau->latitude=nouveau->dirlat*(nouveau->latdeg+nouveau->latmin/60+nouveau->latsec/3600);
+                nouveau->longitude=nouveau->dirlong*(nouveau->longdeg+nouveau->longmin/60+nouveau->longsec/3600);
+                //printf("%lf     %lf\n",nouveau->latitude,nouveau->longitude);
        // printf("%s %d°%d'%lf [%d] %d°%d'%lf [%d]",nouveau->nom,nouveau->latdeg,nouveau->latmin,nouveau->latsec,nouveau->dirlat,nouveau->longdeg,nouveau->longmin,nouveau->longsec,nouveau->dirlong);
        // printf("\n\n\n\n\n");
 
@@ -405,7 +408,7 @@ void charger_fichiers(file_opener *donnees)
                 j=0;
                 int j0=0;
 
-        printf("%s\n",ligne);
+        //printf("%s\n",ligne);
 
                 while(ligne[j]!=' ')        //------------------------ lecture de l'indicatif avion ---------------------------//
                 {
@@ -567,9 +570,9 @@ void conversion(file_opener *donnees)
 
         while(pt_current->ptsuiv!=NULL)             //création et initialisation des checkbox
         {
-        pt_current->pos_y = (51.75 - pt_current->latitude) / 11; // Convertion et transformation de la position en pourcentage de la zone affichable
+        pt_current->pos_y = (donnees->latitude_max - pt_current->latitude) / donnees->dlat; // Conversion et transformation de la position en pourcentage de la zone affichable
         //printf("%s , latitude = %lf, y = %lf\n",pt_current->nom,pt_current->latitude,pt_current->pos_y);
-        pt_current->pos_x = (5.75 + pt_current->longitude) / 16;
+        pt_current->pos_x = (-donnees->longitude_min + pt_current->longitude) / donnees->dlong;
        // printf("%s , longitude = %lf, x = %lf\n\n",pt_current->nom,pt_current->longitude,pt_current->pos_x);
         pt_current=pt_current->ptsuiv;
         }
@@ -588,17 +591,31 @@ void conversion(file_opener *donnees)
 //        pt_balise->pos_x = (pt_balise->latsec) / 3600;
 //        printf("secondes : %lf\n",pt_balise->pos_x);
 //        printf("secondes réels : %lf\n",pt_balise->latsec);
-        pt_balise->pos_y = (51.75 - (pt_balise->latdeg) - (pt_balise->latmin) / 60 - (pt_balise->latsec) / 3600) / 11;
+            pt_balise->pos_y = (donnees->latitude_max - pt_balise->latitude) / donnees->dlat;
+            pt_balise->pos_x = (-donnees->longitude_min + pt_balise->longitude) / donnees->dlong;
+
+//        pt_balise->pos_y = (donnees->latitude_max - (pt_balise->latdeg) - (pt_balise->latmin) / 60 - (pt_balise->latsec) / 3600) / donnees->dlat;
        // printf("%s , latitude = %lf°,%lf',%lf\" , y=%lf\n",pt_balise->nom,pt_balise->latdeg,(pt_balise->latmin) / 60,(pt_balise->latsec) / 3600,pt_balise->pos_y);
-        pt_balise->pos_x = (5.75 + (pt_balise->dirlong) * (pt_balise->longdeg + (pt_balise->longmin) / 60 + (pt_balise->longsec) / 3600)) / 16;
+//        pt_balise->pos_x = (-donnees->longitude_min + (pt_balise->dirlong) * (pt_balise->longdeg + (pt_balise->longmin) / 60 + (pt_balise->longsec) / 3600)) / donnees->dlong;
        // printf("%s , %d longitude = %lf°,%lf',%lf\" , x=%lf\n\n",pt_balise->nom,pt_balise->dirlong,pt_balise->longdeg,pt_balise->longmin,pt_balise->longsec,pt_balise->pos_x);
-        pt_balise=pt_balise->ptsuiv;
+            pt_balise=pt_balise->ptsuiv;
         }
 
     }
 
 }
 
+double conversion_lat(double latitude, file_opener *donnees)
+{
+    double r=(donnees->latitude_max-latitude)/donnees->dlat;
+    return r;
+}
+
+double conversion_longitude(double longitude, file_opener *donnees)
+{
+    double r=(-donnees->longitude_min+longitude)/donnees->dlong;
+    return r;
+}
 
 void liberer_memoire(GtkWidget *bouton, file_opener *donnees)
 {
@@ -733,42 +750,53 @@ void integrer_temps(pdv* pdv_deb)
     while(pdv_current!=NULL)
     {
         pdv_current->temps_depart=60*pdv_current->heure+pdv_current->minute;
-//g_print("\n\nnouveau pdv\n");
-//g_print("\ndépart:%lf\n",pdv_current->temps_depart);
         pt_pass* pass_current=pdv_current->pass_debut;
         pass_current->temps=pdv_current->temps_depart;
         while(pass_current->ptsuiv->ptsuiv!=NULL)
         {
-            double x1,x2,y1,y2;
+            double lat1,lat2,long1,long2;
             if(pass_current->type_point)
             {
                 balise* pt=pass_current->point;
-                x1=pt->pos_x;
-                y1=pt->pos_y;
+                lat1=pt->latitude;
+                long1=pt->longitude;
+//g_print("lat,long %s",pt->nom);
             }
             else
             {
                 aerodrome* pt=pass_current->point;
-                x1=pt->pos_x;
-                y1=pt->pos_y;
+
+                lat1=pt->latitude;
+                long1=pt->longitude;
+//g_print("lat,long %s",pt->oaci);
             }
 
             if(pass_current->ptsuiv->type_point)
             {
                 balise* pt=pass_current->ptsuiv->point;
-                x2=pt->pos_x;
-                y2=pt->pos_y;
+                lat2=pt->latitude;
+                long2=pt->longitude;
+//g_print("  %s",pt->nom);
             }
             else
             {
                 aerodrome* pt=pass_current->ptsuiv->point;
-                x2=pt->pos_x;
-                y2=pt->pos_y;
+                lat2=pt->latitude;
+                long2=pt->longitude;
+//g_print("   %s",pt->oaci);
             }
 
-            double D=sqrt(pow((x2-x1)*680,2)+pow((y2-y1)*660,2));
+            //double D=sqrt(pow((x2-x1)*680,2)+pow((y2-y1)*660,2));
+            double dlat=3340*3.14/180*(lat2-lat1);                             //distance projeté sur un méridien en NM,  rayon de la terre = 6371km = 3340NM
+            double latm=(lat1+lat2)/2;
+            double r=3340*cos(latm*3.14/180);
+            double dlong=r*3.14*(long2-long1)/180.0;               //distance projeté sur l'autre axe en NM
+            double D=sqrt(pow(dlat,2)+pow(dlong,2));                //distance entre les 2 points en NM (approximation: rayon de la terre infini)
+
+//g_print(" = %lf   %lf   D=%lf   latm=%lf\n",dlat,dlong,D,latm);
+//g_print("%lf   %lf   r=%lf\n\n",long1,long2,r);
 //g_print("D=%lf\n",D);
-            pass_current->ptsuiv->temps=pass_current->temps+D/pdv_current->vitesse*60;
+            pass_current->ptsuiv->temps=pass_current->temps+D/(pdv_current->vitesse/60);
 //g_print("t=%lf\n",pass_current->ptsuiv->temps);
 
 

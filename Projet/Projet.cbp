@@ -42,6 +42,9 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="ouverture_fichiers.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="ouverture_fichiers.h" />
 		<Extensions>
 			<code_completion />

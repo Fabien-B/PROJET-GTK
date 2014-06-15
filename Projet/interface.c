@@ -4,10 +4,57 @@
 #include "filtrage.h"
 #include "ajouts_utilisateur.h"
 
-void init_interface(int argc, char *argv[])
+
+void initialisation(int argc, char *argv[])
 {
-    GtkWidget *Window;
-    GtkWidget *mother_box;
+        // Initialisation de Gtk+
+        g_log_set_handler ("Gtk", G_LOG_LEVEL_WARNING, (GLogFunc) gtk_false, NULL);
+        gtk_init (&argc, &argv);
+        g_log_set_handler ("Gtk", G_LOG_LEVEL_WARNING, g_log_default_handler, NULL);
+
+        //initialisation des paramètres/donnees du programme
+        file_opener *donnees=g_malloc(sizeof(file_opener));
+        donnees->ptchemin=NULL;
+        donnees->file_selection=NULL;
+        donnees->debutaero=NULL;
+        donnees->debutbalises=NULL;
+        donnees->debutpdv=NULL;
+        donnees->finpdv=NULL;
+        donnees->finpdv=NULL;
+        donnees->temps=0;
+        donnees->distance_conflit=10;
+        donnees->deltat_conflits=3;
+        donnees->latitude_max=51.75;
+        donnees->dlat=11;
+        donnees->longitude_min=-5.75;
+        donnees->dlong=16;
+        donnees->xcarte=550;//550
+        donnees->ycarte=660;//660
+
+
+        form_pdv* formulaire=malloc(sizeof(form_pdv));
+        formulaire->donnees=donnees;
+        formulaire->nb_pt_int=0;
+        formulaire->altitude[0]='\0';
+        formulaire->nom[0]='\0';
+        formulaire->vitesse[0]='\0';
+        int i;
+        for(i=0;i<40;i++)
+        {
+            formulaire->pass[i][0]='\0';
+        }
+
+        donnees->Window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(donnees->Window), "GATI");
+    gtk_window_set_default_size(GTK_WINDOW(donnees->Window), 32, 40);
+    g_signal_connect(G_OBJECT(donnees->Window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
+
+        creer_interface(donnees,formulaire);
+}
+
+
+void creer_interface(file_opener* donnees,form_pdv* formulaire)
+{
 
     GtkWidget *work_zone;
     GtkWidget *work_zl;
@@ -35,36 +82,10 @@ void init_interface(int argc, char *argv[])
 
     GtkObject *adj2;
 
-    file_opener *donnees=g_malloc(sizeof(file_opener));
-        donnees->ptchemin=NULL;
-        donnees->file_selection=NULL;
-        donnees->debutaero=NULL;
-        donnees->debutbalises=NULL;
-        donnees->debutpdv=NULL;
-        donnees->finpdv=NULL;
-        donnees->distance_conflit=20;
-        donnees->deltat_conflits=5;
-
-
-    form_pdv* formulaire=malloc(sizeof(form_pdv));
-    formulaire->donnees=donnees;
-    formulaire->nb_pt_int=0;
-
- // Initialisation de Gtk+
-    g_log_set_handler ("Gtk", G_LOG_LEVEL_WARNING, (GLogFunc) gtk_false, NULL);
-    gtk_init (&argc, &argv);
-    g_log_set_handler ("Gtk", G_LOG_LEVEL_WARNING, g_log_default_handler, NULL);
-
-
-    Window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-    gtk_window_set_title(GTK_WINDOW(Window), "GATI");
-    gtk_window_set_default_size(GTK_WINDOW(Window), 32, 40);
-    g_signal_connect(G_OBJECT(Window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
-
 
 // Creation et ajout de la GtkBox mère verticale
-    mother_box = gtk_vbox_new(FALSE, 0);
-    gtk_container_add(GTK_CONTAINER(Window), mother_box);
+    donnees->mother_box = gtk_vbox_new(FALSE, 0);
+    gtk_container_add(GTK_CONTAINER(donnees->Window), donnees->mother_box);
 
 //creation et ajout de la barre de menu et la zone de travail------------------------------------------------------------------------------------------------------------------------
     menu_bar = gtk_menu_bar_new();
@@ -94,7 +115,7 @@ void init_interface(int argc, char *argv[])
 
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), MI1_Fichier);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), MI1_Aide);
-    gtk_box_pack_start(GTK_BOX(mother_box), menu_bar, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(donnees->mother_box), menu_bar, FALSE, FALSE, 0);
     //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -104,7 +125,7 @@ void init_interface(int argc, char *argv[])
 
 
     work_zone = gtk_hbox_new(FALSE, 0);
-    gtk_box_pack_start(GTK_BOX(mother_box), work_zone, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(donnees->mother_box), work_zone, FALSE, FALSE, 0);
 //Création et ajout des espaces de travails gauche et droite
     work_zl = gtk_vbox_new(FALSE, 0);
     gtk_box_pack_start(GTK_BOX(work_zone), work_zl, TRUE, TRUE, 0);
@@ -114,7 +135,7 @@ void init_interface(int argc, char *argv[])
 //Création de la carte
 
     donnees->carte = gtk_drawing_area_new ();
-    gtk_drawing_area_size (GTK_DRAWING_AREA(donnees->carte), XCARTE,YCARTE);
+    gtk_drawing_area_size (GTK_DRAWING_AREA(donnees->carte), donnees->xcarte,donnees->ycarte);
     gtk_box_pack_start (GTK_BOX (work_zl), donnees->carte, TRUE, TRUE, 0);
 
 
@@ -132,7 +153,7 @@ void init_interface(int argc, char *argv[])
     gtk_scale_set_digits (GTK_SCALE (curseur), 0);
     gtk_scale_set_draw_value(GTK_SCALE(curseur),FALSE);
     gtk_box_pack_start (GTK_BOX (hbox_curseur), curseur, TRUE, TRUE, 0);
-    gtk_widget_show (curseur);
+    //gtk_widget_show (curseur);
 
     donnees->heure_label=gtk_label_new("   00:00");
     gtk_box_pack_start(GTK_BOX(hbox_curseur),donnees->heure_label,FALSE,FALSE,0);
@@ -157,7 +178,8 @@ void init_interface(int argc, char *argv[])
 
     parametres_button=gtk_button_new_with_label("Paramètres");
     gtk_box_pack_start(GTK_BOX(work_zr),parametres_button,FALSE,FALSE,0);
-    g_signal_connect(GTK_BUTTON(parametres_button),"clicked",G_CALLBACK(parametres),donnees);
+//    g_signal_connect(GTK_BUTTON(parametres_button),"clicked",G_CALLBACK(parametres),donnees);
+    g_signal_connect(GTK_BUTTON(parametres_button),"clicked",G_CALLBACK(parametres),formulaire);
 
 
 // Gère le rafraichissement
@@ -173,7 +195,7 @@ void init_interface(int argc, char *argv[])
 
 
 
-    gtk_widget_show_all(Window);
+    gtk_widget_show_all(donnees->Window);
 }
 
 void recup_temps(GtkAdjustment *adj, file_opener *donnees)
@@ -234,7 +256,6 @@ void voir_pdv(GtkWidget *bouton, file_opener* donnees)
         {
             sprintf(texte,"%s\n\n%s\n\tHeure de départ: %02d:%02d\n\tNiveau de vol: FL%d\n\tvitesse: %d kt\n",texte,pdv_current->nom,pdv_current->heure,pdv_current->minute,pdv_current->altitude,pdv_current->vitesse);
             pt_pass* passage=pdv_current->pass_debut;
-g_print("-----------------------------------\n");
             while(passage->ptsuiv!=NULL)
             {
                 if(passage->type_point==0)
@@ -345,45 +366,94 @@ gtk_widget_queue_draw(carte);
 
 
 
-void parametres(GtkWidget* bouton, file_opener* donnees)
+void parametres(GtkWidget* bouton, form_pdv* formulaire)
 {
-    GtkWidget* boite;
+    //GtkWidget* boite;
     GtkWidget* dist_conflits_label;
     GtkWidget* dist_conflits_spin;
     GtkWidget* delt_conflits_label;
     GtkWidget* delt_conflits_spin;
+    GtkWidget* dim_carte_label;
+    GtkWidget* dim_carte_spin;
+    GtkWidget* zoom_carte_label;
+    GtkWidget* zoom_carte_spin;
+    GtkWidget* lat_coin_label;
+    GtkWidget* long_coin_label;
+    GtkWidget* lat_coin_spin;
+    GtkWidget* long_coin_spin;
+    GtkWidget* pos_centre;
+    GtkWidget* default_button;
+    file_opener* donnees=formulaire->donnees;
 
-
-    boite = gtk_dialog_new_with_buttons("Paramètres",
+    donnees->boite = gtk_dialog_new_with_buttons("Paramètres",
         NULL,
         GTK_DIALOG_MODAL,
         GTK_STOCK_OK,GTK_RESPONSE_OK,
         GTK_STOCK_CANCEL,GTK_RESPONSE_CANCEL,
         NULL);
 
+    default_button=gtk_button_new_with_label("Paramètres par défault");
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(donnees->boite)->vbox),default_button,FALSE,FALSE,0);
+    g_signal_connect(GTK_BUTTON(default_button),"clicked",G_CALLBACK(visu_carte_default),formulaire);
+
     dist_conflits_label = gtk_frame_new("Distance de détection des conflits (NM)");
     dist_conflits_spin = gtk_spin_button_new_with_range(0, 100, 1);
     gtk_container_add(GTK_CONTAINER(dist_conflits_label), dist_conflits_spin);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(boite)->vbox), dist_conflits_label, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(donnees->boite)->vbox), dist_conflits_label, FALSE, FALSE, 0);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(dist_conflits_spin), donnees->distance_conflit);
 
     delt_conflits_label = gtk_frame_new("granularité temporelle de détection des conflits (min)");
     delt_conflits_spin = gtk_spin_button_new_with_range(0.0, 30, 0.5);
     gtk_container_add(GTK_CONTAINER(delt_conflits_label), delt_conflits_spin);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(boite)->vbox), delt_conflits_label, FALSE, FALSE, 0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(donnees->boite)->vbox), delt_conflits_label, FALSE, FALSE, 0);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(delt_conflits_spin), donnees->deltat_conflits);
 
+    dim_carte_label = gtk_frame_new("hauteur de la carte");
+    dim_carte_spin = gtk_spin_button_new_with_range(0, 1000, 25);
+    gtk_container_add(GTK_CONTAINER(dim_carte_label), dim_carte_spin);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(donnees->boite)->vbox), dim_carte_label, FALSE, FALSE, 0);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(dim_carte_spin), donnees->xcarte);
 
-    gtk_widget_show_all(GTK_DIALOG(boite)->vbox);
+    zoom_carte_label = gtk_frame_new("Zoom");
+    zoom_carte_spin = gtk_spin_button_new_with_range(0, 11, 0.1);
+    gtk_container_add(GTK_CONTAINER(zoom_carte_label), zoom_carte_spin);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(donnees->boite)->vbox), zoom_carte_label, FALSE, FALSE, 0);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(zoom_carte_spin), 11/donnees->dlat);
 
 
-    switch (gtk_dialog_run(GTK_DIALOG(boite)))
+    pos_centre=gtk_hbox_new(FALSE,0);
+    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(donnees->boite)->vbox), pos_centre,FALSE,FALSE,FALSE);
+
+    lat_coin_label = gtk_frame_new("latitude du centre");
+    lat_coin_spin = gtk_spin_button_new_with_range(40, 60, 0.2);
+    gtk_container_add(GTK_CONTAINER(lat_coin_label), lat_coin_spin);
+    gtk_box_pack_start(GTK_BOX(pos_centre), lat_coin_label, FALSE, FALSE, 0);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(lat_coin_spin), donnees->latitude_max-donnees->dlat/2);
+
+    long_coin_label = gtk_frame_new("longitude du centre");
+    long_coin_spin = gtk_spin_button_new_with_range(-10, 20, 0.2);
+    gtk_container_add(GTK_CONTAINER(long_coin_label), long_coin_spin);
+    gtk_box_pack_start(GTK_BOX(pos_centre), long_coin_label, FALSE, FALSE, 0);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(long_coin_spin), donnees->longitude_min+donnees->dlong/2);
+    gtk_widget_show_all(GTK_DIALOG(donnees->boite)->vbox);
+
+
+    switch (gtk_dialog_run(GTK_DIALOG(donnees->boite)))
     {
 
         case GTK_RESPONSE_OK:
             donnees->distance_conflit=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(dist_conflits_spin));
             donnees->deltat_conflits=gtk_spin_button_get_value(GTK_SPIN_BUTTON(delt_conflits_spin));
+            donnees->xcarte=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(dim_carte_spin));
+            donnees->ycarte=donnees->xcarte*1.2;
+            donnees->dlat=11/gtk_spin_button_get_value(GTK_SPIN_BUTTON(zoom_carte_spin));
+            donnees->dlong=donnees->dlat*16/11;
+            donnees->latitude_max=gtk_spin_button_get_value(GTK_SPIN_BUTTON(lat_coin_spin))+donnees->dlat/2;
+            donnees->longitude_min=gtk_spin_button_get_value(GTK_SPIN_BUTTON(long_coin_spin))-donnees->dlong/2;
 
+            gtk_widget_destroy(donnees->mother_box);
+            creer_interface(donnees,formulaire);
+            gtk_window_resize(GTK_WINDOW(donnees->Window), 10, 10);
             break;
 
         case GTK_RESPONSE_CANCEL:
@@ -392,5 +462,24 @@ void parametres(GtkWidget* bouton, file_opener* donnees)
 
             break;
     }
-    gtk_widget_destroy(boite);
+    gtk_widget_destroy(donnees->boite);
+}
+
+
+void visu_carte_default(GtkWidget* button, form_pdv* formulaire)
+{
+        file_opener* donnees=formulaire->donnees;
+        donnees->distance_conflit=10;
+        donnees->deltat_conflits=3;
+        donnees->latitude_max=51.75;
+        donnees->dlat=11;
+        donnees->longitude_min=-5.75;
+        donnees->dlong=16;
+        donnees->xcarte=550;//550
+        donnees->ycarte=660;//660
+
+        gtk_widget_destroy(donnees->boite);
+        gtk_widget_destroy(donnees->mother_box);
+        creer_interface(donnees,formulaire);
+        gtk_window_resize(GTK_WINDOW(donnees->Window), 10, 10);
 }
