@@ -136,6 +136,7 @@ void parametres(GtkWidget* bouton, form_pdv* formulaire);
 void redessiner(GtkWidget * carte);
 void redessiner_widget(GtkWidget* button, GtkWidget * carte);
 void recup_temps(GtkAdjustment* adj, file_opener* donnees);
+void test_event_box(GtkWidget* carte,GdkEventScroll* event,file_opener* donnees);
 
 void rapide_file(GtkWidget * widget, file_opener * donnees);
 void visu_carte_default(GtkWidget* button, form_pdv* formulaire);

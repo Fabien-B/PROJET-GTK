@@ -22,6 +22,7 @@ gboolean expose_cb (GtkWidget *canvas, GdkEventExpose *event, file_opener * donn
 void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
 {
     GdkFont * font=gdk_font_load("6x9");//6x9 - 10x20
+    GdkColor c;
 
  /* ----------------------------------  CONTOUR FRANCE -------------------------------------- */
 
@@ -254,43 +255,13 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
 
 
 //                  Une couleur par niveau de vol
-                     if(pt_pdv_current->altitude<140)
-                    {
-                      GdkColor c;
-                    c.pixel = 5;
-                    c.red = (150 - pt_pdv_current->altitude )*5 << 8 ;
-                    c.green = 10 << 8;
-                    c.blue = 10 << 8;
-                    gdk_gc_set_rgb_fg_color (gc, &c);
-                    }
-                    else if(pt_pdv_current->altitude>180)
-                    {
-                      GdkColor c;
-                    c.pixel = 5;
-                    c.red = 10 << 8 ;
-                    c.green = (pt_pdv_current->altitude -180)*5 << 8;
-                    c.blue = 10 << 8;
-                    gdk_gc_set_rgb_fg_color (gc, &c);
-                    }
-                    else
-                    {
-                      GdkColor c;
-                    c.pixel = 5;
-                    c.red = 10 << 8 ;
-                    c.green = 10 << 8;
-                    c.blue = (190 - pt_pdv_current->altitude)*5 << 8;
-                    gdk_gc_set_rgb_fg_color (gc, &c);
-                    }
+                    couleur(gc,c,pt_pdv_current->altitude);
+
 
 //                  Trace la ligne et remet la couleur normalement.
                     gdk_draw_line(carte, gc, x1,y1,x2,y2);
 
-                    GdkColor c;
-                    c.pixel = 0;
-                    c.red = 0 << 8 ;
-                    c.green = 0 << 8;
-                    c.blue = 0 << 8;
-                    gdk_gc_set_rgb_fg_color (gc, &c);
+                    couleur(gc,c,-1);
 
                     // Le point 2 devient le point 1
                     x1=x2;
@@ -313,6 +284,43 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
     gdk_font_unref(font);
 }
 
+
+void couleur(GdkGC* gc,GdkColor c,int altitude)
+{
+c.pixel = 5;
+
+if(0 < altitude && altitude < 140)
+{
+c.red = (150 - altitude )*5 << 8 ;
+c.green = 10 << 8;
+c.blue = 10 << 8;
+//g_print("avion en : rouge \n");
+}
+else if(140 < altitude && altitude < 180)
+{
+c.red = 10 << 8 ;
+c.green = (altitude -180)*5 << 8;
+c.blue = 10 << 8;
+//g_print("avion en : vert \n");
+}
+else if(180 < altitude && altitude < 300)
+{
+c.red = 10 << 8 ;
+c.green = 10 << 8;
+c.blue = (190 - altitude)*5 << 8;
+//g_print("avion en : bleue \n");
+}
+else if(altitude==-1)
+{
+c.red = 0 << 8 ;
+c.green = 0 << 8;
+c.blue = 0 << 8;
+//g_print("avion en : noir \n\n");
+}
+
+gdk_gc_set_rgb_fg_color (gc, &c);
+
+}
 //position* Position_avion(file_opener* donnees, pdv* avion, position* loc)
 //{
 //position *delta_pass=malloc(sizeof(position));

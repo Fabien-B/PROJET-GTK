@@ -5,6 +5,7 @@
 
 gboolean expose_cb (GtkWidget *canvas, GdkEventExpose *event, file_opener *donnees);
 void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees);
+void couleur(GdkGC* gc,GdkColor c,int altitude);
 //position* Position_avion(file_opener* donnees,pdv* avion,position* loc);
 
 

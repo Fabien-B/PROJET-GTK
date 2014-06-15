@@ -82,6 +82,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     GtkWidget *parametres_button;
     GtkWidget *voir_conflits_button;
     GtkObject *adj2;
+    GtkWidget* event_box;
 
 
 // Creation et ajout de la GtkBox mère verticale
@@ -137,8 +138,16 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
 
     donnees->carte = gtk_drawing_area_new ();
     gtk_drawing_area_size (GTK_DRAWING_AREA(donnees->carte), donnees->xcarte,donnees->ycarte);
-    gtk_box_pack_start (GTK_BOX (work_zl), donnees->carte, TRUE, TRUE, 0);
+    //gtk_box_pack_start (GTK_BOX (event_box), donnees->carte, TRUE, TRUE, 0);
 g_signal_connect(donnees->carte, "size-allocate", G_CALLBACK(my_getsizecarte), NULL);
+
+
+//    Ajout event box pour gérer le scroll/zoom
+    event_box = gtk_event_box_new();
+    gtk_box_pack_start (GTK_BOX (work_zl), event_box, TRUE, TRUE, 0);
+    gtk_container_add(GTK_CONTAINER(event_box), donnees->carte);
+    gtk_widget_set_events(event_box,GDK_SCROLL_UP);
+    gtk_signal_connect(GTK_OBJECT(event_box), "scroll_event",GTK_SIGNAL_FUNC(test_event_box), donnees);
 
 
 // Création du curseur temp (adjustment) et de son label
@@ -147,8 +156,8 @@ g_signal_connect(donnees->carte, "size-allocate", G_CALLBACK(my_getsizecarte), N
     label_curseur=gtk_label_new("Temps   ");
     gtk_box_pack_start(GTK_BOX(hbox_curseur), label_curseur, FALSE, FALSE, 0);
 
-//  ( depart , min , max , ? , incrémentation clic en dehors du curseur , ? )
-    adj2 = gtk_adjustment_new (donnees->temps, 0.0, 1440.0, 1.0, 5.0, 0.0);
+//  ( depart , min , max , incrément scroll x2 , incrémentation clic en dehors du curseur , ? )
+    adj2 = gtk_adjustment_new (donnees->temps, 0.0, 1440.0, 0.5, 5.0, 0.0);
     gtk_signal_connect (GTK_OBJECT (adj2), "value_changed", GTK_SIGNAL_FUNC (recup_temps), donnees);
     curseur = gtk_hscale_new (GTK_ADJUSTMENT (adj2));
     gtk_scale_set_digits (GTK_SCALE (curseur), 0);
@@ -200,6 +209,82 @@ g_signal_connect(hbox_curseur, "size-allocate", G_CALLBACK(my_getsizetemps), NUL
 
 g_signal_connect(donnees->Window, "size-allocate", G_CALLBACK(my_getsize), formulaire);
     gtk_widget_show_all(donnees->Window);
+}
+
+void test_event_box(GtkWidget* carte,GdkEventScroll* event,file_opener* donnees)
+{
+
+// NOTE :
+//- Limiter le zoom
+//- Le rendre paramétrable
+//- recentrer le zoom en cas de dézoom quasi max
+
+
+// x = position x sur le programme, x_root = position sur l'écran (globale)
+//double lat,lon;
+//
+//lon = donnees->longitude_min + ((event->x/donnees->xcarte) * donnees->dlong);
+//lat = donnees->latitude_max - ((event->y/donnees->ycarte) * donnees->dlat);
+//g_print("Scroll en x = %lf , y = %lf \n ce qui donne lat = %lf , long = %lf\n",event->x,event->y,lat,lon);
+
+
+
+if(event->direction==0)
+{
+//donnees->latitude_max = donnees->latitude_max - 0.1;
+//donnees->longitude_min = donnees->longitude_min + (0.1 *16/11);
+
+donnees->dlat = donnees->dlat / 2;
+donnees->dlong = donnees->dlat *16/11;
+
+donnees->latitude_max = (donnees->latitude_max - donnees->dlat * event->y/donnees->ycarte);
+donnees->longitude_min = (donnees->longitude_min + donnees->dlong * event->x/donnees->xcarte);
+
+}
+if(event->direction==1)
+{
+//donnees->latitude_max = donnees->latitude_max + 0.1;
+//donnees->longitude_min = donnees->longitude_min - (0.1 *16/11);
+donnees->latitude_max = (donnees->latitude_max + donnees->dlat * event->y/donnees->ycarte);
+donnees->longitude_min = (donnees->longitude_min - donnees->dlong * event->x/donnees->xcarte);
+
+donnees->dlat = donnees->dlat * 2;
+donnees->dlong = donnees->dlat *16/11;
+
+
+
+}
+
+//donnees->latitude_max = (donnees->latitude_max - donnees->dlat * event->x/donnees->xcarte);
+//donnees->longitude_min = (donnees->longitude_min + donnees->dlong * event->y/donnees->ycarte);
+
+//donnees->latitude_max = (donnees->latitude_max + (lat + donnees->dlat/2) ) / 2;
+//donnees->longitude_min = (donnees->longitude_min + (lon - donnees->dlong/2) ) /2;
+
+//g_print("x = %lf, x_root = %lf, y = %lf, y_root = %lf\n",event->x,event->x_root,event->y,event->y_root);
+
+//donnees->latitude_max=gtk_spin_button_get_value(GTK_SPIN_BUTTON(lat_coin_spin))+donnees->dlat/2;
+//donnees->longitude_min=gtk_spin_button_get_value(GTK_SPIN_BUTTON(long_coin_spin))-donnees->dlong/2;
+//
+//double conversion_lat(double latitude, file_opener *donnees)
+//{
+//    double r=(donnees->latitude_max-latitude)/donnees->dlat;
+//    return r;
+//}
+//
+//double conversion_longitude(double longitude, file_opener *donnees)
+//{
+//    double r=(-donnees->longitude_min+longitude)/donnees->dlong;
+//    return r;
+//}
+
+//g_print("test adresse event : %p \n\n",event);
+//g_print("test adresse donnees fin : %p \n\n",donnees);
+//
+//
+//g_print("dlat = %lf, dlong = %lf, lat max = %lf, long min = %lf\n\n",donnees->dlat,donnees->dlong,donnees->latitude_max,donnees->longitude_min);
+redessiner(donnees->carte);
+
 }
 
 void recup_temps(GtkAdjustment *adj, file_opener *donnees)
