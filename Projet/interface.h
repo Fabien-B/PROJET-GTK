@@ -68,6 +68,7 @@ typedef struct conflit{
     double latitude;
     double longitude;
     double D;
+    struct conflit* ptsuiv;
 }conflit;
 
 typedef struct position{
@@ -97,8 +98,7 @@ typedef struct file_opener{
     GtkWidget *Window;
     GtkWidget *mother_box;
     GtkWidget* boite;
-    conflit tab_conflits[10];
-    int nb_conflits;
+    conflit *deb_conflits;
     position *start;
     position *bord;
 

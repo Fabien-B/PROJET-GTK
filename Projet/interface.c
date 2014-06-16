@@ -30,7 +30,6 @@ void initialisation(int argc, char *argv[])
         donnees->dlong=16;
         donnees->xcarte=550;//550
         donnees->ycarte=660;//660
-        donnees->nb_conflits=0;
 
 
         form_pdv* formulaire=malloc(sizeof(form_pdv));
@@ -513,7 +512,6 @@ gtk_widget_queue_draw(carte);
 
 void parametres(GtkWidget* bouton, form_pdv* formulaire)
 {
-printf("D=%lf\n",formulaire->donnees->tab_conflits[0].D);
     //GtkWidget* boite;
     GtkWidget* dist_conflits_label;
     GtkWidget* dist_conflits_spin;
@@ -644,7 +642,7 @@ void voir_conflits(GtkWidget *bouton, file_opener* donnees)
     pdvw = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
     gtk_window_set_title(GTK_WINDOW(pdvw), "Conflits");
-    gtk_window_set_default_size(GTK_WINDOW(pdvw), 100, 500);
+    gtk_window_set_default_size(GTK_WINDOW(pdvw), 10, 500);
     gtk_window_set_position(GTK_WINDOW(pdvw),GTK_WIN_POS_CENTER);
 
     //init scrollbar
@@ -652,22 +650,31 @@ void voir_conflits(GtkWidget *bouton, file_opener* donnees)
     gtk_container_add(GTK_CONTAINER(pdvw),scrollbar);
 
  //création et ajout d'une boite dans la fenètre scroll
-    box=gtk_vbox_new(FALSE,50);
+    box=gtk_vbox_new(FALSE,0);
     gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrollbar), box);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollbar), GTK_POLICY_NEVER, GTK_POLICY_ALWAYS); //Never: désactive la barre, Always, l'inverse
 
-        int i=0;
-        while(i<donnees->nb_conflits)
+        conflit* conflit_current=donnees->deb_conflits;
+        while(conflit_current->ptsuiv!=NULL)
         {
-        conflit conf=donnees->tab_conflits[i];
             char texte[300];
             texte[0]='\0';
-            int k=(conf.temps/60);
+            int k=(conflit_current->temps/60);
             int h=k%24;
-            int m=conf.temps-k*60;
-            sprintf(texte,"CONFLIT entre %s et %s à %02d:%02d |%lf  %lf  D=%lf\n",(conf.pdv1)->nom,conf.pdv2->nom,h,m,conf.latitude,conf.longitude,conf.D);
-
-             sprintf(texte,"%s\n- - - - - - - - - - - - - -\n",texte);
+            int m=conflit_current->temps-k*60;
+            int direc;
+            char dir;
+            if(conflit_current->longitude<0)
+            {
+                dir='W';
+                direc=-1;
+            }
+            else
+            {
+            dir='E';
+            direc=1;
+            }
+            sprintf(texte,"CONFLIT entre %s et %s à %02d:%02d\t\n\t\tPosition: %lf°N  %lf°%c\t\n\t\tDistance=%.2lf NM\t\n  -  -  -  -  -  -  -  -  -  -  -  \n",conflit_current->pdv1->nom,conflit_current->pdv2->nom,h,m,conflit_current->latitude,direc*conflit_current->longitude,dir,conflit_current->D);
 
 //g_print("%s",texte);
 
@@ -676,8 +683,13 @@ void voir_conflits(GtkWidget *bouton, file_opener* donnees)
     gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 0);
     //gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
 
-        i++;
+            conflit_current=conflit_current->ptsuiv;
         }
+        GtkWidget* params;
+        char texte[300];texte[0]='\0';
+        sprintf(texte,"\tParamètres:\n\t\tDistance de détection des conflits: %d NM\t\n\t\tTemps entre deux détections: %.2lf minutes\t",donnees->distance_conflit,donnees->deltat_conflits);
+        params=gtk_label_new(texte);
+        gtk_box_pack_start(GTK_BOX(box), params, FALSE, FALSE, 0);
 
 
         gtk_widget_show_all(pdvw);  //afficher la fenètre

@@ -329,7 +329,10 @@ void detection_conflits(GtkWidget *button, file_opener * donnees)
     position* pos1=malloc(sizeof(position));
     position* pos2=malloc(sizeof(position));
     pdv* pdv1=donnees->debutpdv;
-int c;
+
+    donnees->deb_conflits=malloc(sizeof(conflit));
+    conflit* conflit_current=donnees->deb_conflits;
+    conflit_current->ptsuiv=NULL;
     while(pdv1!=NULL)
     {
         pdv* pdv2=pdv1->ptsuiv;
@@ -367,24 +370,26 @@ int c;
                         double D=sqrt(pow(dlat,2)+pow(dlong,2));                //distance entre les 2 points en NM (approximation: rayon de la terre infini)
 //g_print("D=%lf\n",D);
 
-//g_print("D=%lf\n",D);
                         if(D<donnees->distance_conflit)
                         {
                             conf=1;
                             if(conf!=memconflit)
                             {
-                                int h=t/60;
-                                int m=t-h*60;
-                                conflit aaa=donnees->tab_conflits[c];
-                                aaa.pdv1=pdv1;
-                                aaa.pdv2=pdv2;
-                                aaa.latitude=lat1;
-                                aaa.longitude=long1;
-                                aaa.temps=donnees->temps;
-                                aaa.D=D;
-                                c++;
-                                g_print("CONFLIT entre %s et %s à %02d:%02d |%lf  %lf  D=%lf\n",(aaa.pdv1)->nom,aaa.pdv2->nom,h,m,aaa.latitude,aaa.longitude,aaa.D);
-                                //g_print("\n\nCONFLIT entre %s et %s à %02d:%02d à la position x=%lf, y=%lf\n\n\n",pdv1->nom,pdv2->nom,h,m,pos1->x,pos2->y);
+//int h=t/60;
+//int m=t-h*60;
+                                conflit_current->D=D;
+                                conflit_current->latitude=lat1;
+                                conflit_current->longitude=long1;
+                                conflit_current->pdv1=pdv1;
+                                conflit_current->pdv2=pdv2;
+                                conflit_current->temps=t;
+
+
+//g_print("CONFLIT entre %s et %s à %02d:%02d |%lf  %lf  D=%lf\n",conflit_current->pdv1->nom,conflit_current->pdv2->nom,h,m,conflit_current->latitude,conflit_current->longitude,conflit_current->D);
+
+                                conflit_current->ptsuiv=malloc(sizeof(conflit));
+                                conflit_current=conflit_current->ptsuiv;
+                                conflit_current->ptsuiv=NULL;
                             }
                             memconflit=conf;
                         }
@@ -392,13 +397,15 @@ int c;
                 }
             }
             pdv2=pdv2->ptsuiv;
+
+
         }
 
         pdv1=pdv1->ptsuiv;
+
+
 //g_print("\n\n\n\n");
     }
-
-    donnees->nb_conflits=c;
 
     free(pos1);
     free(pos2);

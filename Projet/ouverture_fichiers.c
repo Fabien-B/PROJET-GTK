@@ -393,7 +393,16 @@ void charger_fichiers(file_opener *donnees)
         if(fic!=NULL)
         {
             pdv* nouveau=malloc(sizeof(pdv));
-            donnees->debutpdv=nouveau;
+
+            if(donnees->debutpdv==NULL)
+            {
+                donnees->debutpdv=nouveau;
+            }
+            else
+            {
+                donnees->debutpdv=nouveau;
+            }
+
             nouveau->ptsuiv=NULL;
             nouveau->pass_debut=NULL;
             int cond;
@@ -402,7 +411,7 @@ void charger_fichiers(file_opener *donnees)
             fgetc(fic);
             do
             {
-
+                int errpass=0; //pour détecter les erreurs d'importations des PDV
                 char chainetempo[200];
 
                 j=0;
@@ -519,6 +528,11 @@ void charger_fichiers(file_opener *donnees)
 
                         }
 
+                        if(pass_current->point==NULL)
+                        {
+                            errpass++;
+                        }
+
                         pass_current->ptsuiv=malloc(sizeof(pt_pass));
                         pass_current=pass_current->ptsuiv;
                         pass_current->ptsuiv=NULL;
@@ -531,19 +545,37 @@ void charger_fichiers(file_opener *donnees)
                 nouveau->affichage=0; //non affiché par défault
 
 
-
             fscanf(fic,"%[^\n]",ligne);
 
             if(fgetc(fic)!=EOF)
             {
+                if(!errpass)
+                {
+                    donnees->finpdv=nouveau;
+                    nouveau->ptsuiv=malloc(sizeof(pdv));
+                    nouveau=nouveau->ptsuiv;
+                    nouveau->ptsuiv=NULL;
+                }
                 cond=1;
-                donnees->finpdv=nouveau;
-                nouveau->ptsuiv=malloc(sizeof(pdv));
-                nouveau=nouveau->ptsuiv;
-                nouveau->ptsuiv=NULL;
+
             }
             else
             {
+                if(!errpass)
+                {
+                    donnees->finpdv=nouveau;
+                }
+                /*else
+                {
+                    pt_pass* pass=nouveau->pass_debut;
+                    while(pass!=NULL)
+                    {
+                        pt_pass* pass2=pass->ptsuiv;
+                        free(pass);
+                        pass=pass2;
+                    }
+                    free(nouveau);
+                }*/
                 cond=0;
             }
 
