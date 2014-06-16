@@ -1,0 +1,34 @@
+Sur la branche master
+Votre branche est en retard sur 'origin/master' de 2 commits, et peut être mise à jour en avance rapide.
+  (utilisez "git pull" pour mettre à jour votre branche locale)
+
+Modifications qui ne seront pas validées :
+  (utilisez "git add/rm <fichier>..." pour mettre à jour ce qui sera validé)
+  (utilisez "git checkout -- <fichier>..." pour annuler les modifications dans la copie de travail)
+
+	supprimé:        Projet/aeroaa.txt
+	modifié:         Projet/aerodromes_fr.txt
+	modifié:         Projet/ajouts_utilisateur.c
+	modifié:         Projet/balises_fr.txt
+	modifié:         Projet/bin/Debug/Projet
+	modifié:         Projet/cartographie.c
+	modifié:         Projet/cartographie.h
+	modifié:         Projet/filtrage.c
+	modifié:         Projet/interface.c
+	modifié:         Projet/interface.h
+	modifié:         Projet/ouverture_fichiers.c
+
+Fichiers non suivis:
+  (utilisez "git add <fichier>..." pour inclure dans ce qui sera validé)
+
+	Exemples_code/GtkEntry_saisie_de_texte/GtkEntry_saisie_de_texte.depend
+	Exemples_code/GtkEntry_saisie_de_texte/GtkEntry_saisie_de_texte.layout
+	Projet/AAA
+	Projet/AAAAAAAAAAAA
+	Projet/PVD_bon (copie).txt
+	Projet/Projet.depend
+	Projet/Projet.layout
+	Projet/manege
+	aaaaaaaaaaaa
+
+aucune modification n'a été ajoutée à la validation (utilisez "git add" ou "git commit -a")

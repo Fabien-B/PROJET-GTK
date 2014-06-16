@@ -475,7 +475,7 @@ void charger_fichiers(file_opener *donnees)
                 while(j<strlen(ligne))
                 {
                     j0=j;
-                    while(ligne[j]!=' ')        //lecture du code
+                    while(ligne[j]!=' ' && ligne[j]!='\0')        //lecture du code
                     {
                         chainetempo[j-j0]=ligne[j];
                         j++;
