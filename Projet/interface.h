@@ -70,6 +70,11 @@ typedef struct conflit{
     double D;
 }conflit;
 
+typedef struct position{
+    double x;
+    double y;
+}position;
+
 typedef struct file_opener{
     char *ptchemin;
     GtkWidget *file_selection;
@@ -94,8 +99,11 @@ typedef struct file_opener{
     GtkWidget* boite;
     conflit tab_conflits[10];
     int nb_conflits;
+    position *start;
+    position *bord;
 
 }file_opener;
+
 
 typedef struct form_pdv{
     GtkWidget* wind;
@@ -122,10 +130,6 @@ typedef struct form_pdv{
     file_opener* donnees;
 }form_pdv;
 
-typedef struct position{
-    double x;
-    double y;
-}position;
 
 
 void initialisation(int argc, char *argv[]);
@@ -136,7 +140,9 @@ void parametres(GtkWidget* bouton, form_pdv* formulaire);
 void redessiner(GtkWidget * carte);
 void redessiner_widget(GtkWidget* button, GtkWidget * carte);
 void recup_temps(GtkAdjustment* adj, file_opener* donnees);
-void test_event_box(GtkWidget* carte,GdkEventScroll* event,file_opener* donnees);
+void scroll_event(GtkWidget* carte,GdkEventScroll* event,file_opener* donnees);
+void press_event(GtkWidget* carte, GdkEventButton* event, file_opener* donnees);
+void drag_event(GtkWidget* carte, GdkEventMotion* event, file_opener* donnees);
 
 void rapide_file(GtkWidget * widget, file_opener * donnees);
 void visu_carte_default(GtkWidget* button, form_pdv* formulaire);

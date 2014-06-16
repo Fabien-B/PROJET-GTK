@@ -97,15 +97,19 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
         MI2_Nouveau = gtk_menu_item_new_with_label("Nouveau");
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Nouveau);
             g_signal_connect(G_OBJECT(MI2_Nouveau), "activate", G_CALLBACK(liberer_memoire), donnees);
+
         MI2_Ouvrir = gtk_menu_item_new_with_label("Ouvrir");
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Ouvrir);
                         g_signal_connect(G_OBJECT(MI2_Ouvrir), "activate", G_CALLBACK(lancer_boite), donnees);
+
         MI2_Enregistrer = gtk_menu_item_new_with_label("Enregistrer");
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Enregistrer);
                         g_signal_connect(G_OBJECT(MI2_Enregistrer), "activate", G_CALLBACK(creer_file_save_selection), donnees);
+
         MI2_Quitter = gtk_menu_item_new_with_label("Quitter");
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Quitter);
             g_signal_connect(G_OBJECT(MI2_Quitter), "activate", G_CALLBACK(gtk_main_quit), NULL);
+
         gtk_menu_item_set_submenu(GTK_MENU_ITEM(MI1_Fichier), Fichier_menu);
 
     MI1_Aide = gtk_menu_item_new_with_label("?");
@@ -113,6 +117,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
         MI2_APropos = gtk_menu_item_new_with_label("À Propos");
         gtk_menu_shell_append(GTK_MENU_SHELL(Aide_menu), MI2_APropos);
             g_signal_connect(G_OBJECT(MI2_APropos), "activate", G_CALLBACK(APropos), NULL);
+
         gtk_menu_item_set_submenu(GTK_MENU_ITEM(MI1_Aide), Aide_menu);
 
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), MI1_Fichier);
@@ -139,7 +144,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     donnees->carte = gtk_drawing_area_new ();
     gtk_drawing_area_size (GTK_DRAWING_AREA(donnees->carte), donnees->xcarte,donnees->ycarte);
     //gtk_box_pack_start (GTK_BOX (event_box), donnees->carte, TRUE, TRUE, 0);
-g_signal_connect(donnees->carte, "size-allocate", G_CALLBACK(my_getsizecarte), NULL);
+//g_signal_connect(donnees->carte, "size-allocate", G_CALLBACK(my_getsizecarte), NULL);
 
 
 //    Ajout event box pour gérer le scroll/zoom
@@ -147,8 +152,12 @@ g_signal_connect(donnees->carte, "size-allocate", G_CALLBACK(my_getsizecarte), N
     gtk_box_pack_start (GTK_BOX (work_zl), event_box, TRUE, TRUE, 0);
     gtk_container_add(GTK_CONTAINER(event_box), donnees->carte);
     gtk_widget_set_events(event_box,GDK_SCROLL_UP);
-    gtk_signal_connect(GTK_OBJECT(event_box), "scroll_event",GTK_SIGNAL_FUNC(test_event_box), donnees);
-
+    gtk_signal_connect(GTK_OBJECT(event_box), "scroll_event",GTK_SIGNAL_FUNC(scroll_event), donnees);
+    gtk_widget_set_events(event_box,GDK_BUTTON_PRESS);
+    g_print("adresse initiale : %p\n",donnees);
+    gtk_signal_connect(GTK_OBJECT(event_box), "button_press_event",GTK_SIGNAL_FUNC(press_event), donnees);
+    gtk_widget_set_events(event_box,GDK_MOTION_NOTIFY);
+    gtk_signal_connect(GTK_OBJECT(event_box), "motion_notify_event",GTK_SIGNAL_FUNC(drag_event), donnees);
 
 // Création du curseur temp (adjustment) et de son label
     hbox_curseur = gtk_hbox_new(FALSE, 0);
@@ -163,7 +172,7 @@ g_signal_connect(donnees->carte, "size-allocate", G_CALLBACK(my_getsizecarte), N
     gtk_scale_set_digits (GTK_SCALE (curseur), 0);
     gtk_scale_set_draw_value(GTK_SCALE(curseur),FALSE);
     gtk_box_pack_start (GTK_BOX (hbox_curseur), curseur, TRUE, TRUE, 0);
-g_signal_connect(hbox_curseur, "size-allocate", G_CALLBACK(my_getsizetemps), NULL);
+//g_signal_connect(hbox_curseur, "size-allocate", G_CALLBACK(my_getsizetemps), NULL);
 
     donnees->heure_label=gtk_label_new("   00:00");
     gtk_box_pack_start(GTK_BOX(hbox_curseur),donnees->heure_label,FALSE,FALSE,0);
@@ -211,7 +220,60 @@ g_signal_connect(donnees->Window, "size-allocate", G_CALLBACK(my_getsize), formu
     gtk_widget_show_all(donnees->Window);
 }
 
-void test_event_box(GtkWidget* carte,GdkEventScroll* event,file_opener* donnees)
+void press_event(GtkWidget* carte, GdkEventButton* event, file_opener* donnees)
+{
+donnees->bord = malloc(sizeof(position));
+donnees->start = malloc(sizeof(position));
+
+//g_print("toujours vivant 0 avec adresse : %p , bord : %p, start : %p \n",donnees,donnees->bord,donnees->start);
+donnees->bord->x = donnees->longitude_min;
+donnees->bord->y = donnees->latitude_max;
+
+
+donnees->start->x = event->x;
+donnees->start->y = event->y;
+
+
+}
+
+void drag_event(GtkWidget* carte, GdkEventMotion* event, file_opener* donnees)
+{
+//g_print("ok\n");
+ int x, y;
+  GdkModifierType state;
+
+  if (event->is_hint)
+  {
+//    g_print("quand ? \n\n");
+    gdk_window_get_pointer (event->window, &x, &y, &state);
+  }
+  else
+    {
+      state = event->state;
+    }
+
+
+
+  if (state & GDK_BUTTON1_MASK )
+  {
+  donnees->longitude_min = donnees->bord->x - ((event->x - donnees->start->x) * donnees->dlong / donnees->xcarte);
+        donnees->latitude_max = donnees->bord->y + ((event->y - donnees->start->y) * donnees->dlat / donnees->ycarte);
+      x = event->x;
+      y = event->y;
+            redessiner(donnees->carte);
+//  g_print("condition bizarre !\n");
+  }
+//  g_print("1 = %d, 2 = %d, 3 = %d, 4 = %d, 5 = %d",GDK_BUTTON1_MASK,GDK_BUTTON2_MASK,GDK_BUTTON3_MASK,GDK_BUTTON1_MASK,GDK_BUTTON1_MOTION_MASK);
+//    g_print("delta x = %lf",((event->x - donnees->start->x) * donnees->dlat / donnees->xcarte) / 10000);
+
+
+
+//g_print("x = %lf, axes = %lf, boutton = %d\n",event->x,event->axes,event->button);
+//g_print("send_event = %d, state = %d, time = %d\n",event->send_event,event->state,event->time);
+//g_print("type : %d\n",event->type);
+}
+
+void scroll_event(GtkWidget* carte,GdkEventScroll* event,file_opener* donnees)
 {
 
 // NOTE :
@@ -626,7 +688,7 @@ void voir_conflits(GtkWidget *bouton, file_opener* donnees)
 
 
 void my_getsize(GtkWidget *widget, GtkAllocation *allocation, form_pdv* formulaire) {
-    printf("W: width = %d, height = %d\n", allocation->width, allocation->height);
+//    printf("W: width = %d, height = %d\n", allocation->width, allocation->height);
     file_opener* donnees=formulaire->donnees;
     gtk_widget_set_size_request(donnees->carte, allocation->width-180, allocation->height-40);
     if((allocation->height)<(allocation->width))
@@ -649,13 +711,13 @@ void my_getsize(GtkWidget *widget, GtkAllocation *allocation, form_pdv* formulai
 
 }
 
-
+/*
 void my_getsizecarte(GtkWidget *widget, GtkAllocation *allocation, void *data) {
-    printf("Carte: width = %d, height = %d\n", allocation->width, allocation->height);
+//    printf("Carte: width = %d, height = %d\n", allocation->width, allocation->height);
 
 }
 
 void my_getsizetemps(GtkWidget *widget, GtkAllocation *allocation, void *data) {
-    printf("Temps: width = %d, height = %d\n", allocation->width, allocation->height);
+//    printf("Temps: width = %d, height = %d\n", allocation->width, allocation->height);
 }
-
+*/
