@@ -24,6 +24,17 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
     GdkFont * font=gdk_font_load("6x9");//6x9 - 10x20
     GdkColor c;
 
+//
+//gdk_draw_line(carte,gc,conversion_lat(40),0,conversion_lat(40),donnees->ycarte);
+//gdk_draw_line(carte,gc,conversion_lat(45),0,conversion_lat(45),donnees->ycarte);
+//gdk_draw_line(carte,gc,conversion_lat(50),0,conversion_lat(50),donnees->ycarte);
+//
+//gdk_draw_line(carte,gc,0,conversion_longitude(-5),donnees->xcarte,conversion_longitude(-5));
+//gdk_draw_line(carte,gc,0,conversion_longitude(0),donnees->xcarte,conversion_longitude(0));
+//gdk_draw_line(carte,gc,0,conversion_longitude(5),donnees->xcarte,conversion_longitude(5));
+//gdk_draw_line(carte,gc,0,conversion_longitude(10),donnees->xcarte,conversion_longitude(10));
+
+
  /* ----------------------------------  CONTOUR FRANCE -------------------------------------- */
 
     double contour[52][2]={{43.378117,-1.787184},{43.396458,-1.686221},{43.441220,-1.593695},{43.500294,-1.544115},
@@ -155,16 +166,17 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
             position* loc_avion=malloc(sizeof(position));
 //            Position_avion(donnees,pt_pdv_current,loc_avion);
             get_position_avion(loc_avion,pt_pdv_current,donnees->temps);
-            loc_avion->x=conversion_lat(loc_avion->x,donnees)*donnees->ycarte;
-            loc_avion->y=conversion_longitude(loc_avion->y,donnees)*donnees->xcarte;
+            loc_avion->y=conversion_lat(loc_avion->y,donnees)*donnees->ycarte;
+            loc_avion->x=conversion_longitude(loc_avion->x,donnees)*donnees->xcarte;
            // loc_avion->x = loc_avion->x * donnees->xcarte;
            // loc_avion->y = loc_avion->y * donnees->ycarte;
 //            printf("\n");
 //            g_print("%lf",loc_avion->x);
 //            g_print("%lf",loc_avion->y);
 
-            gdk_draw_point(carte,gc,loc_avion->y,loc_avion->x);
-            gdk_draw_string(carte,font,gc,loc_avion->y+2,loc_avion->x-1,pt_pdv_current->nom);
+            gdk_draw_point(carte,gc,loc_avion->x,loc_avion->y);
+            gdk_draw_rectangle(carte,gc,TRUE,loc_avion->x-1,loc_avion->y-1,3,3);
+            gdk_draw_string(carte,font,gc,loc_avion->x+2,loc_avion->y-1,pt_pdv_current->nom);
 
 
             int x1=-9,x2=0,y1=0,y2=0; // Variables de stockage des coordonnées pour les points de passage

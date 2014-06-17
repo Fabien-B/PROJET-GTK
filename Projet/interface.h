@@ -101,6 +101,7 @@ typedef struct file_opener{
     conflit *deb_conflits;
     position *start;
     position *bord;
+    position *old;
 
 }file_opener;
 

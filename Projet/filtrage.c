@@ -338,8 +338,17 @@ void detection_conflits(GtkWidget *button, file_opener * donnees)
         pdv* pdv2=pdv1->ptsuiv;
         while(pdv2!=NULL)
         {
+        int dverticale;
+        if(pdv1->altitude>410)      //réglage de la distance de conflit verticale en fonction de l'altitude
+        {
+            dverticale=10;
+        }
+        else
+        {
+            dverticale=20;
+        }
 //g_print("pdv1:%s\npdv2:%s\n",pdv1->nom,pdv2->nom);
-            if(pdv1->altitude==pdv2->altitude) //on ne détecte les conflits que si les vols sont à la même altitude
+            if(abs(pdv1->altitude-pdv2->altitude)<dverticale) //on ne détecte les conflits que si les vols sont à la même altitude
             {
                 double t;
                 int conf=0;
@@ -348,30 +357,25 @@ void detection_conflits(GtkWidget *button, file_opener * donnees)
                 {
                     get_position_avion(pos1,pdv1,t);
                     get_position_avion(pos2,pdv2,t);
-                    double lat1=pos1->x;
-                    double long1=pos1->y;
-                    pos1->x=conversion_lat(pos1->x,donnees);
-                    pos1->y=conversion_longitude(pos1->y,donnees);
-                    pos2->x=conversion_lat(pos2->x,donnees);
-                    pos2->y=conversion_longitude(pos2->y,donnees);
-                    double etat1=donnees->latitude_max-donnees->dlat*pos1->x;
-                    double etat2=donnees->latitude_max-donnees->dlat*pos2->x;
-                     if(etat1>=0 && etat2>=0)  //si les avions sont en vols (etat=-1 si les avions n'ont pas décollés ou déja atterri)
-                     //if(pos1->x>=0 && pos2->x>=0)
+                    double lat1=pos1->y;
+                    double long1=pos1->x;
+
+                    if(pos1->y>=0 && pos2->y>=0)  //si les avions sont en vols (etat=-1 si les avions n'ont pas décollés ou déja atterri)
                     {
 //g_print("x1=%lf,y1=%lf\n",pos1->x,pos1->y);
 //g_print("x2=%lf,y2=%lf\n",pos2->x,pos2->y);
                        // double D=sqrt(pow((pos2->x-pos1->x)*680,2)+pow((pos2->y-pos1->y)*660,2));
 
-                        double dlat=3340*3.14/180*(pos2->x-pos1->x);                             //distance projeté sur un méridien en NM,  rayon de la terre = 6371km = 3340NM
-                        double latm=(pos2->x+pos1->x)/2;
+                        double dlat=3340*3.14/180*(pos2->y-pos1->y);                             //distance projeté sur un méridien en NM,  rayon de la terre = 6371km = 3340NM
+                        double latm=(pos2->y+pos1->y)/2;
                         double r=3340*cos(latm*3.14/180);
-                        double dlong=r*3.14*(pos2->y-pos1->y)/180.0;               //distance projeté sur l'autre axe en NM
+                        double dlong=r*3.14*(pos2->x-pos1->x)/180.0;               //distance projeté sur l'autre axe en NM
                         double D=sqrt(pow(dlat,2)+pow(dlong,2));                //distance entre les 2 points en NM (approximation: rayon de la terre infini)
 //g_print("D=%lf\n",D);
 
                         if(D<donnees->distance_conflit)
                         {
+                            g_print("Conflit entre %s et %s D = %lf, d sécu = %d,  t=%lf\n",pdv1->nom,pdv2->nom,D,donnees->distance_conflit,t);
                             conf=1;
                             if(conf!=memconflit)
                             {
@@ -391,8 +395,18 @@ void detection_conflits(GtkWidget *button, file_opener * donnees)
                                 conflit_current=conflit_current->ptsuiv;
                                 conflit_current->ptsuiv=NULL;
                             }
-                            memconflit=conf;
+                            //memconflit=conf;
                         }
+                        else
+                        {
+                            conf=0;
+                        }
+
+                        if(conf!=memconflit && !conf)
+                        {
+                            g_print("plus de conflit! t=%lf\n",t);
+                        }
+                        memconflit=conf;
                     }
                 }
             }
@@ -415,7 +429,7 @@ void get_position_avion(position* pos, pdv* pdv_c,double t)
 {
     if(t<pdv_c->temps_depart || t>pdv_c->temps_arrivee)
     {
-        pos->x=-100;
+        pos->y=-100;
 //g_print("Avion pas partis, ou déja arrivé\n");
     }
     else
@@ -474,8 +488,8 @@ void get_position_avion(position* pos, pdv* pdv_c,double t)
 
         double d=pdv_c->vitesse/60*dt;
 
-        pos->x=lat1+d/D*(lat2-lat1);
-        pos->y=long1+d/D*(long2-long1);                     //pas vraiment ça mais c'est compliqué...
+        pos->y=lat1+d/D*(lat2-lat1);
+        pos->x=long1+d/D*(long2-long1);                     //pas vraiment ça mais c'est compliqué...
         //pos->x=x1+d/D*(x2-x1);
         //pos->y=y1+d/D*(y2-y1);
 
