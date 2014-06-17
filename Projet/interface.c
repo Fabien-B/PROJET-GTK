@@ -14,6 +14,7 @@ void initialisation(int argc, char *argv[])
 
         //initialisation des paramètres/donnees du programme
         file_opener *donnees=g_malloc(sizeof(file_opener));
+        donnees->old = malloc(sizeof(position));
         donnees->ptchemin=NULL;
         donnees->file_selection=NULL;
         donnees->debutaero=NULL;
@@ -21,6 +22,7 @@ void initialisation(int argc, char *argv[])
         donnees->debutpdv=NULL;
         donnees->finpdv=NULL;
         donnees->finpdv=NULL;
+        donnees->deb_conflits=NULL;
         donnees->temps=0;
         donnees->distance_conflit=10;
         donnees->deltat_conflits=3;
@@ -153,7 +155,6 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     gtk_widget_set_events(event_box,GDK_SCROLL_UP);
     gtk_signal_connect(GTK_OBJECT(event_box), "scroll_event",GTK_SIGNAL_FUNC(scroll_event), donnees);
     gtk_widget_set_events(event_box,GDK_BUTTON_PRESS);
-    g_print("adresse initiale : %p\n",donnees);
     gtk_signal_connect(GTK_OBJECT(event_box), "button_press_event",GTK_SIGNAL_FUNC(press_event), donnees);
     gtk_widget_set_events(event_box,GDK_MOTION_NOTIFY);
     gtk_signal_connect(GTK_OBJECT(event_box), "motion_notify_event",GTK_SIGNAL_FUNC(drag_event), donnees);
@@ -221,46 +222,49 @@ g_signal_connect(donnees->Window, "size-allocate", G_CALLBACK(my_getsize), formu
 
 void press_event(GtkWidget* carte, GdkEventButton* event, file_opener* donnees)
 {
+
 donnees->bord = malloc(sizeof(position));
 donnees->start = malloc(sizeof(position));
 
-//g_print("toujours vivant 0 avec adresse : %p , bord : %p, start : %p \n",donnees,donnees->bord,donnees->start);
 donnees->bord->x = donnees->longitude_min;
 donnees->bord->y = donnees->latitude_max;
-
 
 donnees->start->x = event->x;
 donnees->start->y = event->y;
 
+position clic;
+clic.x = donnees->longitude_min + donnees->dlong * (event->x/donnees->xcarte);
+clic.y = donnees->latitude_max - donnees->dlat * (event->y/donnees->ycarte);
+
+
+
+    double dlat=3340*3.14/180*(clic.y - donnees->old->y);                             //distance projeté sur un méridien en NM,  rayon de la terre = 6371km = 3340NM
+    double latm=(clic.y+donnees->old->y)/2;
+    double r=3340*cos(latm*3.14/180);
+    double dlong=r*3.14*(donnees->old->x-clic.x)/180.0;               //distance projeté sur l'autre axe en NM
+    double D=sqrt(pow(dlat,2)+pow(dlong,2));
+    g_print("Les deux derniers points précédants sont (1 : ancien): \n - x1 = %lf \n - y1 = %lf \n - x2 = %lf \n - y2 = %lf\n",donnees->old->x,donnees->old->y,clic.x,clic.y);
+    g_print("La distance entre les 2 derniers points vaut : %lf (NM)\n\n",D);
+
+
+donnees->old->x = clic.x;
+donnees->old->y = clic.y;
+
+g_print("Clic en : lat = %lf, long = %lf\n",clic.y,clic.x);
 
 }
 
 void drag_event(GtkWidget* carte, GdkEventMotion* event, file_opener* donnees)
 {
-//g_print("ok\n");
- int x, y;
-  GdkModifierType state;
 
-  if (event->is_hint)
-  {
-//    g_print("quand ? \n\n");
-    gdk_window_get_pointer (event->window, &x, &y, &state);
-  }
-  else
-    {
-      state = event->state;
-    }
-
-
+ GdkModifierType state;
+state = event->state;
 
   if (state & GDK_BUTTON1_MASK )
   {
-  donnees->longitude_min = donnees->bord->x - ((event->x - donnees->start->x) * donnees->dlong / donnees->xcarte);
-        donnees->latitude_max = donnees->bord->y + ((event->y - donnees->start->y) * donnees->dlat / donnees->ycarte);
-      x = event->x;
-      y = event->y;
-            redessiner(donnees->carte);
-//  g_print("condition bizarre !\n");
+    donnees->longitude_min = donnees->bord->x - ((event->x - donnees->start->x) * donnees->dlong / donnees->xcarte);
+    donnees->latitude_max = donnees->bord->y + ((event->y - donnees->start->y) * donnees->dlat / donnees->ycarte);
+    redessiner(donnees->carte);
   }
 //  g_print("1 = %d, 2 = %d, 3 = %d, 4 = %d, 5 = %d",GDK_BUTTON1_MASK,GDK_BUTTON2_MASK,GDK_BUTTON3_MASK,GDK_BUTTON1_MASK,GDK_BUTTON1_MOTION_MASK);
 //    g_print("delta x = %lf",((event->x - donnees->start->x) * donnees->dlat / donnees->xcarte) / 10000);
@@ -275,11 +279,50 @@ void drag_event(GtkWidget* carte, GdkEventMotion* event, file_opener* donnees)
 void scroll_event(GtkWidget* carte,GdkEventScroll* event,file_opener* donnees)
 {
 
-// NOTE :
-//- Limiter le zoom
-//- Le rendre paramétrable
-//- recentrer le zoom en cas de dézoom quasi max
 
+// Facteur de zoom
+double Z = 2;
+
+if(11/donnees->dlat <= 0.25 && event->direction)
+{
+// Recentrage et blocage du zoom
+donnees->latitude_max = 68.25;
+donnees->longitude_min = -29.75;
+
+donnees->dlat = 44;
+donnees->dlong = 64;
+//g_print("Zoom min ! \n");
+}
+else if(11/donnees->dlat >= 48 && event->direction==0)
+{
+// Blocage du zoom
+
+//g_print("Zoom max !\n");
+}
+else
+{
+    // Scroll up zoom
+    if(event->direction==0)
+    {
+        // Nouvelle largeur et hauteur
+        donnees->dlat = donnees->dlat / Z;
+        donnees->dlong = donnees->dlat *16/11;
+
+        // Repositionnement du bord de la carte
+        donnees->latitude_max = (donnees->latitude_max - donnees->dlat * (Z -1) * event->y/donnees->ycarte);
+        donnees->longitude_min = (donnees->longitude_min + donnees->dlong * (Z -1) * event->x/donnees->xcarte);
+
+    }
+    // Scroll down dézoom
+    if(event->direction==1)
+    {
+        donnees->dlat = donnees->dlat * Z;
+        donnees->dlong = donnees->dlat *16/11;
+
+        donnees->latitude_max = (donnees->latitude_max + donnees->dlat * (1 - 1/Z) * event->y/donnees->ycarte);
+        donnees->longitude_min = (donnees->longitude_min - donnees->dlong * (1 - 1/Z) * event->x/donnees->xcarte);
+    }
+}
 
 // x = position x sur le programme, x_root = position sur l'écran (globale)
 //double lat,lon;
@@ -288,33 +331,12 @@ void scroll_event(GtkWidget* carte,GdkEventScroll* event,file_opener* donnees)
 //lat = donnees->latitude_max - ((event->y/donnees->ycarte) * donnees->dlat);
 //g_print("Scroll en x = %lf , y = %lf \n ce qui donne lat = %lf , long = %lf\n",event->x,event->y,lat,lon);
 
+    //donnees->latitude_max = donnees->latitude_max - 0.1;
+    //donnees->longitude_min = donnees->longitude_min + (0.1 *16/11);
 
+    //donnees->latitude_max = donnees->latitude_max + 0.1;
+    //donnees->longitude_min = donnees->longitude_min - (0.1 *16/11);
 
-if(event->direction==0)
-{
-//donnees->latitude_max = donnees->latitude_max - 0.1;
-//donnees->longitude_min = donnees->longitude_min + (0.1 *16/11);
-
-donnees->dlat = donnees->dlat / 2;
-donnees->dlong = donnees->dlat *16/11;
-
-donnees->latitude_max = (donnees->latitude_max - donnees->dlat * event->y/donnees->ycarte);
-donnees->longitude_min = (donnees->longitude_min + donnees->dlong * event->x/donnees->xcarte);
-
-}
-if(event->direction==1)
-{
-//donnees->latitude_max = donnees->latitude_max + 0.1;
-//donnees->longitude_min = donnees->longitude_min - (0.1 *16/11);
-donnees->latitude_max = (donnees->latitude_max + donnees->dlat * event->y/donnees->ycarte);
-donnees->longitude_min = (donnees->longitude_min - donnees->dlong * event->x/donnees->xcarte);
-
-donnees->dlat = donnees->dlat * 2;
-donnees->dlong = donnees->dlat *16/11;
-
-
-
-}
 
 //donnees->latitude_max = (donnees->latitude_max - donnees->dlat * event->x/donnees->xcarte);
 //donnees->longitude_min = (donnees->longitude_min + donnees->dlong * event->y/donnees->ycarte);
@@ -654,7 +676,12 @@ void voir_conflits(GtkWidget *bouton, file_opener* donnees)
     gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrollbar), box);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollbar), GTK_POLICY_NEVER, GTK_POLICY_ALWAYS); //Never: désactive la barre, Always, l'inverse
 
-        conflit* conflit_current=donnees->deb_conflits;
+    detection_conflits(NULL,donnees);
+
+    if(donnees->deb_conflits!=NULL)
+    {
+
+    conflit* conflit_current=donnees->deb_conflits;
         while(conflit_current->ptsuiv!=NULL)
         {
             char texte[300];
@@ -690,6 +717,15 @@ void voir_conflits(GtkWidget *bouton, file_opener* donnees)
         sprintf(texte,"\tParamètres:\n\t\tDistance de détection des conflits: %d NM\t\n\t\tTemps entre deux détections: %.2lf minutes\t",donnees->distance_conflit,donnees->deltat_conflits);
         params=gtk_label_new(texte);
         gtk_box_pack_start(GTK_BOX(box), params, FALSE, FALSE, 0);
+
+    }
+    else
+    {
+        GtkWidget* lab;
+        lab=gtk_label_new("  Vous n'avez pas lancer la détection des conflits!   ");
+        gtk_box_pack_start(GTK_BOX(box), lab, FALSE, FALSE, 0);
+    }
+
 
 
         gtk_widget_show_all(pdvw);  //afficher la fenètre
