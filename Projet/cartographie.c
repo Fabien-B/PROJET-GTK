@@ -23,16 +23,24 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
 {
     GdkFont * font=gdk_font_load("6x9");//6x9 - 10x20
     GdkColor c;
+int j;
+char text[5];
 
-//
-//gdk_draw_line(carte,gc,conversion_lat(40),0,conversion_lat(40),donnees->ycarte);
-//gdk_draw_line(carte,gc,conversion_lat(45),0,conversion_lat(45),donnees->ycarte);
-//gdk_draw_line(carte,gc,conversion_lat(50),0,conversion_lat(50),donnees->ycarte);
-//
-//gdk_draw_line(carte,gc,0,conversion_longitude(-5),donnees->xcarte,conversion_longitude(-5));
-//gdk_draw_line(carte,gc,0,conversion_longitude(0),donnees->xcarte,conversion_longitude(0));
-//gdk_draw_line(carte,gc,0,conversion_longitude(5),donnees->xcarte,conversion_longitude(5));
-//gdk_draw_line(carte,gc,0,conversion_longitude(10),donnees->xcarte,conversion_longitude(10));
+for(j=35;j<60;)
+{
+sprintf(text,"%d",j);
+gdk_draw_line(carte,gc,0,conversion_lat(j,donnees)*donnees->ycarte,donnees->xcarte,conversion_lat(j,donnees)*donnees->ycarte);
+gdk_draw_string(carte,font,gc,3,conversion_lat(j,donnees)*donnees->ycarte-5,text);
+j=j+5;
+}
+
+for(j=-10;j<20;)
+{
+sprintf(text,"%d",j);
+gdk_draw_line(carte,gc,conversion_longitude(j,donnees)*donnees->xcarte,0,conversion_longitude(j,donnees)*donnees->xcarte,donnees->ycarte);
+gdk_draw_string(carte,font,gc,conversion_longitude(j,donnees)*donnees->xcarte+5,8,text);
+j=j+5;
+}
 
 
  /* ----------------------------------  CONTOUR FRANCE -------------------------------------- */

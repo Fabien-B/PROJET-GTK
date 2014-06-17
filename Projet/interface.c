@@ -283,14 +283,14 @@ void scroll_event(GtkWidget* carte,GdkEventScroll* event,file_opener* donnees)
 // Facteur de zoom
 double Z = 2;
 
-if(11/donnees->dlat <= 0.25 && event->direction)
+if(11/donnees->dlat <= 1 && event->direction)
 {
 // Recentrage et blocage du zoom
-donnees->latitude_max = 68.25;
-donnees->longitude_min = -29.75;
+donnees->latitude_max = 57.25;
+donnees->longitude_min = -13.75;
 
-donnees->dlat = 44;
-donnees->dlong = 64;
+donnees->dlat = 22;
+donnees->dlong = 32;
 //g_print("Zoom min ! \n");
 }
 else if(11/donnees->dlat >= 48 && event->direction==0)
