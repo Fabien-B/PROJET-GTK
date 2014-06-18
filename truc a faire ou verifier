@@ -1,0 +1,30 @@
+
+unité de temps?
+
+trucs inutiles dans les structures:
+aérodrome:
+	pos_x;
+	pos_y;
+	
+balise:
+	latdeg;
+	longdeg;
+	dirlat;
+	dirlong;
+	latmin;
+	longmin;
+	latsec;
+	longsec;
+	pos_x;
+	pos_y;
+	
+pdv:
+	heure?
+	minute?
+	
+conflit:
+	latitude;
+	longitude;
+
+
+
