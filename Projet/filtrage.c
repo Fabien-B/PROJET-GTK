@@ -353,15 +353,26 @@ void detection_conflits(GtkWidget *button, file_opener * donnees)
                 double t;
                 int conf=0;
                 int memconflit=0;
-                for(t=0;t<TEMPS_SIMULATION;t+=donnees->deltat_conflits)
+                double td=pdv1->temps_depart;
+                if(pdv2->temps_depart>td)
+                {
+                    td=pdv2->temps_depart;
+                }
+
+                double ta=pdv1->temps_arrivee;
+                if(pdv2->temps_depart>ta)
+                {
+                    ta=pdv2->temps_arrivee;
+                }
+
+
+                for(t=td;t<=ta;t+=donnees->deltat_conflits)
                 {
                     get_position_avion(pos1,pdv1,t);
                     get_position_avion(pos2,pdv2,t);
                     double lat1=pos1->y;
                     double long1=pos1->x;
 
-                    if(pos1->y>=0 && pos2->y>=0)  //si les avions sont en vols (etat=-1 si les avions n'ont pas décollés ou déja atterri)
-                    {
 //g_print("x1=%lf,y1=%lf\n",pos1->x,pos1->y);
 //g_print("x2=%lf,y2=%lf\n",pos2->x,pos2->y);
                        // double D=sqrt(pow((pos2->x-pos1->x)*680,2)+pow((pos2->y-pos1->y)*660,2));
@@ -410,7 +421,6 @@ void detection_conflits(GtkWidget *button, file_opener * donnees)
                             conflit_current->ptsuiv=NULL;
                         }
                         memconflit=conf;
-                    }
                 }
             }
             pdv2=pdv2->ptsuiv;

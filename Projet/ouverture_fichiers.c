@@ -688,6 +688,16 @@ void liberer_memoire(GtkWidget *bouton, file_opener *donnees)
     }
     donnees->debutpdv=NULL;
 
+    conflit* pt_current_conflit=donnees->deb_conflits;
+    while(pt_current_conflit!=NULL)
+    {
+        conflit* pt2=pt_current_conflit->ptsuiv;
+        free(pt_current_conflit);
+        pt_current_conflit=pt2;
+    }
+    donnees->deb_conflits=NULL;
+
+
     redessiner(donnees->carte);
 }
 

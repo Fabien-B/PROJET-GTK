@@ -25,7 +25,7 @@ void initialisation(int argc, char *argv[])
         donnees->deb_conflits=NULL;
         donnees->temps=0;
         donnees->distance_conflit=10;
-        donnees->deltat_conflits=3;
+        donnees->deltat_conflits=3.0/36;
         donnees->latitude_max=51.75;
         donnees->dlat=11;
         donnees->longitude_min=-5.75;
@@ -429,7 +429,7 @@ void voir_pdv(GtkWidget *bouton, file_opener* donnees)
     gtk_container_add(GTK_CONTAINER(pdvw),scrollbar);
 
  //création et ajout d'une boite dans la fenètre scroll
-    box=gtk_vbox_new(FALSE,50);
+    box=gtk_vbox_new(FALSE,0);
     gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrollbar), box);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollbar), GTK_POLICY_NEVER, GTK_POLICY_ALWAYS); //Never: désactive la barre, Always, l'inverse
 
@@ -443,7 +443,7 @@ void voir_pdv(GtkWidget *bouton, file_opener* donnees)
         {
             char texte[3000];
             texte[0]='\0';
-            sprintf(texte,"%s\n\tHeure de départ: %02d:%02d\n\tNiveau de vol: FL%d\n\tvitesse: %d kt    \n",pdv_current->nom,pdv_current->heure,pdv_current->minute,pdv_current->altitude,pdv_current->vitesse);
+            sprintf(texte,"\n%s\n\tHeure de départ: %02d:%02d\n\tNiveau de vol: FL%d\n\tvitesse: %d kt    \n",pdv_current->nom,pdv_current->heure,pdv_current->minute,pdv_current->altitude,pdv_current->vitesse);
             pt_pass* passage=pdv_current->pass_debut;
             while(passage->ptsuiv!=NULL)
             {
@@ -488,14 +488,14 @@ void voir_pdv(GtkWidget *bouton, file_opener* donnees)
                 passage=passage->ptsuiv;
 
             }
-             sprintf(texte,"%s\n- - - - - - - - - - - - - -\n",texte);
+             sprintf(texte,"%s\n-  -  -  -  -  -  -  -  -  -  -  -  -  -\n",texte);
 
 g_print("%s",texte);
 
     GtkWidget* label;
     label=gtk_label_new(texte);
     gtk_box_pack_start(GTK_BOX(box), label, FALSE, FALSE, 0);
-    //gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
+    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_CENTER);
 
             pdv_current=pdv_current->ptsuiv;
         }
@@ -584,11 +584,11 @@ void parametres(GtkWidget* bouton, form_pdv* formulaire)
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(donnees->boite)->vbox), dist_conflits_label, FALSE, FALSE, 0);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(dist_conflits_spin), donnees->distance_conflit);
 
-    delt_conflits_label = gtk_frame_new("granularité temporelle de détection des conflits (min)");
-    delt_conflits_spin = gtk_spin_button_new_with_range(0.0, 30, 0.5);
+    delt_conflits_label = gtk_frame_new("temps entre deux détections de conflits (s)");
+    delt_conflits_spin = gtk_spin_button_new_with_range(1, 300, 1);
     gtk_container_add(GTK_CONTAINER(delt_conflits_label), delt_conflits_spin);
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(donnees->boite)->vbox), delt_conflits_label, FALSE, FALSE, 0);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(delt_conflits_spin), donnees->deltat_conflits);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(delt_conflits_spin), donnees->deltat_conflits*60);
 
     dim_carte_label = gtk_frame_new("hauteur de la carte");
     dim_carte_spin = gtk_spin_button_new_with_range(0, 1000, 25);
@@ -625,7 +625,7 @@ void parametres(GtkWidget* bouton, form_pdv* formulaire)
 
         case GTK_RESPONSE_OK:
             donnees->distance_conflit=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(dist_conflits_spin));
-            donnees->deltat_conflits=gtk_spin_button_get_value(GTK_SPIN_BUTTON(delt_conflits_spin));
+            donnees->deltat_conflits=gtk_spin_button_get_value(GTK_SPIN_BUTTON(delt_conflits_spin))/60;
             donnees->xcarte=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(dim_carte_spin));
             donnees->ycarte=donnees->xcarte*1.2;
             donnees->dlat=11/gtk_spin_button_get_value(GTK_SPIN_BUTTON(zoom_carte_spin));
@@ -730,7 +730,7 @@ void voir_conflits(GtkWidget *bouton, file_opener* donnees)
         }
         GtkWidget* params;
         char texte[300];texte[0]='\0';
-        sprintf(texte,"\tParamètres:\n\t\tDistance de détection des conflits: %d NM\t\n\t\tTemps entre deux détections: %.2lf minutes\t",donnees->distance_conflit,donnees->deltat_conflits);
+        sprintf(texte,"\tParamètres:\n\t\tDistance de détection des conflits: %d NM\t\n\t\tTemps entre deux détections: %.0lf secondes\t",donnees->distance_conflit,donnees->deltat_conflits*60);
         params=gtk_label_new(texte);
         gtk_box_pack_start(GTK_BOX(box), params, FALSE, FALSE, 0);
 

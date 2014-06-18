@@ -26,7 +26,6 @@ void dessiner(GdkDrawable* carte, GdkGC *gc, file_opener *donnees)
 int j;
 char text[5];
 
-couleur(gc,c,-2);
 for(j=35;j<=55;j+=5)
 {
 sprintf(text,"%d",j);
@@ -40,7 +39,7 @@ sprintf(text,"%d",j);
 gdk_draw_line(carte,gc,conversion_longitude(j,donnees)*donnees->xcarte,0,conversion_longitude(j,donnees)*donnees->xcarte,donnees->ycarte);
 gdk_draw_string(carte,font,gc,conversion_longitude(j,donnees)*donnees->xcarte+5,8,text);
 }
-couleur(gc,c,-1);
+
 
  /* ----------------------------------  CONTOUR FRANCE -------------------------------------- */
 
@@ -300,61 +299,6 @@ couleur(gc,c,-1);
 //    printf("\nFIN PLAN DE VOL \n\n");
     }
 
-/* ------------------------------------ CONFLITS  ---------------------------------------- */
-
-
-    if(donnees->deb_conflits!=NULL)
-    {
-    couleur(gc,c,-3);
-        conflit* conflit_current = donnees->deb_conflits;
-
-        while(conflit_current->ptsuiv != NULL)
-        {
-        pdv* avion1 = conflit_current->pdv1;
-        pdv* avion2 = conflit_current->pdv2;
-
-
-//        g_print("debut : %lf, fin : %lf",conflit_current->temps_deb,conflit_current->temps_fin);
-            if(donnees->temps > conflit_current->temps_deb && donnees->temps < conflit_current->temps_fin)
-            {
-                position c0;
-
-                if(avion1->affichage)
-                {
-                    get_position_avion(&c0,avion1,donnees->temps);
-                    gdk_draw_rectangle(carte,gc,TRUE,conversion_longitude(c0.x,donnees)*donnees->xcarte-3,conversion_lat(c0.y,donnees)*donnees->ycarte-3,7,7);
-                }
-
-                if(avion1->affichage)
-                {
-                    get_position_avion(&c0,avion2,donnees->temps);
-                    gdk_draw_rectangle(carte,gc,TRUE,conversion_longitude(c0.x,donnees)*donnees->xcarte-3,conversion_lat(c0.y,donnees)*donnees->ycarte-3,7,7);
-                }
-
-                    char *markup;
-                    markup = g_markup_printf_escaped ("<span foreground=\"#FF0000\">%s</span>", "Conflit");
-                    gtk_label_set_markup (GTK_LABEL (donnees->Msg_conflit), markup);
-//                    gtk_label_set_text(GTK_LABEL(donnees->Msg_conflit),"centre1");
-                    g_free (markup);
-
-
-            }
-            else
-            {
-                    char *markup;
-                    markup = g_markup_printf_escaped ("<span foreground=\"#00A000\">%s</span>", "Pas de conflit.");
-                    gtk_label_set_markup (GTK_LABEL (donnees->Msg_conflit), markup);
-                    g_free (markup);
-//                    gtk_label_set_text(GTK_LABEL(donnees->Msg_conflit),"centre2");
-
-
-            }
-        conflit_current = conflit_current->ptsuiv;
-        }
-    couleur(gc,c,-1);
-    }
-
-
     gdk_font_unref(font);
 }
 
@@ -391,24 +335,10 @@ c.green = 0 << 8;
 c.blue = 0 << 8;
 //g_print("avion en : noir \n\n");
 }
-else if(altitude==-2)
-{
-c.red = 150 << 8 ;
-c.green = 150 << 8;
-c.blue = 200 << 8;
-}
-else if(altitude==-3)
-{
-c.red = 250 << 8 ;
-c.green = 0 << 8;
-c.blue = 0 << 8;
-}
 
 gdk_gc_set_rgb_fg_color (gc, &c);
 
 }
-
-
 //position* Position_avion(file_opener* donnees, pdv* avion, position* loc)
 //{
 //position *delta_pass=malloc(sizeof(position));
