@@ -64,7 +64,8 @@ typedef struct pdv{
 typedef struct conflit{
     pdv* pdv1;
     pdv* pdv2;
-    double temps;
+    double temps_deb;
+    double temps_fin;
     double latitude;
     double longitude;
     double D;
@@ -102,6 +103,7 @@ typedef struct file_opener{
     position *start;
     position *bord;
     position *old;
+    GtkWidget *Msg_conflit;
 
 }file_opener;
 

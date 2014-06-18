@@ -70,6 +70,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     GtkWidget *MI2_APropos;
     GtkWidget *MI2_Nouveau;
     GtkWidget *MI2_Ouvrir;
+    GtkWidget *MI2_Charger_default;
     GtkWidget *MI2_Enregistrer;
     GtkWidget *MI2_Quitter;
 
@@ -83,7 +84,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     GtkWidget *parametres_button;
     GtkWidget *voir_conflits_button;
     GtkObject *adj2;
-    GtkWidget* event_box;
+    GtkWidget *event_box;
 
 
 // Creation et ajout de la GtkBox mère verticale
@@ -95,6 +96,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
 
     MI1_Fichier = gtk_menu_item_new_with_label("Fichier");
     Fichier_menu = gtk_menu_new();
+
         MI2_Nouveau = gtk_menu_item_new_with_label("Nouveau");
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Nouveau);
             g_signal_connect(G_OBJECT(MI2_Nouveau), "activate", G_CALLBACK(liberer_memoire), donnees);
@@ -102,6 +104,10 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
         MI2_Ouvrir = gtk_menu_item_new_with_label("Ouvrir");
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Ouvrir);
                         g_signal_connect(G_OBJECT(MI2_Ouvrir), "activate", G_CALLBACK(lancer_boite), donnees);
+
+        MI2_Charger_default = gtk_menu_item_new_with_label("Chargement par default");
+        gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Charger_default);
+                        g_signal_connect(G_OBJECT(MI2_Charger_default), "activate", G_CALLBACK(rapide_file), donnees);
 
         MI2_Enregistrer = gtk_menu_item_new_with_label("Enregistrer");
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Enregistrer);
@@ -115,6 +121,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
 
     MI1_Aide = gtk_menu_item_new_with_label("?");
     Aide_menu = gtk_menu_new();
+
         MI2_APropos = gtk_menu_item_new_with_label("À Propos");
         gtk_menu_shell_append(GTK_MENU_SHELL(Aide_menu), MI2_APropos);
             g_signal_connect(G_OBJECT(MI2_APropos), "activate", G_CALLBACK(APropos), NULL);
@@ -174,46 +181,54 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     gtk_box_pack_start (GTK_BOX (hbox_curseur), curseur, TRUE, TRUE, 0);
 //g_signal_connect(hbox_curseur, "size-allocate", G_CALLBACK(my_getsizetemps), NULL);
 
-    donnees->heure_label=gtk_label_new("   00:00");
+    char heure[10];
+    int h=donnees->temps/60;
+    int m=donnees->temps-h*60;
+    sprintf(heure,"   %02d:%02d",h,m);
+    donnees->heure_label=gtk_label_new(heure);
     gtk_box_pack_start(GTK_BOX(hbox_curseur),donnees->heure_label,FALSE,FALSE,0);
 //        gtk_range_set_update_policy (GTK_RANGE (curseur), GTK_UPDATE_DISCONTINUOUS);
 
 
-    filtre_button=gtk_button_new_with_label("Filtres");
+    filtre_button=gtk_button_new_with_mnemonic("_Filtres");
     gtk_box_pack_start(GTK_BOX(work_zr),filtre_button,FALSE,FALSE,0);
     g_signal_connect(GTK_BUTTON(filtre_button),"clicked",G_CALLBACK(filtres),donnees);
 
-    voir_pdv_button=gtk_button_new_with_label("voir les plans de vols");
+    voir_pdv_button=gtk_button_new_with_mnemonic("_Voir les plans de vols");
     gtk_box_pack_start(GTK_BOX(work_zr),voir_pdv_button,FALSE,FALSE,0);
     g_signal_connect(GTK_BUTTON(voir_pdv_button),"clicked",G_CALLBACK(voir_pdv),donnees);
 
-    ajouter_pdv_button=gtk_button_new_with_label("Ajouter un plan de vol");
+    ajouter_pdv_button=gtk_button_new_with_mnemonic("_Ajouter un plan de vol");
     gtk_box_pack_start(GTK_BOX(work_zr),ajouter_pdv_button,FALSE,FALSE,0);
     g_signal_connect(GTK_BUTTON(ajouter_pdv_button),"clicked",G_CALLBACK(ajouter_plan_de_vol),formulaire);
 
-    detect_conflits_button=gtk_button_new_with_label("Détection des conflits");
+    detect_conflits_button=gtk_button_new_with_mnemonic("_Détection des conflits");
     gtk_box_pack_start(GTK_BOX(work_zr),detect_conflits_button,FALSE,FALSE,0);
     g_signal_connect(GTK_BUTTON(detect_conflits_button),"clicked",G_CALLBACK(detection_conflits),donnees);
 
-    parametres_button=gtk_button_new_with_label("Paramètres");
+    parametres_button=gtk_button_new_with_mnemonic("_Paramètres");
     gtk_box_pack_start(GTK_BOX(work_zr),parametres_button,FALSE,FALSE,0);
     g_signal_connect(GTK_BUTTON(parametres_button),"clicked",G_CALLBACK(parametres),formulaire);
 
-    voir_conflits_button=gtk_button_new_with_label("Voir les conflits");
+    voir_conflits_button=gtk_button_new_with_mnemonic("Voir les _conflits");
     gtk_box_pack_start(GTK_BOX(work_zr),voir_conflits_button,FALSE,FALSE,0);
     g_signal_connect(GTK_BUTTON(voir_conflits_button),"clicked",G_CALLBACK(voir_conflits),donnees);
+
+    //Debug rapide
+    GtkWidget * rapide_file_button;
+
+    rapide_file_button=gtk_button_new_with_mnemonic("Chargement _rapide");
+    gtk_box_pack_start(GTK_BOX(work_zr),rapide_file_button,FALSE,FALSE,0);
+    g_signal_connect(GTK_BUTTON(rapide_file_button),"clicked",G_CALLBACK(rapide_file),donnees);
+
+
+
+    donnees->Msg_conflit=gtk_label_new("");
+    gtk_box_pack_start(GTK_BOX(work_zr),donnees->Msg_conflit,FALSE,FALSE,10);
 
 
 // Gère le rafraichissement
     g_signal_connect (G_OBJECT (donnees->carte), "expose-event", G_CALLBACK (expose_cb), donnees);
-
-// Debug rapide
-     GtkWidget * rapide_file_button;
-
-    rapide_file_button=gtk_button_new_with_label("Chargement rapide");
-    gtk_box_pack_start(GTK_BOX(work_zr),rapide_file_button,FALSE,FALSE,0);
-    g_signal_connect(GTK_BUTTON(rapide_file_button),"clicked",G_CALLBACK(rapide_file),donnees);
-
 
 
 g_signal_connect(donnees->Window, "size-allocate", G_CALLBACK(my_getsize), formulaire);
@@ -375,6 +390,8 @@ void recup_temps(GtkAdjustment *adj, file_opener *donnees)
 donnees->temps = adj->value;
 //printf("adj : %lf",adj->value);
 //printf("donnees temps : %lf\n", donnees->temps);
+//    donnees->heure_label=gtk_label_new(lab_heure);
+//    gtk_box_pack_start(GTK_BOX(hbox_curseur),donnees->heure_label,TRUE,TRUE,0);
 redessiner(donnees->carte);
 
     int h=donnees->temps/60;
@@ -382,8 +399,7 @@ redessiner(donnees->carte);
     char lab_heure[10];
     sprintf(lab_heure,"   %02d:%02d",h,m);
     gtk_label_set_text(GTK_LABEL(donnees->heure_label),lab_heure);
-//    donnees->heure_label=gtk_label_new(lab_heure);
-//    gtk_box_pack_start(GTK_BOX(hbox_curseur),donnees->heure_label,TRUE,TRUE,0);
+
 }
 
 
@@ -686,9 +702,9 @@ void voir_conflits(GtkWidget *bouton, file_opener* donnees)
         {
             char texte[300];
             texte[0]='\0';
-            int k=(conflit_current->temps/60);
+            int k=(conflit_current->temps_deb/60);
             int h=k%24;
-            int m=conflit_current->temps-k*60;
+            int m=conflit_current->temps_deb-k*60;
             int direc;
             char dir;
             if(conflit_current->longitude<0)
@@ -735,7 +751,8 @@ void voir_conflits(GtkWidget *bouton, file_opener* donnees)
 
 
 
-void my_getsize(GtkWidget *widget, GtkAllocation *allocation, form_pdv* formulaire) {
+void my_getsize(GtkWidget *widget, GtkAllocation *allocation, form_pdv* formulaire)
+{
 //    printf("W: width = %d, height = %d\n", allocation->width, allocation->height);
     file_opener* donnees=formulaire->donnees;
     gtk_widget_set_size_request(donnees->carte, allocation->width-180, allocation->height-40);

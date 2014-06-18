@@ -386,14 +386,12 @@ void detection_conflits(GtkWidget *button, file_opener * donnees)
                                 conflit_current->longitude=long1;
                                 conflit_current->pdv1=pdv1;
                                 conflit_current->pdv2=pdv2;
-                                conflit_current->temps=t;
+                                conflit_current->temps_deb=t;
 
 
 //g_print("CONFLIT entre %s et %s à %02d:%02d |%lf  %lf  D=%lf\n",conflit_current->pdv1->nom,conflit_current->pdv2->nom,h,m,conflit_current->latitude,conflit_current->longitude,conflit_current->D);
 
-                                conflit_current->ptsuiv=malloc(sizeof(conflit));
-                                conflit_current=conflit_current->ptsuiv;
-                                conflit_current->ptsuiv=NULL;
+
                             }
                             //memconflit=conf;
                         }
@@ -405,6 +403,11 @@ void detection_conflits(GtkWidget *button, file_opener * donnees)
                         if(conf!=memconflit && !conf)
                         {
                             g_print("plus de conflit! t=%lf\n",t);
+                            conflit_current->temps_fin=t;
+
+                            conflit_current->ptsuiv=malloc(sizeof(conflit));
+                            conflit_current=conflit_current->ptsuiv;
+                            conflit_current->ptsuiv=NULL;
                         }
                         memconflit=conf;
                     }
