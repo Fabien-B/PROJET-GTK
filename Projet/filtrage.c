@@ -52,8 +52,8 @@ if(donnees->debutaero!=NULL)
     GtkWidget* is;
 
     lab=gtk_label_new("Aérodromes"); //un label et deux boutons pour aider à la sélection
-    saa=gtk_button_new_with_label("sélectionner/(D) tout");
-    is=gtk_button_new_with_label("inverser la sélection");
+    saa=gtk_button_new_with_label("Sélectionner/(D) tout");
+    is=gtk_button_new_with_label("Inverser la sélection");
     gtk_box_pack_start(GTK_BOX(boxaero),lab,FALSE,FALSE,0);
     gtk_box_pack_start(GTK_BOX(boxaero),saa,FALSE,FALSE,0);
     gtk_box_pack_start(GTK_BOX(boxaero),is,FALSE,FALSE,0);
@@ -83,8 +83,8 @@ if(donnees->debutbalises!=NULL)
     GtkWidget* is;
 
     lab=gtk_label_new("Balises");                    //un label et deux boutons pour aider à la sélection
-    sab=gtk_button_new_with_label("sélectionner/(D) tout");
-    is=gtk_button_new_with_label("inverser la sélection");
+    sab=gtk_button_new_with_label("Sélectionner/(D) tout");
+    is=gtk_button_new_with_label("Inverser la sélection");
     gtk_box_pack_start(GTK_BOX(boxbalises),lab,FALSE,FALSE,0);
     gtk_box_pack_start(GTK_BOX(boxbalises),sab,FALSE,FALSE,0);
     gtk_box_pack_start(GTK_BOX(boxbalises),is,FALSE,FALSE,0);
@@ -114,8 +114,8 @@ if(donnees->debutpdv!=NULL)
     GtkWidget* is;
 
     lab=gtk_label_new("Plans de vols");                    //un label et deux boutons pour aider à la sélection
-    sap=gtk_button_new_with_label("sélectionner/(D) tout");
-    is=gtk_button_new_with_label("inverser la sélection");
+    sap=gtk_button_new_with_label("Sélectionner/(D) tout");
+    is=gtk_button_new_with_label("Inverser la sélection");
     gtk_box_pack_start(GTK_BOX(boxpdv),lab,FALSE,FALSE,0);
     gtk_box_pack_start(GTK_BOX(boxpdv),sap,FALSE,FALSE,0);
     gtk_box_pack_start(GTK_BOX(boxpdv),is,FALSE,FALSE,0);
@@ -386,7 +386,7 @@ void detection_conflits(GtkWidget *button, file_opener * donnees)
 
                         if(D<donnees->distance_conflit)
                         {
-                            g_print("Conflit entre %s et %s D = %lf, d sécu = %d,  t=%lf\n",pdv1->nom,pdv2->nom,D,donnees->distance_conflit,t);
+                            //g_print("Conflit entre %s et %s D = %lf, d sécu = %d,  t=%lf\n",pdv1->nom,pdv2->nom,D,donnees->distance_conflit,t);
                             conf=1;
                             if(conf!=memconflit)
                             {
@@ -413,7 +413,7 @@ void detection_conflits(GtkWidget *button, file_opener * donnees)
 
                         if(conf!=memconflit && !conf)
                         {
-                            g_print("plus de conflit! t=%lf\n",t);
+                            //g_print("plus de conflit! t=%lf\n",t);
                             conflit_current->temps_fin=t;
 
                             conflit_current->ptsuiv=malloc(sizeof(conflit));
