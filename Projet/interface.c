@@ -80,7 +80,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     GtkWidget *filtre_button;
     GtkWidget *voir_pdv_button;
     GtkWidget *ajouter_pdv_button;
-    GtkWidget *detect_conflits_button;
+//    GtkWidget *detect_conflits_button;
     GtkWidget *parametres_button;
     GtkWidget *voir_conflits_button;
 //    GtkObject *adj2;
@@ -202,11 +202,11 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     ajouter_pdv_button=gtk_button_new_with_mnemonic("_Ajouter un plan de vol");
     gtk_box_pack_start(GTK_BOX(work_zr),ajouter_pdv_button,FALSE,FALSE,0);
     g_signal_connect(GTK_BUTTON(ajouter_pdv_button),"clicked",G_CALLBACK(ajouter_plan_de_vol),formulaire);
-
+/*
     detect_conflits_button=gtk_button_new_with_mnemonic("_Détection des conflits");
     gtk_box_pack_start(GTK_BOX(work_zr),detect_conflits_button,FALSE,FALSE,0);
     g_signal_connect(GTK_BUTTON(detect_conflits_button),"clicked",G_CALLBACK(detection_conflits),donnees);
-
+*/
     parametres_button=gtk_button_new_with_mnemonic("_Paramètres");
     gtk_box_pack_start(GTK_BOX(work_zr),parametres_button,FALSE,FALSE,0);
     g_signal_connect(GTK_BUTTON(parametres_button),"clicked",G_CALLBACK(parametres),formulaire);
@@ -737,7 +737,7 @@ void voir_conflits(GtkWidget *bouton, file_opener* donnees)
             dir='E';
             direc=1;
             }
-            sprintf(texte,"CONFLIT entre %s et %s à %02d:%02d\t\n\t\tPosition: %lf°N  %lf°%c\t\n\t\tDistance=%.2lf NM\t\n  -  -  -  -  -  -  -  -  -  -  -  \n",conflit_current->pdv1->nom,conflit_current->pdv2->nom,h,m,conflit_current->latitude,direc*conflit_current->longitude,dir,conflit_current->D);
+            sprintf(texte,"CONFLIT entre %s et %s à %02d:%02d\t\n\t\tPosition: %lf°N  %lf°%c\t\n  -  -  -  -  -  -  -  -  -  -  -  \n",conflit_current->pdv1->nom,conflit_current->pdv2->nom,h,m,conflit_current->latitude,direc*conflit_current->longitude,dir);
 
 //g_print("%s",texte);
 

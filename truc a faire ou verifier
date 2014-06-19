@@ -1,31 +1,13 @@
 
-unité de temps?
 
 trucs inutiles dans les structures:
-aérodrome:
-	pos_x;
-	pos_y;
+
 	
-balise:
-	latdeg;
-	longdeg;
-	dirlat;
-	dirlong;
-	latmin;
-	longmin;
-	latsec;
-	longsec;
-	pos_x;
-	pos_y;
 	
 pdv:
 	heure?
 	minute?
 	
-conflit:
-	latitude;
-	longitude;
-
 
 Majuscules dans filtres
 
@@ -34,8 +16,6 @@ retirer le bouton détection => lancer une détection au chargement des PDV, à 
 augmenter le nombre de points de la france
 
 bloquer le déplacement sur la carte
-
-ajouter pt de passage =>Ajouter un point de passage
 
 Couleurs (pdv)
 

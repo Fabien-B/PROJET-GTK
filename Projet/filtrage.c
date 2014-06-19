@@ -386,9 +386,6 @@ void detection_conflits(GtkWidget *button, file_opener * donnees)
                             conf=1;
                             if(conf!=memconflit)
                             {
-//int h=t/60;
-//int m=t-h*60;
-                                conflit_current->D=D;
                                 conflit_current->latitude=lat1;
                                 conflit_current->longitude=long1;
                                 conflit_current->pdv1=pdv1;
