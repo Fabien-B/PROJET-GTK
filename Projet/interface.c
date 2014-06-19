@@ -297,7 +297,6 @@ void scroll_event(GtkWidget* carte,GdkEventScroll* event,file_opener* donnees)
 
 // Facteur de zoom
 double Z = 2;
-
 if(11/donnees->dlat <= 1 && event->direction)
 {
 // Recentrage et blocage du zoom

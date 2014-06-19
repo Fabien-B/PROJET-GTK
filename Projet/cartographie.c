@@ -306,7 +306,8 @@ couleur(gc,c,-1);
     if(donnees->deb_conflits!=NULL)
     {
     couleur(gc,c,-3);
-        conflit* conflit_current = donnees->deb_conflits;
+    conflit* conflit_current = donnees->deb_conflits;
+    int conflit_affiche = 0;
 
         while(conflit_current->ptsuiv != NULL)
         {
@@ -317,8 +318,9 @@ couleur(gc,c,-1);
 //        g_print("debut : %lf, fin : %lf",conflit_current->temps_deb,conflit_current->temps_fin);
             if(donnees->temps > conflit_current->temps_deb && donnees->temps < conflit_current->temps_fin)
             {
+            conflit_affiche++;
                 position c0;
-
+                g_print("Conflit \n");
                 if(avion1->affichage)
                 {
                     get_position_avion(&c0,avion1,donnees->temps);
@@ -332,25 +334,23 @@ couleur(gc,c,-1);
                 }
 
                     char *markup;
-                    markup = g_markup_printf_escaped ("<span foreground=\"#FF0000\">%s</span>", "Conflit");
-                    gtk_label_set_markup (GTK_LABEL (donnees->Msg_conflit), markup);
-//                    gtk_label_set_text(GTK_LABEL(donnees->Msg_conflit),"centre1");
-                    g_free (markup);
-
-
-            }
-            else
-            {
-                    char *markup;
-                    markup = g_markup_printf_escaped ("<span foreground=\"#00A000\">%s</span>", "Pas de conflit.");
+                    markup = g_markup_printf_escaped ("<span foreground=\"#A00000\">%s</span>", "Conflit.");
                     gtk_label_set_markup (GTK_LABEL (donnees->Msg_conflit), markup);
                     g_free (markup);
-//                    gtk_label_set_text(GTK_LABEL(donnees->Msg_conflit),"centre2");
-
-
             }
+
         conflit_current = conflit_current->ptsuiv;
         }
+
+    if(conflit_affiche==0)
+    {
+        char *markup;
+        markup = g_markup_printf_escaped ("<span foreground=\"#00A000\">%s</span>", "Pas de conflit.");
+        gtk_label_set_markup (GTK_LABEL (donnees->Msg_conflit), markup);
+        g_free (markup);
+//        gtk_label_set_text(GTK_LABEL(donnees->Msg_conflit),"centre2");
+    }
+
     couleur(gc,c,-1);
     }
 
