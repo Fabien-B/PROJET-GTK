@@ -2,6 +2,7 @@
 #include <gtk/gtk.h>
 #include <string.h>
 #include <math.h>
+#include <ctype.h>
 #ifndef INTERFACE_H_INCLUDED
 #define INTERFACE_H_INCLUDED
 #define XCARTE 550
@@ -13,8 +14,6 @@ typedef struct aerodrome{
     double longitude;
     char nom[100];
     char oaci[5];
-    double pos_x;          //positions x et y sur la zone de dessin, à recalculer quand la zone change de taille
-    double pos_y;
     int affichage;      //1 si affichage activé, 0 sinon
     GtkWidget* coch;
     struct aerodrome * ptsuiv;
@@ -23,17 +22,10 @@ typedef struct aerodrome{
 typedef struct balise{
     char nom[10];
     double latdeg;
-    double latmin;
-    double latsec;
     int dirlat;         //1 si nord, -1 si sud
-    double longdeg;
-    double longmin;
-    double longsec;
     double latitude;
     double longitude;
     int dirlong;        //1 si est, -1 si ouest
-    double pos_x;          //positions x et y sur la zone de dessin, à recalculer quand la zone change de taille
-    double pos_y;
     int affichage;      //1 si affichage activé, 0 sinon
     GtkWidget* coch;
     struct balise * ptsuiv;
@@ -68,7 +60,6 @@ typedef struct conflit{
     double temps_fin;
     double latitude;
     double longitude;
-    double D;
     struct conflit* ptsuiv;
 }conflit;
 
@@ -104,6 +95,8 @@ typedef struct file_opener{
     position *bord;
     position *old;
     GtkWidget *Msg_conflit;
+    gint tag_lecture;
+    GtkObject* adj2;
 
 }file_opener;
 
@@ -140,7 +133,7 @@ void creer_interface(file_opener* donnees, form_pdv* formulaire);
 void APropos(GtkWidget* widget);
 void voir_pdv(GtkWidget *bouton, file_opener* donnees);
 void parametres(GtkWidget* bouton, form_pdv* formulaire);
-void redessiner(GtkWidget * carte);
+void redessiner(GtkWidget* button, GtkWidget * carte);
 void redessiner_widget(GtkWidget* button, GtkWidget * carte);
 void recup_temps(GtkAdjustment* adj, file_opener* donnees);
 void scroll_event(GtkWidget* carte,GdkEventScroll* event,file_opener* donnees);
@@ -154,5 +147,9 @@ void voir_conflits(GtkWidget *bouton, file_opener* donnees);
 void my_getsize(GtkWidget *widget, GtkAllocation *allocation, form_pdv* formulaire);
 void my_getsizecarte(GtkWidget *widget, GtkAllocation *allocation, void *data);
 void my_getsizetemps(GtkWidget *widget, GtkAllocation *allocation, void *data);
+
+gboolean animation(file_opener* donnees);
+void play(GtkWidget* bouton,file_opener* donnees);
+void stop(GtkWidget* bouton,file_opener* donnees);
 
 #endif // INTERFACE_H_INCLUDED

@@ -10,7 +10,7 @@ void filtres(GtkWidget* button, file_opener* donnees)
     GtkWidget* boxbalises;
     GtkWidget* boxpdv;
     GtkWidget* box1;
-    //GtkWidget* actualiserbt;
+
     //init fenêtre
     filw = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
@@ -27,9 +27,6 @@ void filtres(GtkWidget* button, file_opener* donnees)
     gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrollbar), box1);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollbar), GTK_POLICY_NEVER, GTK_POLICY_ALWAYS); //Never: désactive la barre, Always, l'inverse
 
-//    actualiserbt=gtk_button_new_with_label("Actualiser l'affichage");
-//    gtk_box_pack_start(GTK_BOX(box1),actualiserbt,FALSE,FALSE,0);
-//    g_signal_connect(G_OBJECT(actualiserbt), "clicked", G_CALLBACK(redessiner_widget), donnees->carte);
 
     box=gtk_hbox_new(FALSE,0);
     gtk_box_pack_start(GTK_BOX(box1), box, FALSE, FALSE, 0);
@@ -64,12 +61,12 @@ if(donnees->debutaero!=NULL)
     while(pt_current->ptsuiv!=NULL)             //création et initialisation des checkbox
     {
         char label[100];
-        sprintf(label,"%s\n",pt_current->nom);
+        sprintf(label,"%s :  %s\n",pt_current->oaci,pt_current->nom);
         pt_current->coch=gtk_check_button_new_with_label(label);
         gtk_box_pack_start(GTK_BOX(boxaero),pt_current->coch,FALSE,FALSE,0);
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pt_current->coch), (pt_current->affichage));
         g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(check_aero), pt_current);
-        g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(redessiner_widget), donnees->carte);
+        g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(redessiner), donnees->carte);
         pt_current=pt_current->ptsuiv;
     }
 
@@ -100,7 +97,7 @@ if(donnees->debutbalises!=NULL)
         gtk_box_pack_start(GTK_BOX(boxbalises),pt_current->coch,FALSE,FALSE,0);
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pt_current->coch), (pt_current->affichage));
         g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(check_balise), pt_current);
-        g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(redessiner_widget), donnees->carte);
+        g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(redessiner), donnees->carte);
         pt_current=pt_current->ptsuiv;
     }
 
@@ -128,12 +125,12 @@ if(donnees->debutpdv!=NULL)
 
         char label[100];
 
-        sprintf(label,"%s\n", pt_current->nom);
+        sprintf(label,"%s\n",pt_current->nom);
         pt_current->coch=gtk_check_button_new_with_label(label);
         gtk_box_pack_start(GTK_BOX(boxpdv),pt_current->coch,FALSE,FALSE,0);
         gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pt_current->coch), (pt_current->affichage));
         g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(check_pdv), pt_current);
-        g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(redessiner_widget), donnees->carte);
+        g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(redessiner), donnees->carte);
         pt_current=pt_current->ptsuiv;
     }
 
@@ -386,13 +383,9 @@ void detection_conflits(GtkWidget *button, file_opener * donnees)
 
                         if(D<donnees->distance_conflit)
                         {
-                            //g_print("Conflit entre %s et %s D = %lf, d sécu = %d,  t=%lf\n",pdv1->nom,pdv2->nom,D,donnees->distance_conflit,t);
                             conf=1;
                             if(conf!=memconflit)
                             {
-//int h=t/60;
-//int m=t-h*60;
-                                conflit_current->D=D;
                                 conflit_current->latitude=lat1;
                                 conflit_current->longitude=long1;
                                 conflit_current->pdv1=pdv1;
@@ -413,7 +406,8 @@ void detection_conflits(GtkWidget *button, file_opener * donnees)
 
                         if(conf!=memconflit && !conf)
                         {
-                            //g_print("plus de conflit! t=%lf\n",t);
+//g_print("plus de conflit! t=%lf\n",t);
+
                             conflit_current->temps_fin=t;
 
                             conflit_current->ptsuiv=malloc(sizeof(conflit));
@@ -455,7 +449,6 @@ void get_position_avion(position* pos, pdv* pdv_c,double t)
         double dt=t-pass_c->temps;
 
 
-       // double x1,x2,y1,y2;
         double lat1,lat2,long1,long2;
 
             if(pass_c->type_point)
@@ -463,16 +456,12 @@ void get_position_avion(position* pos, pdv* pdv_c,double t)
                 balise* pt=pass_c->point;
                 lat1=pt->latitude;
                 long1=pt->longitude;
-                //x1=pt->pos_x;
-                //y1=pt->pos_y;
             }
             else
             {
                 aerodrome* pt=pass_c->point;
                 lat1=pt->latitude;
                 long1=pt->longitude;
-                //x1=pt->pos_x;
-                //y1=pt->pos_y;
             }
 
             if(pass_c->ptsuiv->type_point)
@@ -480,19 +469,14 @@ void get_position_avion(position* pos, pdv* pdv_c,double t)
                 balise* pt=pass_c->ptsuiv->point;
                 lat2=pt->latitude;
                 long2=pt->longitude;
-                //x2=pt->pos_x;
-                //y2=pt->pos_y;
             }
             else
             {
                 aerodrome* pt=pass_c->ptsuiv->point;
                 lat2=pt->latitude;
                 long2=pt->longitude;
-                //x2=pt->pos_x;
-                //y2=pt->pos_y;
             }
 
-            //double D=sqrt(pow((x2-x1)*680,2)+pow((y2-y1)*660,2));
             double dlat=3340*3.14/180*(lat2-lat1);                             //distance projeté sur un méridien en NM,  rayon de la terre = 6371km = 3340NM
             double latm=(lat1+lat2)/2;
             double r=3340*cos(latm*3.14/180);
@@ -503,8 +487,6 @@ void get_position_avion(position* pos, pdv* pdv_c,double t)
 
         pos->y=lat1+d/D*(lat2-lat1);
         pos->x=long1+d/D*(long2-long1);                     //pas vraiment ça mais c'est compliqué...
-        //pos->x=x1+d/D*(x2-x1);
-        //pos->y=y1+d/D*(y2-y1);
 
 //g_print("%lf   %lf\n",pos->x,pos->y);
     }

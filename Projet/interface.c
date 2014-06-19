@@ -80,10 +80,10 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     GtkWidget *filtre_button;
     GtkWidget *voir_pdv_button;
     GtkWidget *ajouter_pdv_button;
-    GtkWidget *detect_conflits_button;
+//    GtkWidget *detect_conflits_button;
     GtkWidget *parametres_button;
     GtkWidget *voir_conflits_button;
-    GtkObject *adj2;
+//    GtkObject *adj2;
     GtkWidget *event_box;
 
 
@@ -173,13 +173,14 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     gtk_box_pack_start(GTK_BOX(hbox_curseur), label_curseur, FALSE, FALSE, 0);
 
 //  ( depart , min , max , incrément scroll x2 , incrémentation clic en dehors du curseur , ? )
-    adj2 = gtk_adjustment_new (donnees->temps, 0.0, 1440.0, 0.5, 5.0, 0.0);
-    gtk_signal_connect (GTK_OBJECT (adj2), "value_changed", GTK_SIGNAL_FUNC (recup_temps), donnees);
-    curseur = gtk_hscale_new (GTK_ADJUSTMENT (adj2));
+    donnees->adj2 = gtk_adjustment_new (donnees->temps, 0.0, 1440.0, 0.5, 5.0, 0.0);
+    gtk_signal_connect (GTK_OBJECT (donnees->adj2), "value_changed", GTK_SIGNAL_FUNC (recup_temps), donnees);
+    curseur = gtk_hscale_new (GTK_ADJUSTMENT (donnees->adj2));
     gtk_scale_set_digits (GTK_SCALE (curseur), 0);
     gtk_scale_set_draw_value(GTK_SCALE(curseur),FALSE);
     gtk_box_pack_start (GTK_BOX (hbox_curseur), curseur, TRUE, TRUE, 0);
 //g_signal_connect(hbox_curseur, "size-allocate", G_CALLBACK(my_getsizetemps), NULL);
+
 
     char heure[10];
     int h=donnees->temps/60;
@@ -201,25 +202,42 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     ajouter_pdv_button=gtk_button_new_with_mnemonic("_Ajouter un plan de vol");
     gtk_box_pack_start(GTK_BOX(work_zr),ajouter_pdv_button,FALSE,FALSE,0);
     g_signal_connect(GTK_BUTTON(ajouter_pdv_button),"clicked",G_CALLBACK(ajouter_plan_de_vol),formulaire);
-
+/*
     detect_conflits_button=gtk_button_new_with_mnemonic("_Détection des conflits");
     gtk_box_pack_start(GTK_BOX(work_zr),detect_conflits_button,FALSE,FALSE,0);
     g_signal_connect(GTK_BUTTON(detect_conflits_button),"clicked",G_CALLBACK(detection_conflits),donnees);
-
+*/
     voir_conflits_button=gtk_button_new_with_mnemonic("Voir les _conflits");
     gtk_box_pack_start(GTK_BOX(work_zr),voir_conflits_button,FALSE,FALSE,0);
     g_signal_connect(GTK_BUTTON(voir_conflits_button),"clicked",G_CALLBACK(voir_conflits),donnees);
 
-    parametres_button=gtk_button_new_with_mnemonic("_Paramètres");
-    gtk_box_pack_start(GTK_BOX(work_zr),parametres_button,FALSE,FALSE,0);
-    g_signal_connect(GTK_BUTTON(parametres_button),"clicked",G_CALLBACK(parametres),formulaire);
+
+    GtkWidget* media_box;
+    media_box=gtk_hbox_new(TRUE,0);
+    gtk_box_pack_start(GTK_BOX(work_zr), media_box, FALSE, FALSE, 0);
+
+    GtkWidget* play_b;
+    GtkWidget* img;
+    play_b=gtk_button_new();
+    img=gtk_image_new_from_file("play");
+    gtk_button_set_image(GTK_BUTTON(play_b), img);
+    gtk_box_pack_start(GTK_BOX(media_box),play_b,TRUE,TRUE,0);
+    g_signal_connect(GTK_BUTTON(play_b),"clicked",G_CALLBACK(play),donnees);
+
+    GtkWidget* pause_b;
+    GtkWidget* img2;
+    pause_b=gtk_button_new();
+    img2=gtk_image_new_from_file("pause");
+    gtk_button_set_image(GTK_BUTTON(pause_b), img2);
+    gtk_box_pack_start(GTK_BOX(media_box),pause_b,TRUE,TRUE,0);
+    g_signal_connect(GTK_BUTTON(pause_b),"clicked",G_CALLBACK(stop),donnees);
 
     //Debug rapide
-    GtkWidget * rapide_file_button;
+    /*GtkWidget * rapide_file_button;
 
     rapide_file_button=gtk_button_new_with_mnemonic("Chargement _rapide");
     gtk_box_pack_start(GTK_BOX(work_zr),rapide_file_button,FALSE,FALSE,0);
-    g_signal_connect(GTK_BUTTON(rapide_file_button),"clicked",G_CALLBACK(rapide_file),donnees);
+    g_signal_connect(GTK_BUTTON(rapide_file_button),"clicked",G_CALLBACK(rapide_file),donnees);*/
 
 
 
@@ -232,7 +250,10 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
 
 
 g_signal_connect(donnees->Window, "size-allocate", G_CALLBACK(my_getsize), formulaire);
+
+
     gtk_widget_show_all(donnees->Window);
+
 }
 
 void press_event(GtkWidget* carte, GdkEventButton* event, file_opener* donnees)
@@ -279,7 +300,7 @@ state = event->state;
   {
     donnees->longitude_min = donnees->bord->x - ((event->x - donnees->start->x) * donnees->dlong / donnees->xcarte);
     donnees->latitude_max = donnees->bord->y + ((event->y - donnees->start->y) * donnees->dlat / donnees->ycarte);
-    redessiner(donnees->carte);
+    redessiner(NULL,donnees->carte);
   }
 //  g_print("1 = %d, 2 = %d, 3 = %d, 4 = %d, 5 = %d",GDK_BUTTON1_MASK,GDK_BUTTON2_MASK,GDK_BUTTON3_MASK,GDK_BUTTON1_MASK,GDK_BUTTON1_MOTION_MASK);
 //    g_print("delta x = %lf",((event->x - donnees->start->x) * donnees->dlat / donnees->xcarte) / 10000);
@@ -380,7 +401,7 @@ else
 //
 //
 //g_print("dlat = %lf, dlong = %lf, lat max = %lf, long min = %lf\n\n",donnees->dlat,donnees->dlong,donnees->latitude_max,donnees->longitude_min);
-redessiner(donnees->carte);
+redessiner(NULL,donnees->carte);
 
 }
 
@@ -391,7 +412,7 @@ donnees->temps = adj->value;
 //printf("donnees temps : %lf\n", donnees->temps);
 //    donnees->heure_label=gtk_label_new(lab_heure);
 //    gtk_box_pack_start(GTK_BOX(hbox_curseur),donnees->heure_label,TRUE,TRUE,0);
-redessiner(donnees->carte);
+redessiner(NULL,donnees->carte);
 
     int h=donnees->temps/60;
     int m=donnees->temps-h*60;
@@ -489,7 +510,7 @@ void voir_pdv(GtkWidget *bouton, file_opener* donnees)
             }
              sprintf(texte,"%s\n-  -  -  -  -  -  -  -  -  -  -  -  -  -\n",texte);
 
-g_print("%s",texte);
+//g_print("%s",texte);
 
     GtkWidget* label;
     label=gtk_label_new(texte);
@@ -533,12 +554,7 @@ charger_fichiers(donnees);
 }
 
 
-void redessiner(GtkWidget * carte) // force le rafraichissement
-{
-gtk_widget_queue_draw(carte);
-}
-
-void redessiner_widget(GtkWidget* button, GtkWidget * carte) // force le rafraichissement
+void redessiner(GtkWidget* button, GtkWidget * carte) // force le rafraichissement
 {
 gtk_widget_queue_draw(carte);
 }
@@ -716,7 +732,7 @@ void voir_conflits(GtkWidget *bouton, file_opener* donnees)
             dir='E';
             direc=1;
             }
-            sprintf(texte,"CONFLIT entre %s et %s à %02d:%02d\t\n\t\tPosition: %lf°N  %lf°%c\t\n\t\tDistance=%.2lf NM\t\n  -  -  -  -  -  -  -  -  -  -  -  \n",conflit_current->pdv1->nom,conflit_current->pdv2->nom,h,m,conflit_current->latitude,direc*conflit_current->longitude,dir,conflit_current->D);
+            sprintf(texte,"CONFLIT entre %s et %s à %02d:%02d\t\n\t\tPosition: %lf°N  %lf°%c\t\n  -  -  -  -  -  -  -  -  -  -  -  \n",conflit_current->pdv1->nom,conflit_current->pdv2->nom,h,m,conflit_current->latitude,direc*conflit_current->longitude,dir);
 
 //g_print("%s",texte);
 
@@ -785,3 +801,27 @@ void my_getsizetemps(GtkWidget *widget, GtkAllocation *allocation, void *data) {
 //    printf("Temps: width = %d, height = %d\n", allocation->width, allocation->height);
 }
 */
+
+
+gboolean animation(file_opener* donnees)
+{
+    donnees->temps++;
+    gtk_adjustment_set_value(GTK_ADJUSTMENT(donnees->adj2), donnees->temps);
+    redessiner(NULL,donnees->carte);
+
+    return TRUE;
+}
+
+void play(GtkWidget* bouton,file_opener* donnees)
+{
+
+    donnees->tag_lecture=gtk_timeout_add(250,(GtkFunction) animation,donnees);
+
+}
+
+void stop(GtkWidget* bouton,file_opener* donnees)
+{
+    gtk_timeout_remove (donnees->tag_lecture);
+}
+
+

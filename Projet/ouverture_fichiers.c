@@ -1,5 +1,6 @@
 #include "interface.h"
 #include "ouverture_fichiers.h"
+#include "filtrage.h"
 
 void creer_file_selection(file_opener *donnees)
 {
@@ -179,6 +180,13 @@ void charger_fichiers(file_opener *donnees)
                     j++;
                 }
                 nouveau->oaci[j-j0]='\0';
+                int i=0;
+                while(nouveau->oaci[i]!='\0')
+                {
+                    nouveau->oaci[i]=toupper(nouveau->oaci[i]);
+                    i++;
+                }
+
 //        printf("oaci=%s\n",nouveau->oaci);
 
         //printf("\n\n\n\n\n");
@@ -248,6 +256,12 @@ void charger_fichiers(file_opener *donnees)
                     nouveau->nom[j-j0]=ligne[j];
                     j++;
                 }
+                int i=0;
+                while(nouveau->nom[i]!='\0')
+                {
+                    nouveau->nom[i]=toupper(nouveau->nom[i]);
+                    i++;
+                }
                 nouveau->nom[j-j0]='\0';
 
                 j++;                                        //degres latitude
@@ -258,7 +272,8 @@ void charger_fichiers(file_opener *donnees)
                     j++;
                 }
                 chainetempo[j-j0]='\0';
-                sscanf(chainetempo, "%lf", &nouveau->latdeg);
+                double latdeg;
+                sscanf(chainetempo, "%lf", &latdeg);
 
                 j+=2;                                        //minutes latitude
                 j0=j;
@@ -268,7 +283,8 @@ void charger_fichiers(file_opener *donnees)
                     j++;
                 }
                 chainetempo[j-j0]='\0';
-                sscanf(chainetempo, "%lf", &nouveau->latmin);
+                double latmin;
+                sscanf(chainetempo, "%lf", &latmin);
 
                 j+=1;                                         //secondes latitude
                 j0=j;
@@ -286,7 +302,8 @@ void charger_fichiers(file_opener *donnees)
                         chainetempo[k]=',';
                     }
                 }
-                sscanf(chainetempo, "%lf", &nouveau->latsec);
+                double latsec;
+                sscanf(chainetempo, "%lf", &latsec);
 
                 if(ligne[j+2]=='N')                                        //latitude nord ou sud
                 {
@@ -306,7 +323,8 @@ void charger_fichiers(file_opener *donnees)
                     j++;
                 }
                 chainetempo[j-j0]='\0';
-                sscanf(chainetempo, "%lf", &nouveau->longdeg);
+                double longdeg;
+                sscanf(chainetempo, "%lf", &longdeg);
 
                 j+=2;                                        //longitude minutes
                 j0=j;
@@ -316,7 +334,8 @@ void charger_fichiers(file_opener *donnees)
                     j++;
                 }
                 chainetempo[j-j0]='\0';
-                sscanf(chainetempo, "%lf", &nouveau->longmin);
+                double longmin;
+                sscanf(chainetempo, "%lf", &longmin);
 
                 j+=1;                                        //longitude secondes
                 j0=j;
@@ -333,7 +352,8 @@ void charger_fichiers(file_opener *donnees)
                         chainetempo[k]=',';
                     }
                 }
-                sscanf(chainetempo, "%lf", &nouveau->longsec);
+                double longsec;
+                sscanf(chainetempo, "%lf", &longsec);
 
                 if(ligne[j+2]=='E')                                        //longitude est ou ouest
                 {
@@ -344,8 +364,8 @@ void charger_fichiers(file_opener *donnees)
                     nouveau->dirlong=-1;
                 }
 
-                nouveau->latitude=nouveau->dirlat*(nouveau->latdeg+nouveau->latmin/60+nouveau->latsec/3600);
-                nouveau->longitude=nouveau->dirlong*(nouveau->longdeg+nouveau->longmin/60+nouveau->longsec/3600);
+                nouveau->latitude=nouveau->dirlat*(latdeg+latmin/60+latsec/3600);
+                nouveau->longitude=nouveau->dirlong*(longdeg+longmin/60+longsec/3600);
                 //printf("%lf     %lf\n",nouveau->latitude,nouveau->longitude);
        // printf("%s %d°%d'%lf [%d] %d°%d'%lf [%d]",nouveau->nom,nouveau->latdeg,nouveau->latmin,nouveau->latsec,nouveau->dirlat,nouveau->longdeg,nouveau->longmin,nouveau->longsec,nouveau->dirlong);
        // printf("\n\n\n\n\n");
@@ -490,6 +510,12 @@ void charger_fichiers(file_opener *donnees)
                         j++;
                     }
                     chainetempo[j-j0]='\0';
+                    int i=0;
+                    while(chainetempo[i]!='\0')
+                    {
+                        chainetempo[i]=toupper(chainetempo[i]);
+                        i++;
+                    }
 
 
                         if(donnees->debutbalises!=NULL)
@@ -583,59 +609,14 @@ void charger_fichiers(file_opener *donnees)
 
         fclose(fic);
         }
-        integrer_temps(donnees->debutpdv);
+        integrer_temps(donnees);
     }
 
 
     donnees->file_selection=NULL;
 
-    conversion(donnees);
 }
 
-
-void conversion(file_opener *donnees)
-{
-
-    if(donnees->what_file==0)
-    {
-        aerodrome* pt_current=donnees->debutaero;
-
-        while(pt_current->ptsuiv!=NULL)             //création et initialisation des checkbox
-        {
-        pt_current->pos_y = (donnees->latitude_max - pt_current->latitude) / donnees->dlat; // Conversion et transformation de la position en pourcentage de la zone affichable
-        //printf("%s , latitude = %lf, y = %lf\n",pt_current->nom,pt_current->latitude,pt_current->pos_y);
-        pt_current->pos_x = (-donnees->longitude_min + pt_current->longitude) / donnees->dlong;
-       // printf("%s , longitude = %lf, x = %lf\n\n",pt_current->nom,pt_current->longitude,pt_current->pos_x);
-        pt_current=pt_current->ptsuiv;
-        }
-
-    }
-
-    if(donnees->what_file==1)
-    {
-        balise* pt_balise=donnees->debutbalises;
-
-        while(pt_balise->ptsuiv!=NULL)
-        {
-//        pt_balise->pos_x = (pt_balise->latmin) / 60;
-//        printf("minutes : %lf\n",pt_balise->pos_x);
-//        printf("minutes réels : %lf\n",pt_balise->latmin);
-//        pt_balise->pos_x = (pt_balise->latsec) / 3600;
-//        printf("secondes : %lf\n",pt_balise->pos_x);
-//        printf("secondes réels : %lf\n",pt_balise->latsec);
-            pt_balise->pos_y = (donnees->latitude_max - pt_balise->latitude) / donnees->dlat;
-            pt_balise->pos_x = (-donnees->longitude_min + pt_balise->longitude) / donnees->dlong;
-
-//        pt_balise->pos_y = (donnees->latitude_max - (pt_balise->latdeg) - (pt_balise->latmin) / 60 - (pt_balise->latsec) / 3600) / donnees->dlat;
-       // printf("%s , latitude = %lf°,%lf',%lf\" , y=%lf\n",pt_balise->nom,pt_balise->latdeg,(pt_balise->latmin) / 60,(pt_balise->latsec) / 3600,pt_balise->pos_y);
-//        pt_balise->pos_x = (-donnees->longitude_min + (pt_balise->dirlong) * (pt_balise->longdeg + (pt_balise->longmin) / 60 + (pt_balise->longsec) / 3600)) / donnees->dlong;
-       // printf("%s , %d longitude = %lf°,%lf',%lf\" , x=%lf\n\n",pt_balise->nom,pt_balise->dirlong,pt_balise->longdeg,pt_balise->longmin,pt_balise->longsec,pt_balise->pos_x);
-            pt_balise=pt_balise->ptsuiv;
-        }
-
-    }
-
-}
 
 double conversion_lat(double latitude, file_opener *donnees)
 {
@@ -698,7 +679,7 @@ void liberer_memoire(GtkWidget *bouton, file_opener *donnees)
     donnees->deb_conflits=NULL;
 
 
-    redessiner(donnees->carte);
+    redessiner(NULL,donnees->carte);
 }
 
 
@@ -786,9 +767,10 @@ printf("%s",donnees->ptchemin);
 
 
 
-void integrer_temps(pdv* pdv_deb)
+void integrer_temps(file_opener* donnees)
 {
-    pdv* pdv_current=pdv_deb;
+
+    pdv* pdv_current=donnees->debutpdv;
     while(pdv_current!=NULL)
     {
         pdv_current->temps_depart=60*pdv_current->heure+pdv_current->minute;
@@ -849,6 +831,6 @@ void integrer_temps(pdv* pdv_deb)
 //g_print("arrivée:%lf\n",pdv_current->temps_arrivee);
         pdv_current=pdv_current->ptsuiv;
     }
-
+    detection_conflits(NULL,donnees);
 
 }
