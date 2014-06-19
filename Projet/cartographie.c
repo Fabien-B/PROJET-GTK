@@ -27,14 +27,14 @@ int j;
 char text[5];
 
 couleur(gc,c,-2);
-for(j=35;j<=55;j+=5)
+for(j=15;j<=85;j+=5)
 {
 sprintf(text,"%d",j);
 gdk_draw_line(carte,gc,0,conversion_lat(j,donnees)*donnees->ycarte,donnees->xcarte,conversion_lat(j,donnees)*donnees->ycarte);
 gdk_draw_string(carte,font,gc,3,conversion_lat(j,donnees)*donnees->ycarte-5,text);
 }
 
-for(j=-10;j<=15;j+=5)
+for(j=-30;j<=45;j+=5)
 {
 sprintf(text,"%d",j);
 gdk_draw_line(carte,gc,conversion_longitude(j,donnees)*donnees->xcarte,0,conversion_longitude(j,donnees)*donnees->xcarte,donnees->ycarte);
@@ -68,8 +68,37 @@ couleur(gc,c,-1);
                                 {42.661235,9.049882},{42.727347,9.091767},{42.741469,9.179658},{42.715745,9.255189},
                                 {42.673857,9.291581},{42.740460,9.344453},{42.832678,9.309434},{42.899110,9.320420},
                                 {42.926267,9.356812},{43.005655,9.348229}};
-    int i;
 
+    {
+        double x1,x2,y1,y2;
+        FILE *f = fopen("contour_france.csv", "rb");
+        //printf("f=%p\n", f);
+        if(f){
+            char buffer[1024];
+
+            while(fgets(buffer, sizeof(buffer), f)){
+
+                sscanf(buffer, "%lf;%lf", &x1, &y1);
+                x1 = conversion_longitude(x1, donnees);
+                y1 = conversion_lat(y1, donnees);
+                while(fgets(buffer, sizeof(buffer), f)){
+
+                    if(!strcmp(buffer, "BREAK\n")){
+                        break;
+                    }
+
+                    sscanf(buffer, "%lf;%lf", &x2, &y2);
+                    x2=conversion_longitude(x2, donnees);
+                    y2=conversion_lat(y2, donnees);
+                    gdk_draw_line(carte, gc, x1*donnees->xcarte,y1*donnees->ycarte,x2*donnees->xcarte,y2*donnees->ycarte);
+                    x1=x2;
+                    y1=y2;
+                }
+            }
+            fclose(f);
+        }
+    }
+/*
     double x1,x2,y1,y2;
     x1=conversion_longitude(contour[0][1],donnees);
     y1=conversion_lat(contour[0][0],donnees);
@@ -94,7 +123,7 @@ couleur(gc,c,-1);
         x1=x2;
         y1=y2;
     }
-
+*/
  /* ----------------------------------  AERODROMES -------------------------------------- */
 
    if(donnees->debutaero!=NULL)

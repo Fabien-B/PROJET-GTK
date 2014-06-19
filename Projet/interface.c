@@ -4,7 +4,8 @@
 #include "filtrage.h"
 #include "ajouts_utilisateur.h"
 
-
+//#define MIN(a,b) ((a)<(b)?(a):(b))
+//#define MAX(a,b) ((a)>(b)?(a):(b))
 void initialisation(int argc, char *argv[])
 {
         // Initialisation de Gtk+
@@ -14,6 +15,7 @@ void initialisation(int argc, char *argv[])
 
         //initialisation des paramètres/donnees du programme
         file_opener *donnees=g_malloc(sizeof(file_opener));
+        memset(donnees, 0, sizeof(file_opener));
         donnees->old = malloc(sizeof(position));
         donnees->ptchemin=NULL;
         donnees->file_selection=NULL;
@@ -274,13 +276,13 @@ clic.y = donnees->latitude_max - donnees->dlat * (event->y/donnees->ycarte);
 
 
 
-//    double dlat=3340*3.14/180*(clic.y - donnees->old->y);
-//    double latm=(clic.y+donnees->old->y)/2;
-//    double r=3340*cos(latm*3.14/180);
-//    double dlong=r*3.14*(donnees->old->x-clic.x)/180.0;
-//    double D=sqrt(pow(dlat,2)+pow(dlong,2));
-//    g_print("Les deux derniers points précédants sont (1 : ancien): \n - x1 = %lf \n - y1 = %lf \n - x2 = %lf \n - y2 = %lf\n",donnees->old->x,donnees->old->y,clic.x,clic.y);
-//    g_print("La distance entre les 2 derniers points vaut : %lf (NM)\n\n",D);
+    double dlat=3340*3.14/180*(clic.y - donnees->old->y);
+    double latm=(clic.y+donnees->old->y)/2;
+    double r=3340*cos(latm*3.14/180);
+    double dlong=r*3.14*(donnees->old->x-clic.x)/180.0;
+    double D=sqrt(pow(dlat,2)+pow(dlong,2));
+    g_print("Les deux derniers points précédants sont (1 : ancien): \n - x1 = %lf \n - y1 = %lf \n - x2 = %lf \n - y2 = %lf\n",donnees->old->x,donnees->old->y,clic.x,clic.y);
+    g_print("La distance entre les 2 derniers points vaut : %lf (NM)\n\n",D);
 
 
 donnees->old->x = clic.x;
@@ -298,9 +300,41 @@ state = event->state;
 
   if (state & GDK_BUTTON1_MASK )
   {
-    donnees->longitude_min = donnees->bord->x - ((event->x - donnees->start->x) * donnees->dlong / donnees->xcarte);
-    donnees->latitude_max = donnees->bord->y + ((event->y - donnees->start->y) * donnees->dlat / donnees->ycarte);
+
+    double longi = donnees->bord->x - ((event->x - donnees->start->x) * donnees->dlong / donnees->xcarte);
+    double lati = donnees->bord->y + ((event->y - donnees->start->y) * donnees->dlat / donnees->ycarte);
+
+
+    donnees->longitude_min = MAX(longi,-13.75);
+         donnees->latitude_max = MIN(lati,57.25);
+/*
+    if(donnees->longitude_min < -13.7)
+    {
+
+    }
+    else
+    {
+      donnees->longitude_min = MIN(longi,18.25-donnees->dlong);
+    }
+
+    if(donnees->latitude_max > 57.2)
+    {
+    }
+    else
+    {
+     donnees->latitude_max = MAX(lati-donnees->dlat,37.25);
+    }
+*/
+
+
+
+
+    g_print("lati = %lf, longi = %lf\n",donnees->latitude_max,donnees->longitude_min);
+    g_print("bord gauche : %lf",MAX(longi,-13.75));
+
+
     redessiner(NULL,donnees->carte);
+
   }
 //  g_print("1 = %d, 2 = %d, 3 = %d, 4 = %d, 5 = %d",GDK_BUTTON1_MASK,GDK_BUTTON2_MASK,GDK_BUTTON3_MASK,GDK_BUTTON1_MASK,GDK_BUTTON1_MOTION_MASK);
 //    g_print("delta x = %lf",((event->x - donnees->start->x) * donnees->dlat / donnees->xcarte) / 10000);
@@ -359,48 +393,7 @@ else
     }
 }
 
-// x = position x sur le programme, x_root = position sur l'écran (globale)
-//double lat,lon;
-//
-//lon = donnees->longitude_min + ((event->x/donnees->xcarte) * donnees->dlong);
-//lat = donnees->latitude_max - ((event->y/donnees->ycarte) * donnees->dlat);
-//g_print("Scroll en x = %lf , y = %lf \n ce qui donne lat = %lf , long = %lf\n",event->x,event->y,lat,lon);
 
-    //donnees->latitude_max = donnees->latitude_max - 0.1;
-    //donnees->longitude_min = donnees->longitude_min + (0.1 *16/11);
-
-    //donnees->latitude_max = donnees->latitude_max + 0.1;
-    //donnees->longitude_min = donnees->longitude_min - (0.1 *16/11);
-
-
-//donnees->latitude_max = (donnees->latitude_max - donnees->dlat * event->x/donnees->xcarte);
-//donnees->longitude_min = (donnees->longitude_min + donnees->dlong * event->y/donnees->ycarte);
-
-//donnees->latitude_max = (donnees->latitude_max + (lat + donnees->dlat/2) ) / 2;
-//donnees->longitude_min = (donnees->longitude_min + (lon - donnees->dlong/2) ) /2;
-
-//g_print("x = %lf, x_root = %lf, y = %lf, y_root = %lf\n",event->x,event->x_root,event->y,event->y_root);
-
-//donnees->latitude_max=gtk_spin_button_get_value(GTK_SPIN_BUTTON(lat_coin_spin))+donnees->dlat/2;
-//donnees->longitude_min=gtk_spin_button_get_value(GTK_SPIN_BUTTON(long_coin_spin))-donnees->dlong/2;
-//
-//double conversion_lat(double latitude, file_opener *donnees)
-//{
-//    double r=(donnees->latitude_max-latitude)/donnees->dlat;
-//    return r;
-//}
-//
-//double conversion_longitude(double longitude, file_opener *donnees)
-//{
-//    double r=(-donnees->longitude_min+longitude)/donnees->dlong;
-//    return r;
-//}
-
-//g_print("test adresse event : %p \n\n",event);
-//g_print("test adresse donnees fin : %p \n\n",donnees);
-//
-//
-//g_print("dlat = %lf, dlong = %lf, lat max = %lf, long min = %lf\n\n",donnees->dlat,donnees->dlong,donnees->latitude_max,donnees->longitude_min);
 redessiner(NULL,donnees->carte);
 
 }
@@ -410,9 +403,11 @@ void recup_temps(GtkAdjustment *adj, file_opener *donnees)
 donnees->temps = adj->value;
 //printf("adj : %lf",adj->value);
 //printf("donnees temps : %lf\n", donnees->temps);
+
 //    donnees->heure_label=gtk_label_new(lab_heure);
 //    gtk_box_pack_start(GTK_BOX(hbox_curseur),donnees->heure_label,TRUE,TRUE,0);
 redessiner(NULL,donnees->carte);
+
 
     int h=donnees->temps/60;
     int m=donnees->temps-h*60;
@@ -659,7 +654,7 @@ void parametres(GtkWidget* bouton, form_pdv* formulaire)
 
             break;
     }
-    gtk_widget_destroy(donnees->boite);
+//    gtk_widget_destroy(donnees->boite);
 }
 
 
