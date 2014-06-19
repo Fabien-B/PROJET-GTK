@@ -49,7 +49,7 @@ void ajouter_plan_de_vol(GtkWidget* bouton,form_pdv* formulaire)
     GtkWidget* ok_button;
     formulaire->wind = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
-    gtk_window_set_title(GTK_WINDOW(formulaire->wind), "ajouter PDV");
+    gtk_window_set_title(GTK_WINDOW(formulaire->wind), "Ajouter un Plan de Vol");
     gtk_window_set_default_size(GTK_WINDOW(formulaire->wind), 200, 400);
     gtk_window_set_position(GTK_WINDOW(formulaire->wind),GTK_WIN_POS_CENTER);
 
@@ -65,7 +65,7 @@ void ajouter_plan_de_vol(GtkWidget* bouton,form_pdv* formulaire)
 
 
 
-    formulaire->nom_label=gtk_label_new("Indicatif de l'avion:");               //label et gtkEntry pour l'indicatif avion
+    formulaire->nom_label=gtk_label_new("Indicatif de l'avion:"); //label et gtkEntry pour l'indicatif avion
     formulaire->nom_entry=gtk_entry_new();
     gtk_box_pack_start(GTK_BOX(box),formulaire->nom_label,FALSE,FALSE,0);
     gtk_box_pack_start(GTK_BOX(box),formulaire->nom_entry,FALSE,FALSE,0);
@@ -88,28 +88,28 @@ void ajouter_plan_de_vol(GtkWidget* bouton,form_pdv* formulaire)
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(formulaire->spinm), formulaire->minutes);
 
 
-    formulaire->altitude_label=gtk_label_new("Niveau de vol:");               //label et gtkEntry pour le niveau de vol
+    formulaire->altitude_label=gtk_label_new("Niveau de vol:"); //label et gtkEntry pour le niveau de vol
     formulaire->altitude_entry=gtk_entry_new();
     gtk_box_pack_start(GTK_BOX(box),formulaire->altitude_label,FALSE,FALSE,0);
     gtk_box_pack_start(GTK_BOX(box),formulaire->altitude_entry,FALSE,FALSE,0);
     gtk_entry_set_text(GTK_ENTRY(formulaire->altitude_entry), formulaire->altitude);
 
-    formulaire->vitesse_label=gtk_label_new("Vitesse de vol:");               //label et gtkEntry pour la vitesse
+    formulaire->vitesse_label=gtk_label_new("Vitesse de vol:"); //label et gtkEntry pour la vitesse
     formulaire->vitesse_entry=gtk_entry_new();
     gtk_box_pack_start(GTK_BOX(box),formulaire->vitesse_label,FALSE,FALSE,0);
     gtk_box_pack_start(GTK_BOX(box),formulaire->vitesse_entry,FALSE,FALSE,0);
     gtk_entry_set_text(GTK_ENTRY(formulaire->vitesse_entry), formulaire->vitesse);
 
-    formulaire->pass_label[0]=gtk_label_new("point de départ:");               //label et gtkEntry pour le pt de départ
+    formulaire->pass_label[0]=gtk_label_new("Point de départ:"); //label et gtkEntry pour le pt de départ
     formulaire->pass_entry[0]=gtk_entry_new();
     gtk_box_pack_start(GTK_BOX(box),formulaire->pass_label[0],FALSE,FALSE,0);
     gtk_box_pack_start(GTK_BOX(box),formulaire->pass_entry[0],FALSE,FALSE,0);
     gtk_entry_set_text(GTK_ENTRY(formulaire->pass_entry[0]), formulaire->pass[0]);
 
     int i=1;
-    while(i<formulaire->nb_pt_int+1)                                             //label et gtkEntry pour les pts intermédiaires
+    while(i<formulaire->nb_pt_int+1) //label et gtkEntry pour les pts intermédiaires
     {
-        formulaire->pass_label[i]=gtk_label_new("point de passage:");
+        formulaire->pass_label[i]=gtk_label_new("Point de passage:");
         formulaire->pass_entry[i]=gtk_entry_new();
         gtk_box_pack_start(GTK_BOX(box),formulaire->pass_label[i],FALSE,FALSE,0);
         gtk_box_pack_start(GTK_BOX(box),formulaire->pass_entry[i],FALSE,FALSE,0);
@@ -117,21 +117,21 @@ void ajouter_plan_de_vol(GtkWidget* bouton,form_pdv* formulaire)
         i++;
     }
 
-    formulaire->pass_label[i]=gtk_label_new("point d'arrivée:");               //label et gtkEntry pour le pt d'arrivée
+    formulaire->pass_label[i]=gtk_label_new("Point d'arrivée:"); //label et gtkEntry pour le pt d'arrivée
     formulaire->pass_entry[i]=gtk_entry_new();
     gtk_box_pack_start(GTK_BOX(box),formulaire->pass_label[i],FALSE,FALSE,0);
     gtk_box_pack_start(GTK_BOX(box),formulaire->pass_entry[i],FALSE,FALSE,0);
     gtk_entry_set_text(GTK_ENTRY(formulaire->pass_entry[i]), formulaire->pass[i]);
 
-    aj_pass=gtk_button_new_with_label("ajouter pt de passage");               //bouton pour ajouter un pt de passage
-    gtk_box_pack_start(GTK_BOX(box),aj_pass,FALSE,FALSE,0);
+    aj_pass=gtk_button_new_with_label("Ajouter un point de passage"); //bouton pour ajouter un pt de passage
+    gtk_box_pack_start(GTK_BOX(box),aj_pass,FALSE,FALSE,5);
     g_signal_connect(GTK_BUTTON(aj_pass),"clicked",G_CALLBACK(ajouter_pt_pass),formulaire);
 
-    ok_button=gtk_button_new_with_label("Ajouter");                              //label et gtkEntry pour ajouter le plan de vol à la base de données
+    ok_button=gtk_button_new_with_label("Confirmer"); //label et gtkEntry pour ajouter le plan de vol à la base de données
     gtk_box_pack_start(GTK_BOX(box),ok_button,FALSE,FALSE,0);
     g_signal_connect(GTK_BUTTON(ok_button),"clicked",G_CALLBACK(ajouter_pdv),formulaire);
 
-    gtk_widget_show_all(formulaire->wind);  //afficher la fenètre
+    gtk_widget_show_all(formulaire->wind); //afficher la fenètre
 
 }
 
@@ -139,7 +139,7 @@ void ajouter_pdv(GtkWidget* bouton,form_pdv* formulaire)
 {
 
 
-//g_print("%p   %p   %p\n",formulaire->donnees->debutaero,formulaire->donnees->debutbalises,formulaire->donnees->debutpdv);
+//g_print("%p %p %p\n",formulaire->donnees->debutaero,formulaire->donnees->debutbalises,formulaire->donnees->debutpdv);
 int cas;
     pdv* pdv_current;
     if(formulaire->donnees->finpdv!=NULL)
@@ -278,7 +278,7 @@ int cas;
     gtk_widget_destroy(formulaire->wind);
 
 
-    formulaire->nom[0]='\0';        //réinitialisation du formulaire
+    formulaire->nom[0]='\0'; //réinitialisation du formulaire
     formulaire->altitude[0]='\0';
     formulaire->vitesse[0]='\0';
     formulaire->heure=0;
@@ -293,5 +293,4 @@ int cas;
     integrer_temps(formulaire->donnees);
 
 }
-
 

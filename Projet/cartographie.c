@@ -182,8 +182,8 @@ couleur(gc,c,-1);
 //            g_print("%lf",loc_avion->y);
 
             gdk_draw_point(carte,gc,loc_avion->x,loc_avion->y);
-            gdk_draw_rectangle(carte,gc,TRUE,loc_avion->x-1,loc_avion->y-1,5,5);
-            gdk_draw_string(carte,font,gc,loc_avion->x+2,loc_avion->y-1,pt_pdv_current->nom);
+            gdk_draw_rectangle(carte,gc,TRUE,loc_avion->x-2,loc_avion->y-2,5,5);
+            gdk_draw_string(carte,font,gc,loc_avion->x+3,loc_avion->y-2,pt_pdv_current->nom);
 
 
             int x1=-9,x2=0,y1=0,y2=0; // Variables de stockage des coordonnées pour les points de passage
