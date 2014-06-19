@@ -1,5 +1,6 @@
 #include "interface.h"
 #include "ouverture_fichiers.h"
+#include "filtrage.h"
 
 void creer_file_selection(file_opener *donnees)
 {
@@ -179,6 +180,13 @@ void charger_fichiers(file_opener *donnees)
                     j++;
                 }
                 nouveau->oaci[j-j0]='\0';
+                int i=0;
+                while(nouveau->oaci[i]!='\0')
+                {
+                    nouveau->oaci[i]=toupper(nouveau->oaci[i]);
+                    i++;
+                }
+
 //        printf("oaci=%s\n",nouveau->oaci);
 
         //printf("\n\n\n\n\n");
@@ -247,6 +255,12 @@ void charger_fichiers(file_opener *donnees)
                 {
                     nouveau->nom[j-j0]=ligne[j];
                     j++;
+                }
+                int i=0;
+                while(nouveau->nom[i]!='\0')
+                {
+                    nouveau->nom[i]=toupper(nouveau->nom[i]);
+                    i++;
                 }
                 nouveau->nom[j-j0]='\0';
 
@@ -490,6 +504,12 @@ void charger_fichiers(file_opener *donnees)
                         j++;
                     }
                     chainetempo[j-j0]='\0';
+                    int i=0;
+                    while(chainetempo[i]!='\0')
+                    {
+                        chainetempo[i]=toupper(chainetempo[i]);
+                        i++;
+                    }
 
 
                         if(donnees->debutbalises!=NULL)
@@ -583,7 +603,7 @@ void charger_fichiers(file_opener *donnees)
 
         fclose(fic);
         }
-        integrer_temps(donnees->debutpdv);
+        integrer_temps(donnees);
     }
 
 
@@ -698,7 +718,7 @@ void liberer_memoire(GtkWidget *bouton, file_opener *donnees)
     donnees->deb_conflits=NULL;
 
 
-    redessiner(donnees->carte);
+    redessiner(NULL,donnees->carte);
 }
 
 
@@ -786,9 +806,10 @@ printf("%s",donnees->ptchemin);
 
 
 
-void integrer_temps(pdv* pdv_deb)
+void integrer_temps(file_opener* donnees)
 {
-    pdv* pdv_current=pdv_deb;
+
+    pdv* pdv_current=donnees->debutpdv;
     while(pdv_current!=NULL)
     {
         pdv_current->temps_depart=60*pdv_current->heure+pdv_current->minute;
@@ -849,6 +870,6 @@ void integrer_temps(pdv* pdv_deb)
 //g_print("arrivée:%lf\n",pdv_current->temps_arrivee);
         pdv_current=pdv_current->ptsuiv;
     }
-
+    detection_conflits(NULL,donnees);
 
 }

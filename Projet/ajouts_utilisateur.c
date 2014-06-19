@@ -4,7 +4,6 @@
 #include "filtrage.h"
 #include "ajouts_utilisateur.h"
 
-
 void ajouter_pt_pass(GtkWidget* bouton,form_pdv* formulaire)
 {
     const gchar *text;
@@ -147,8 +146,9 @@ int cas;
     {
 //g_print("SUITE\n");
         formulaire->donnees->finpdv->ptsuiv=malloc(sizeof(pdv));
-        formulaire->donnees->finpdv=formulaire->donnees->finpdv->ptsuiv;
-        pdv_current=formulaire->donnees->finpdv;
+        //formulaire->donnees->finpdv=formulaire->donnees->finpdv->ptsuiv;
+        //pdv_current=formulaire->donnees->finpdv;
+        pdv_current=formulaire->donnees->finpdv->ptsuiv;
         pdv_current->ptsuiv=NULL;
         cas=0;
     }
@@ -191,15 +191,22 @@ int cas;
     for(i=0;i<formulaire->nb_pt_int+2;i++)
     {
         text = gtk_entry_get_text(GTK_ENTRY(formulaire->pass_entry[i]));
-            pass_current->type_point=-1;
+        char text2[40];
+        strcpy(text2,text);
+        int i=0;
+        while(text2[i]!='\0')
+        {
+            text2[i]=toupper(text2[i]);
+            i++;
+        }
+        printf("%s\n",text2);
                 if(formulaire->donnees->debutbalises!=NULL)
                 {
                     balise* pt_current=formulaire->donnees->debutbalises;
-                    strcpy(pt_current->nom,"N/A");
                     while(pt_current!=NULL)
                     {
 
-                        if(!strcmp(text,pt_current->nom))
+                        if(!strcmp(text2,pt_current->nom))
                         {
                             pass_current->point=pt_current;
                             pass_current->type_point=1;
@@ -213,11 +220,9 @@ int cas;
                 if(formulaire->donnees->debutaero!=NULL)
                 {
                     aerodrome* pt_current=formulaire->donnees->debutaero;
-                    strcpy(pt_current->nom,"N/A");
                     while(pt_current!=NULL)
                     {
-
-                        if(!strcmp(text,pt_current->oaci))
+                        if(!strcmp(text2,pt_current->oaci))
                         {
                             pass_current->point=pt_current;
                             pass_current->type_point=0;
@@ -228,9 +233,10 @@ int cas;
 
                 }
 
-        if(pass_current->type_point==-1)
+        if(pass_current->point==NULL)
         {
             er++;
+            printf("er=%d\n",er);
         }
 
     pass_current->ptsuiv=malloc(sizeof(pt_pass));
@@ -262,6 +268,10 @@ int cas;
         }
 
     }
+    else
+    {
+        formulaire->donnees->finpdv=formulaire->donnees->finpdv->ptsuiv;
+    }
 
     pdv_current->affichage=0;
 
@@ -280,7 +290,7 @@ int cas;
     formulaire->nb_pt_int=0;
 
 
-    integrer_temps(formulaire->donnees->debutpdv);
+    integrer_temps(formulaire->donnees);
 
 }
 
