@@ -104,7 +104,6 @@ void charger_fichiers(file_opener *donnees)
     {
     //g_print("aérodrome: %s\n",donnees->ptchemin);
 
-        int j;
         FILE * fic=NULL;
         fic=fopen(donnees->ptchemin,"r");
         char ligne[50];
@@ -116,80 +115,42 @@ void charger_fichiers(file_opener *donnees)
             int cond;
             do
             {
-                char chainetempo[60]; //initialisation d'une chaine de caractères temporaire
 
-                j=0;
-                int j0=0;
+
+
                 fscanf(fic,"%[^\n]",ligne);
-        //printf("%s\n",ligne);
-
-                while(ligne[j]!=',')        //------------------------ lecture de la longitude ---------------------------//
-                {
-                    chainetempo[j-j0]=ligne[j];
-                    j++;
-                }
-                chainetempo[j-j0]='\0';
 
                 int k;
-                for(k=0;k<strlen(chainetempo);k++) //remplacement du caractère '.' par ',' ...
+                for(k=0;k<strlen(ligne);k++) //remplacement du caractère '.' par ','.
                 {
-                    if(chainetempo[k]=='.')
+                    if(ligne[k]=='.')
                     {
-                        chainetempo[k]=',';
+                        ligne[k]=',';
                     }
                 }
-                sscanf(chainetempo, "%lf", &nouveau->longitude); //et conversion de la chaine de caractère en double
-        //printf("latitude=%lf\n",nouveau->latitude);
 
 
-                j+=2;                      //------------------------ lecture de la latitude ---------------------------//
-                j0=j;
-                while(ligne[j]!=',')
+                for(k=0;k<strlen(ligne)-1;k++) //remplacement de " (" par "|".
                 {
-                    chainetempo[j-j0]=ligne[j];
-                    j++;
-                }
-                chainetempo[j-j0]='\0';
-
-                for(k=0;k<strlen(chainetempo);k++)
-                {
-                    if(chainetempo[k]=='.')
+                    if(ligne[k]==' ' && ligne[k+1]=='(')
                     {
-                        chainetempo[k]=',';
+                        ligne[k]='|';
                     }
                 }
-                sscanf(chainetempo, "%lf", &nouveau->latitude);
-        //printf("longitude=%lf\n",nouveau->longitude);
 
 
-                j+=3;                      //------------------------ lecture du nom de l'aérodrome ---------------------------//
-                j0=j;
-                while(ligne[j]!='(')
-                {
-                    nouveau->nom[j-j0]=ligne[j];
-                    j++;
-                }
-                nouveau->nom[j-j0-1]='\0';
-        //printf("nom=%s\n",nouveau->nom);
+//printf("%s\n",ligne);
+                sscanf(ligne, "%lf, %lf, \"%[^||]|(%[^)]", &nouveau->longitude,&nouveau->latitude,nouveau->nom,nouveau->oaci);
 
-                j+=1;                      //------------------------ lecture du code OACI ---------------------------//
-                j0=j;
-                while(ligne[j]!=')')
-                {
-                    nouveau->oaci[j-j0]=ligne[j];
-                    j++;
-                }
-                nouveau->oaci[j-j0]='\0';
-                int i=0;
-                while(nouveau->oaci[i]!='\0')
-                {
-                    nouveau->oaci[i]=toupper(nouveau->oaci[i]);
-                    i++;
-                }
 
-//        printf("oaci=%s\n",nouveau->oaci);
 
-        //printf("\n\n\n\n\n");
+
+
+//printf("latitude=%lf\n",nouveau->latitude);
+//printf("longitude=%lf\n",nouveau->longitude);
+//printf("nom=%s\n",nouveau->nom);
+//printf("oaci=%s\n",nouveau->oaci);
+//printf("\n\n\n\n\n");
 
 
             nouveau->affichage=0; //non affiché par défault
