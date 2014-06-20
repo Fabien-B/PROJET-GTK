@@ -102,11 +102,9 @@ void charger_fichiers(file_opener *donnees)
 
     if(donnees->what_file==0)
     {
-    //g_print("aérodrome: %s\n",donnees->ptchemin);
-
         FILE * fic=NULL;
         fic=fopen(donnees->ptchemin,"r");
-        char ligne[50];
+        char ligne[100];
         if(fic!=NULL)
         {
             aerodrome * nouveau=malloc(sizeof(aerodrome));
@@ -138,46 +136,22 @@ void charger_fichiers(file_opener *donnees)
                     }
                 }
 
-
-//printf("%s\n",ligne);
                 sscanf(ligne, "%lf, %lf, \"%[^||]|(%[^)]", &nouveau->longitude,&nouveau->latitude,nouveau->nom,nouveau->oaci);
 
+                nouveau->affichage=0; //non affiché par défault
 
+                if(fgetc(fic)!=EOF)
+                {
+                    cond=1;
 
-
-
-//printf("latitude=%lf\n",nouveau->latitude);
-//printf("longitude=%lf\n",nouveau->longitude);
-//printf("nom=%s\n",nouveau->nom);
-//printf("oaci=%s\n",nouveau->oaci);
-//printf("\n\n\n\n\n");
-
-
-            nouveau->affichage=0; //non affiché par défault
-
-            if(fgetc(fic)!=EOF)
-            {
-                cond=1;
-
-                nouveau->ptsuiv=malloc(sizeof(aerodrome));
-                nouveau=nouveau->ptsuiv;
-                nouveau->ptsuiv=NULL;
-            }
-            else
-            {
-            cond=0;
-
-
-           /* printf("\n\n\n\n\n\n\n"); /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-            aerodrome *ptcurr=donnees->debutaero;
-            while(ptcurr->ptsuiv!=NULL)
-            {
-                printf("%s\n",ptcurr->nom);
-                ptcurr=ptcurr->ptsuiv;
-            }/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-*/
-            }
+                    nouveau->ptsuiv=malloc(sizeof(aerodrome));
+                    nouveau=nouveau->ptsuiv;
+                    nouveau->ptsuiv=NULL;
+                }
+                else
+                {
+                    cond=0;
+                }
 
             }while(cond);
         fclose(fic);
@@ -189,12 +163,9 @@ void charger_fichiers(file_opener *donnees)
 
     if(donnees->what_file==1)
     {
-    //g_print("balises: %s\n",donnees->ptchemin);
-
-        int j;
         FILE * fic=NULL;
         fic=fopen(donnees->ptchemin,"r");
-        char ligne[50];
+        char ligne[100];
         if(fic!=NULL)
         {
             balise * nouveau=malloc(sizeof(balise));
@@ -204,132 +175,56 @@ void charger_fichiers(file_opener *donnees)
             int cond;
             do
             {
-                nouveau->affichage=0;
-                char chainetempo[20]; //initialisation d'une chaine de caractères temporaire
 
-                j=0;
-                int j0=0;
                 fscanf(fic,"%[^\n]",ligne);
-       //printf("%s\n",ligne);
 
-                while(ligne[j]!=' ')                        //Nom
+                double latdeg,latmin,latsec;
+                double longdeg,longmin,longsec;
+                char dirla,dirlo;
+                int dirlat,dirlong;
+
+                int i;
+                for(i=0;i<strlen(ligne);i++)
                 {
-                    nouveau->nom[j-j0]=ligne[j];
-                    j++;
+                    if(ligne[i]=='.')
+                    {
+                        ligne[i]=',';
+                    }
                 }
-                int i=0;
+
+                sscanf(ligne, "%s %lf°%lf'%lf\" %c %lf°%lf'%lf\" %c", nouveau->nom,&latdeg,&latmin,&latsec,&dirla,&longdeg,&longmin,&longsec,&dirlo);
+
+
+                i=0;
                 while(nouveau->nom[i]!='\0')
                 {
                     nouveau->nom[i]=toupper(nouveau->nom[i]);
                     i++;
                 }
-                nouveau->nom[j-j0]='\0';
+                nouveau->nom[i]='\0';
 
-                j++;                                        //degres latitude
-                j0=j;
-                while(j<j0+2)
-                {
-                    chainetempo[j-j0]=ligne[j];
-                    j++;
-                }
-                chainetempo[j-j0]='\0';
-                double latdeg;
-                sscanf(chainetempo, "%lf", &latdeg);
 
-                j+=2;                                        //minutes latitude
-                j0=j;
-                while(j<j0+2)
+                if(dirlo=='E')
                 {
-                    chainetempo[j-j0]=ligne[j];
-                    j++;
-                }
-                chainetempo[j-j0]='\0';
-                double latmin;
-                sscanf(chainetempo, "%lf", &latmin);
-
-                j+=1;                                         //secondes latitude
-                j0=j;
-                while(j<j0+4)
-                {
-                    chainetempo[j-j0]=ligne[j];
-                    j++;
-                }
-                chainetempo[j-j0]='\0';
-                int k;
-                for(k=0;k<strlen(chainetempo);k++)
-                {
-                    if(chainetempo[k]=='.')
-                    {
-                        chainetempo[k]=',';
-                    }
-                }
-                double latsec;
-                sscanf(chainetempo, "%lf", &latsec);
-
-                if(ligne[j+2]=='N')                                        //latitude nord ou sud
-                {
-                    nouveau->dirlat=1;
+                    dirlong=1;
                 }
                 else
                 {
-                    nouveau->dirlat=-1;
+                    dirlong=-1;
                 }
 
-                j+=3;
-                j0=j;
-
-                while(j<j0+4)                                        //longitude degres
+                if(dirla=='N')
                 {
-                    chainetempo[j-j0]=ligne[j];
-                    j++;
-                }
-                chainetempo[j-j0]='\0';
-                double longdeg;
-                sscanf(chainetempo, "%lf", &longdeg);
-
-                j+=2;                                        //longitude minutes
-                j0=j;
-                while(j<j0+2)
-                {
-                    chainetempo[j-j0]=ligne[j];
-                    j++;
-                }
-                chainetempo[j-j0]='\0';
-                double longmin;
-                sscanf(chainetempo, "%lf", &longmin);
-
-                j+=1;                                        //longitude secondes
-                j0=j;
-                while(j<j0+4)
-                {
-                    chainetempo[j-j0]=ligne[j];
-                    j++;
-                }
-                chainetempo[j-j0]='\0';
-                for(k=0;k<strlen(chainetempo);k++)
-                {
-                    if(chainetempo[k]=='.')
-                    {
-                        chainetempo[k]=',';
-                    }
-                }
-                double longsec;
-                sscanf(chainetempo, "%lf", &longsec);
-
-                if(ligne[j+2]=='E')                                        //longitude est ou ouest
-                {
-                    nouveau->dirlong=1;
+                    dirlat=1;
                 }
                 else
                 {
-                    nouveau->dirlong=-1;
+                    dirlat=-1;
                 }
 
-                nouveau->latitude=nouveau->dirlat*(latdeg+latmin/60+latsec/3600);
-                nouveau->longitude=nouveau->dirlong*(longdeg+longmin/60+longsec/3600);
-                //printf("%lf     %lf\n",nouveau->latitude,nouveau->longitude);
-       // printf("%s %d°%d'%lf [%d] %d°%d'%lf [%d]",nouveau->nom,nouveau->latdeg,nouveau->latmin,nouveau->latsec,nouveau->dirlat,nouveau->longdeg,nouveau->longmin,nouveau->longsec,nouveau->dirlong);
-       // printf("\n\n\n\n\n");
+
+                nouveau->latitude=dirlat*(latdeg+latmin/60+latsec/3600);
+                nouveau->longitude=dirlong*(longdeg+longmin/60+longsec/3600);
 
             nouveau->affichage=0; //non affiché par défault
             if(fgetc(fic)!=EOF)
@@ -341,32 +236,18 @@ void charger_fichiers(file_opener *donnees)
             }
             else
             {
-            cond=0;
-
-           /* printf("\n\n\n\n\n\n\n");/////////////////////////////////////////////
-                                                                                //
-            balise *ptcurr=donnees->debutbalises;                               //
-            while(ptcurr->ptsuiv!=NULL)                                         // sert à rien, c'est pour vérifier que le chainage marche correctement.
-            {                                                                   //
-                printf("%s\n",ptcurr->nom);                                     //
-                ptcurr=ptcurr->ptsuiv;                                          //
-            }/////////////////////////////////////////////////////////////////////
-*/
+                cond=0;
             }
 
             }while(cond);
         fclose(fic);
         }
-//__________________________________________________________________________________________________________________________________________________________________________________________
-//_____________________________________________________________________________plan de vols_________________________________________________________________________________________________
-
     }
 //__________________________________________________________________________________________________________________________________________________________________________________________
 //_____________________________________________________________________________plans de vols________________________________________________________________________________________________
+
     if(donnees->what_file==2)
     {
-    //g_print("PDV: %s\n",donnees->ptchemin);
-
         int j;
         FILE * fic=NULL;
         fic=fopen(donnees->ptchemin,"r");
