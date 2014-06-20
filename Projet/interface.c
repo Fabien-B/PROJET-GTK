@@ -74,6 +74,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     GtkWidget *MI2_Ouvrir;
     GtkWidget *MI2_Charger_default;
     GtkWidget *MI2_Enregistrer;
+    GtkWidget *MI2_parametres;
     GtkWidget *MI2_Quitter;
 
     GtkWidget *hbox_curseur;
@@ -83,7 +84,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     GtkWidget *voir_pdv_button;
     GtkWidget *ajouter_pdv_button;
 //    GtkWidget *detect_conflits_button;
-//    GtkWidget *parametres_button;
+
     GtkWidget *voir_conflits_button;
 //    GtkObject *adj2;
     GtkWidget *event_box;
@@ -114,6 +115,10 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
         MI2_Enregistrer = gtk_menu_item_new_with_label("Enregistrer le plan de vol");
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Enregistrer);
                         g_signal_connect(G_OBJECT(MI2_Enregistrer), "activate", G_CALLBACK(creer_file_save_selection), donnees);
+
+        MI2_parametres = gtk_menu_item_new_with_label("Paramètres");
+        gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_parametres);
+                        g_signal_connect(G_OBJECT(MI2_parametres), "activate", G_CALLBACK(parametres), formulaire);
 
         MI2_Quitter = gtk_menu_item_new_with_label("Quitter");
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Quitter);
@@ -519,18 +524,18 @@ void voir_pdv(GtkWidget *bouton, file_opener* donnees)
 void rapide_file(GtkWidget * widget, file_opener * donnees)
 {
 donnees->what_file=0;
-donnees->ptchemin="aerodromes_fr.txt";
+donnees->ptchemin="aerodromes.txt";
 
 charger_fichiers(donnees);
 
 donnees->what_file=1;
-donnees->ptchemin="balises_fr.txt";
+donnees->ptchemin="balises.txt";
 
 charger_fichiers(donnees);
 
 
 donnees->what_file=2;
-donnees->ptchemin="PVD_bon.txt";
+donnees->ptchemin="PVD.txt";
 
 charger_fichiers(donnees);
 
@@ -780,9 +785,38 @@ void my_getsizetemps(GtkWidget *widget, GtkAllocation *allocation, void *data) {
 
 gboolean animation(file_opener* donnees)
 {
-    donnees->temps++;
-    gtk_adjustment_set_value(GTK_ADJUSTMENT(donnees->adj2), donnees->temps);
-    redessiner(NULL,donnees->carte);
+    if(donnees->temps<24*60-1)
+    {
+        int c=0;
+        conflit* conflit_current=donnees->deb_conflits;
+
+        while(conflit_current!=NULL)
+        {
+            int dt1=abs(donnees->temps-conflit_current->temps_deb);
+            int dt2=abs(donnees->temps-conflit_current->temps_fin);
+
+            if(dt1<2 || dt2<2)
+            {
+               c=1;
+            }
+
+            conflit_current=conflit_current->ptsuiv;
+        }
+
+        if(c)
+        {
+            donnees->temps+=0.2;
+        }
+        else
+        {
+            donnees->temps+=1;
+        }
+
+        gtk_adjustment_set_value(GTK_ADJUSTMENT(donnees->adj2), donnees->temps);
+        redessiner(NULL,donnees->carte);
+
+    }
+
 
     return TRUE;
 }
