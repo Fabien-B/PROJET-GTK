@@ -30,7 +30,7 @@ couleur(gc,c,-2);
 for(j=15;j<=85;j+=5)
 {
 sprintf(text,"%d",j);
-gdk_draw_line(carte,gc,0,conversion_lat(j,donnees)*donnees->ycarte,donnees->xcarte,conversion_lat(j,donnees)*donnees->ycarte);
+gdk_draw_line(carte,gc,0,conversion_lat(j,donnees)*donnees->ycarte,donnees->xcarte*3,conversion_lat(j,donnees)*donnees->ycarte);
 gdk_draw_string(carte,font,gc,3,conversion_lat(j,donnees)*donnees->ycarte-5,text);
 }
 
