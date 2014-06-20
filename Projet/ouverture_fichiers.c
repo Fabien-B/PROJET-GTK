@@ -1,6 +1,9 @@
 #include "interface.h"
 #include "ouverture_fichiers.h"
+#include "cartographie.h"
 #include "filtrage.h"
+#include "ajouts_utilisateur.h"
+
 
 void creer_file_selection(file_opener *donnees)
 {
@@ -15,6 +18,7 @@ void creer_file_selection(file_opener *donnees)
     g_signal_connect_swapped(G_OBJECT(GTK_FILE_SELECTION(donnees->file_selection)->cancel_button), "clicked", G_CALLBACK(gtk_widget_destroy), donnees->file_selection);
 }
 
+
 void recuperer_chemin(GtkWidget *bouton, file_opener *donnees)
 {
     const gchar* chemin_fichier;
@@ -27,6 +31,7 @@ void recuperer_chemin(GtkWidget *bouton, file_opener *donnees)
 
      charger_fichiers(donnees);
 }
+
 
 void lancer_boite(GtkWidget *bouton, file_opener *donnees)
 {
@@ -88,11 +93,6 @@ void combo_selected(GtkWidget *widget,file_opener *donnees)
 
   g_free(text);
 }
-
-
-
-
-
 
 
 void charger_fichiers(file_opener *donnees)
@@ -624,11 +624,13 @@ double conversion_lat(double latitude, file_opener *donnees)
     return r;
 }
 
+
 double conversion_longitude(double longitude, file_opener *donnees)
 {
     double r=(-donnees->longitude_min+longitude)/donnees->dlong;
     return r;
 }
+
 
 void liberer_memoire(GtkWidget *bouton, file_opener *donnees)
 {
@@ -683,25 +685,31 @@ void liberer_memoire(GtkWidget *bouton, file_opener *donnees)
 }
 
 
-
-
-
-
-
-
-
 void creer_file_save_selection(GtkWidget *bouton,file_opener *donnees)
 {
 //printf("azert\n");
-    donnees->file_selection = gtk_file_selection_new( g_locale_to_utf8( "Sélectionnez un fichier", -1, NULL, NULL, NULL) );
-    gtk_widget_show(donnees->file_selection);
+    if(donnees->debutpdv!=NULL)
+    {
 
-    gtk_window_set_modal(GTK_WINDOW(donnees->file_selection), TRUE);
+        donnees->file_selection = gtk_file_selection_new( g_locale_to_utf8( "Sélectionnez un fichier", -1, NULL, NULL, NULL) );
+        gtk_widget_show(donnees->file_selection);
 
-    g_signal_connect(G_OBJECT(GTK_FILE_SELECTION(donnees->file_selection)->ok_button), "clicked", G_CALLBACK(recuperer_save_chemin), donnees );
+        gtk_window_set_modal(GTK_WINDOW(donnees->file_selection), TRUE);
 
-    g_signal_connect_swapped(G_OBJECT(GTK_FILE_SELECTION(donnees->file_selection)->cancel_button), "clicked", G_CALLBACK(gtk_widget_destroy), donnees->file_selection);
+        g_signal_connect(G_OBJECT(GTK_FILE_SELECTION(donnees->file_selection)->ok_button), "clicked", G_CALLBACK(recuperer_save_chemin), donnees );
+
+        g_signal_connect_swapped(G_OBJECT(GTK_FILE_SELECTION(donnees->file_selection)->cancel_button), "clicked", G_CALLBACK(gtk_widget_destroy), donnees->file_selection);
+    }
+    else
+    {
+    GtkWidget* erreur_box;
+    erreur_box = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_WARNING, GTK_BUTTONS_OK, "Aucun plan de vol chargé.");
+    gtk_dialog_run(GTK_DIALOG(erreur_box));
+    gtk_widget_destroy(erreur_box);
+    }
+
 }
+
 
 void recuperer_save_chemin(GtkWidget *bouton, file_opener *donnees)
 {
@@ -711,12 +719,47 @@ void recuperer_save_chemin(GtkWidget *bouton, file_opener *donnees)
     donnees->ptchemin = malloc (sizeof *(donnees->ptchemin) * strlen (chemin_fichier) + 1);
     strcpy (donnees->ptchemin, chemin_fichier);
 
+    FILE *f =fopen(donnees->ptchemin,"r");
+    if(f)
+    {
+        gtk_widget_destroy(donnees->file_selection);
+
+        GtkWidget *main_box;
+        GtkWidget *label_alerte;
+
+        main_box = gtk_dialog_new_with_buttons("Paramètres",
+        NULL,
+        GTK_DIALOG_MODAL,
+        GTK_STOCK_OK,GTK_RESPONSE_OK,
+        GTK_STOCK_CANCEL,GTK_RESPONSE_CANCEL,
+        NULL);
+
+        char label[300];
+        sprintf(label,"Le fichier %s existe déjà voulez vous vraiment le supprimer ?",donnees->ptchemin);
+        label_alerte = gtk_label_new(label);
+        gtk_box_pack_start(GTK_BOX(GTK_DIALOG(main_box)->vbox), label_alerte,FALSE,FALSE,0);
+        gtk_widget_show_all(GTK_DIALOG(main_box)->vbox);
+
+        switch (gtk_dialog_run(GTK_DIALOG(main_box)))
+        {
+
+            case GTK_RESPONSE_OK:
+                sauver_fichiers(donnees);
+                gtk_widget_destroy(main_box);
+
+            case GTK_RESPONSE_CANCEL:
+                creer_file_save_selection(NULL,donnees);
+                gtk_widget_destroy(main_box);
+            default:break;
+        }
+    }
+    else
+    {
     gtk_widget_destroy(donnees->file_selection);
+    sauver_fichiers(donnees);
+    }
 
-     sauver_fichiers(donnees);
 }
-
-
 
 
 void sauver_fichiers(file_opener *donnees)
@@ -763,8 +806,6 @@ printf("%s",donnees->ptchemin);
 
 
 }
-
-
 
 
 void integrer_temps(file_opener* donnees)

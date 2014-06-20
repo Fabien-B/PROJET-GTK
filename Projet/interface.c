@@ -83,7 +83,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     GtkWidget *voir_pdv_button;
     GtkWidget *ajouter_pdv_button;
 //    GtkWidget *detect_conflits_button;
-    GtkWidget *parametres_button;
+//    GtkWidget *parametres_button;
     GtkWidget *voir_conflits_button;
 //    GtkObject *adj2;
     GtkWidget *event_box;
@@ -111,7 +111,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Charger_default);
                         g_signal_connect(G_OBJECT(MI2_Charger_default), "activate", G_CALLBACK(rapide_file), donnees);
 
-        MI2_Enregistrer = gtk_menu_item_new_with_label("Enregistrer");
+        MI2_Enregistrer = gtk_menu_item_new_with_label("Enregistrer le plan de vol");
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Enregistrer);
                         g_signal_connect(G_OBJECT(MI2_Enregistrer), "activate", G_CALLBACK(creer_file_save_selection), donnees);
 
@@ -276,13 +276,13 @@ clic.y = donnees->latitude_max - donnees->dlat * (event->y/donnees->ycarte);
 
 
 
-    double dlat=3340*3.14/180*(clic.y - donnees->old->y);
-    double latm=(clic.y+donnees->old->y)/2;
-    double r=3340*cos(latm*3.14/180);
-    double dlong=r*3.14*(donnees->old->x-clic.x)/180.0;
-    double D=sqrt(pow(dlat,2)+pow(dlong,2));
-    g_print("Les deux derniers points précédants sont (1 : ancien): \n - x1 = %lf \n - y1 = %lf \n - x2 = %lf \n - y2 = %lf\n",donnees->old->x,donnees->old->y,clic.x,clic.y);
-    g_print("La distance entre les 2 derniers points vaut : %lf (NM)\n\n",D);
+//    double dlat=3340*3.14/180*(clic.y - donnees->old->y);
+//    double latm=(clic.y+donnees->old->y)/2;
+//    double r=3340*cos(latm*3.14/180);
+//    double dlong=r*3.14*(donnees->old->x-clic.x)/180.0;
+//    double D=sqrt(pow(dlat,2)+pow(dlong,2));
+//    g_print("Les deux derniers points précédants sont (1 : ancien): \n - x1 = %lf \n - y1 = %lf \n - x2 = %lf \n - y2 = %lf\n",donnees->old->x,donnees->old->y,clic.x,clic.y);
+//    g_print("La distance entre les 2 derniers points vaut : %lf (NM)\n\n",D);
 
 
 donnees->old->x = clic.x;
@@ -306,40 +306,27 @@ state = event->state;
 
 
     donnees->longitude_min = MAX(longi,-13.75);
-         donnees->latitude_max = MIN(lati,57.25);
-/*
-    if(donnees->longitude_min < -13.7)
-    {
+    donnees->latitude_max = MIN(lati,57.25);
 
-    }
-    else
+    if(donnees->longitude_min + donnees->dlong > 18.25)
     {
-      donnees->longitude_min = MIN(longi,18.25-donnees->dlong);
+    donnees->longitude_min = MIN(longi + donnees->dlong,18.25) - donnees->dlong;
     }
 
-    if(donnees->latitude_max > 57.2)
+    if(donnees->latitude_max - donnees->dlat < 35.25)
     {
+    donnees->latitude_max = MAX(lati - donnees->dlat,35.25) + donnees->dlat;
     }
-    else
-    {
-     donnees->latitude_max = MAX(lati-donnees->dlat,37.25);
-    }
-*/
 
-
-
-
-    g_print("lati = %lf, longi = %lf\n",donnees->latitude_max,donnees->longitude_min);
-    g_print("bord gauche : %lf",MAX(longi,-13.75));
-
+//    g_print("lati = %lf, longi = %lf\n",donnees->latitude_max,donnees->longitude_min);
+//    g_print("bord gauche : %lf",MAX(longi,-13.75));
 
     redessiner(NULL,donnees->carte);
 
   }
+
 //  g_print("1 = %d, 2 = %d, 3 = %d, 4 = %d, 5 = %d",GDK_BUTTON1_MASK,GDK_BUTTON2_MASK,GDK_BUTTON3_MASK,GDK_BUTTON1_MASK,GDK_BUTTON1_MOTION_MASK);
 //    g_print("delta x = %lf",((event->x - donnees->start->x) * donnees->dlat / donnees->xcarte) / 10000);
-
-
 
 //g_print("x = %lf, axes = %lf, boutton = %d\n",event->x,event->axes,event->button);
 //g_print("send_event = %d, state = %d, time = %d\n",event->send_event,event->state,event->time);
@@ -425,6 +412,7 @@ void APropos(GtkWidget* widget)
     gtk_dialog_run(GTK_DIALOG(APropos_box));
     gtk_widget_destroy(APropos_box);
 }
+
 
 void voir_pdv(GtkWidget *bouton, file_opener* donnees)
 {
@@ -555,9 +543,6 @@ gtk_widget_queue_draw(carte);
 }
 
 
-
-
-
 void parametres(GtkWidget* bouton, form_pdv* formulaire)
 {
     //GtkWidget* boite;
@@ -677,9 +662,6 @@ void visu_carte_default(GtkWidget* button, form_pdv* formulaire)
 }
 
 
-
-
-
 void voir_conflits(GtkWidget *bouton, file_opener* donnees)
 {
     GtkWidget *pdvw;
@@ -757,8 +739,6 @@ void voir_conflits(GtkWidget *bouton, file_opener* donnees)
         gtk_widget_show_all(pdvw);  //afficher la fenètre
 
 }
-
-
 
 
 void my_getsize(GtkWidget *widget, GtkAllocation *allocation, form_pdv* formulaire)
