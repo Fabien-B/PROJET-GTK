@@ -137,7 +137,7 @@ void charger_fichiers(file_opener *donnees)
                     }
                 }
 
-                sscanf(ligne, "%lf, %lf, \"%[^||]|(%[^)]", &nouveau->longitude,&nouveau->latitude,nouveau->nom,nouveau->oaci);
+                sscanf(ligne, "%lf, %lf, \"%[^|]|(%[^)]", &nouveau->longitude,&nouveau->latitude,nouveau->nom,nouveau->oaci);
 
                 nouveau->affichage=0; //non affiché par défault
 
@@ -463,6 +463,8 @@ void charger_fichiers(file_opener *donnees)
 
 
 
+
+
 void liberer_memoire(GtkWidget *bouton, file_opener *donnees)
 {
     aerodrome* pt_current_aero= donnees->debutaero;
@@ -514,6 +516,11 @@ void liberer_memoire(GtkWidget *bouton, file_opener *donnees)
 
     redessiner(NULL,donnees->carte);
 }
+
+
+
+
+
 
 
 void creer_file_save_selection(GtkWidget *bouton,file_opener *donnees)
@@ -639,13 +646,6 @@ printf("%s",donnees->ptchemin);
 
 
 }
-
-
-
-
-
-
-
 
 
 

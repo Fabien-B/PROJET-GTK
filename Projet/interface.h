@@ -112,11 +112,15 @@ typedef struct form_pdv{
     double heure;
     GtkWidget * spinm;
     double minutes;
-    GtkWidget *altitude_entry;
-    char altitude[5];
+    GtkWidget * spinfl;
+    int altitude;
+    GtkWidget * spinvi;
+    int vitesse;
+    //GtkWidget *altitude_entry;
+    //char altitude[5];
     GtkWidget *altitude_label;
     GtkWidget *vitesse_entry;
-    char vitesse[5];
+//    char vitesse[5];
     GtkWidget *vitesse_label;
     GtkWidget *pass_entry[40];
     char pass[40][10];

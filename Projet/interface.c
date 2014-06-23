@@ -39,14 +39,14 @@ void initialisation(int argc, char *argv[])
         donnees->dlong=16;
         donnees->xcarte=550;//550
         donnees->ycarte=660;//660
-
+        donnees->tag_lecture=0;
 
         form_pdv* formulaire=malloc(sizeof(form_pdv));
         formulaire->donnees=donnees;
         formulaire->nb_pt_int=0;
-        formulaire->altitude[0]='\0';
+        formulaire->altitude=100;
         formulaire->nom[0]='\0';
-        formulaire->vitesse[0]='\0';
+        formulaire->vitesse=200;
         int i;
         for(i=0;i<40;i++)
         {
@@ -429,7 +429,7 @@ redessiner(NULL,donnees->carte);
 void APropos(GtkWidget* widget)
 {
     GtkWidget* APropos_box;
-    APropos_box = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "The GATI, 'The GNU Air Traffic Indicator' est un software devellopé dans le cadre d'un projet étudiant.\nCopyright (C) 2014  Fabien Bonneval, Xavier Durand.\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\nYou should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/.");
+    APropos_box = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "The GATI, 'The GNU Air Traffic Indicator' est un software devellopé dans le cadre d'un projet étudiant.\nCopyright (C) 2014  Fabien Bonneval, Xavier Durand.\n\nThis program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.\nYou should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/.\n\nLe contour de la france est extrait des données sous licence Creative Commons mises à disposition par Bjorn Sandvik à l'adresse: http://thematicmapping.org/downloads/world_borders.php");
 
     gtk_dialog_run(GTK_DIALOG(APropos_box));
     gtk_widget_destroy(APropos_box);
@@ -460,7 +460,6 @@ void voir_pdv(GtkWidget *bouton, file_opener* donnees)
 
     if(donnees->debutpdv!=NULL)
     {
-
 
         pdv *pdv_current=donnees->debutpdv;
 //->ptsuiv
@@ -552,7 +551,7 @@ charger_fichiers(donnees);
 
 
 donnees->what_file=2;
-donnees->ptchemin="PVD.txt";
+donnees->ptchemin="PDV.txt";
 
 charger_fichiers(donnees);
 
@@ -646,7 +645,7 @@ void voir_conflits(GtkWidget *bouton, file_opener* donnees)
     pdvw = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
     gtk_window_set_title(GTK_WINDOW(pdvw), "Conflits");
-    gtk_window_set_default_size(GTK_WINDOW(pdvw), 10, 500);
+    gtk_window_set_default_size(GTK_WINDOW(pdvw), 150, 500);
     gtk_window_set_position(GTK_WINDOW(pdvw),GTK_WIN_POS_CENTER);
 
     //init scrollbar
@@ -660,7 +659,7 @@ void voir_conflits(GtkWidget *bouton, file_opener* donnees)
 
     detection_conflits(NULL,donnees);
 
-    if(donnees->deb_conflits!=NULL)
+    if(donnees->deb_conflits->ptsuiv!=NULL)
     {
 
     conflit* conflit_current=donnees->deb_conflits;
@@ -704,7 +703,7 @@ void voir_conflits(GtkWidget *bouton, file_opener* donnees)
     else
     {
         GtkWidget* lab;
-        lab=gtk_label_new("  Vous n'avez pas lancer la détection des conflits!   ");
+        lab=gtk_label_new("  Pas de conflits!   ");
         gtk_box_pack_start(GTK_BOX(box), lab, FALSE, FALSE, 0);
     }
 
@@ -740,16 +739,6 @@ void my_getsize(GtkWidget *widget, GtkAllocation *allocation, form_pdv* formulai
 
 }
 
-/*
-void my_getsizecarte(GtkWidget *widget, GtkAllocation *allocation, void *data) {
-//    printf("Carte: width = %d, height = %d\n", allocation->width, allocation->height);
-
-}
-
-void my_getsizetemps(GtkWidget *widget, GtkAllocation *allocation, void *data) {
-//    printf("Temps: width = %d, height = %d\n", allocation->width, allocation->height);
-}
-*/
 
 
 gboolean animation(file_opener* donnees)
@@ -792,14 +781,22 @@ gboolean animation(file_opener* donnees)
 
 void play(GtkWidget* bouton,file_opener* donnees)
 {
-
-    donnees->tag_lecture=gtk_timeout_add(250,(GtkFunction) animation,donnees);
+    if(donnees->tag_lecture==0)
+    {
+        //gtk_timeout_remove (donnees->tag_lecture);
+        donnees->tag_lecture=gtk_timeout_add(250,(GtkFunction) animation,donnees);
+    }
 
 }
 
 void stop(GtkWidget* bouton,file_opener* donnees)
 {
-    gtk_timeout_remove (donnees->tag_lecture);
+    if(donnees->tag_lecture!=0)
+    {
+        gtk_timeout_remove (donnees->tag_lecture);
+        donnees->tag_lecture=0;
+    }
+
 }
 
 

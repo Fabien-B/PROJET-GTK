@@ -31,6 +31,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="cartographie.h" />
+		<Unit filename="conflits.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="conflits.h" />
 		<Unit filename="filtrage.c">
 			<Option compilerVar="CC" />
 		</Unit>

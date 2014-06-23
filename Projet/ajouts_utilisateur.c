@@ -10,27 +10,19 @@ void ajouter_pt_pass(GtkWidget* bouton,form_pdv* formulaire)
     formulaire->nb_pt_int++;
     text = gtk_entry_get_text(GTK_ENTRY(formulaire->nom_entry));
     strcpy(formulaire->nom,text);
-g_print("%s\n",text);
 
-     text = gtk_entry_get_text(GTK_ENTRY(formulaire->altitude_entry));
-    strcpy(formulaire->altitude,text);
-g_print("%s\n",text);
-
-     text = gtk_entry_get_text(GTK_ENTRY(formulaire->vitesse_entry));
-    strcpy(formulaire->vitesse,text);
-g_print("%s\n",text);
+    formulaire->altitude = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(formulaire->spinfl));
+    formulaire->vitesse = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(formulaire->spinvi));
 
 int i;
     for(i=0;i<formulaire->nb_pt_int+1;i++)
     {
         text = gtk_entry_get_text(GTK_ENTRY(formulaire->pass_entry[i]));
         strcpy(formulaire->pass[i],text);
-    g_print("%s\n",text);
-
     }
 
-    formulaire->heure=gtk_spin_button_get_value(GTK_SPIN_BUTTON(formulaire->spinh));
-    formulaire->minutes=gtk_spin_button_get_value(GTK_SPIN_BUTTON(formulaire->spinm));
+    formulaire->heure=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(formulaire->spinh));
+    formulaire->minutes=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(formulaire->spinm));
 
 
     gtk_widget_destroy(formulaire->wind);
@@ -88,17 +80,18 @@ void ajouter_plan_de_vol(GtkWidget* bouton,form_pdv* formulaire)
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(formulaire->spinm), formulaire->minutes);
 
 
-    formulaire->altitude_label=gtk_label_new("Niveau de vol:"); //label et gtkEntry pour le niveau de vol
-    formulaire->altitude_entry=gtk_entry_new();
-    gtk_box_pack_start(GTK_BOX(box),formulaire->altitude_label,FALSE,FALSE,0);
-    gtk_box_pack_start(GTK_BOX(box),formulaire->altitude_entry,FALSE,FALSE,0);
-    gtk_entry_set_text(GTK_ENTRY(formulaire->altitude_entry), formulaire->altitude);
 
-    formulaire->vitesse_label=gtk_label_new("Vitesse de vol:"); //label et gtkEntry pour la vitesse
-    formulaire->vitesse_entry=gtk_entry_new();
-    gtk_box_pack_start(GTK_BOX(box),formulaire->vitesse_label,FALSE,FALSE,0);
-    gtk_box_pack_start(GTK_BOX(box),formulaire->vitesse_entry,FALSE,FALSE,0);
-    gtk_entry_set_text(GTK_ENTRY(formulaire->vitesse_entry), formulaire->vitesse);
+    formulaire->altitude_label = gtk_frame_new("Niveau de vol (FL)");
+    formulaire->spinfl = gtk_spin_button_new_with_range(0, 700, 5);
+    gtk_container_add(GTK_CONTAINER(formulaire->altitude_label), formulaire->spinfl);
+    gtk_box_pack_start(GTK_BOX(box), formulaire->altitude_label, FALSE, FALSE, 0);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(formulaire->spinfl), formulaire->altitude);
+
+    formulaire->vitesse_label = gtk_frame_new("Vitesse de vol (kt)");
+    formulaire->spinvi = gtk_spin_button_new_with_range(0, 700, 10);
+    gtk_container_add(GTK_CONTAINER(formulaire->vitesse_label), formulaire->spinvi);
+    gtk_box_pack_start(GTK_BOX(box), formulaire->vitesse_label, FALSE, FALSE, 0);
+    gtk_spin_button_set_value(GTK_SPIN_BUTTON(formulaire->spinvi), formulaire->vitesse);
 
     formulaire->pass_label[0]=gtk_label_new("Point de départ:"); //label et gtkEntry pour le pt de départ
     formulaire->pass_entry[0]=gtk_entry_new();
@@ -139,22 +132,17 @@ void ajouter_pdv(GtkWidget* bouton,form_pdv* formulaire)
 {
 
 
-//g_print("%p %p %p\n",formulaire->donnees->debutaero,formulaire->donnees->debutbalises,formulaire->donnees->debutpdv);
 int cas;
     pdv* pdv_current;
     if(formulaire->donnees->finpdv!=NULL)
     {
-//g_print("SUITE\n");
         formulaire->donnees->finpdv->ptsuiv=malloc(sizeof(pdv));
-        //formulaire->donnees->finpdv=formulaire->donnees->finpdv->ptsuiv;
-        //pdv_current=formulaire->donnees->finpdv;
         pdv_current=formulaire->donnees->finpdv->ptsuiv;
         pdv_current->ptsuiv=NULL;
         cas=0;
     }
     else
     {
-//g_print("DEBUT PDV\n");fflush(stdout);
         formulaire->donnees->debutpdv=malloc(sizeof(pdv));
         pdv_current=formulaire->donnees->debutpdv;
         formulaire->donnees->finpdv=pdv_current;
@@ -166,20 +154,13 @@ int cas;
     const gchar *text;
     text = gtk_entry_get_text(GTK_ENTRY(formulaire->nom_entry));
     strcpy(pdv_current->nom,text);
-//g_print("%s\n",pdv_current->nom);
 
     pdv_current->heure=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(formulaire->spinh));
     pdv_current->minute=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(formulaire->spinm));
-//g_print("%d:%d\n",pdv_current->heure,pdv_current->minute);
 
 
-    text = gtk_entry_get_text(GTK_ENTRY(formulaire->altitude_entry));
-    sscanf(text, "%d", &pdv_current->altitude);
-//g_print("%d\n",pdv_current->altitude);
-
-     text = gtk_entry_get_text(GTK_ENTRY(formulaire->vitesse_entry));
-    sscanf(text, "%d", &pdv_current->vitesse);
-//g_print("%d\n",pdv_current->vitesse);
+    pdv_current->altitude = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(formulaire->spinfl));
+    pdv_current->vitesse = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(formulaire->spinvi));
 
 
     pdv_current->pass_debut=malloc(sizeof(pt_pass));
@@ -199,7 +180,6 @@ int cas;
             text2[i]=toupper(text2[i]);
             i++;
         }
-        printf("%s\n",text2);
                 if(formulaire->donnees->debutbalises!=NULL)
                 {
                     balise* pt_current=formulaire->donnees->debutbalises;
@@ -210,7 +190,6 @@ int cas;
                         {
                             pass_current->point=pt_current;
                             pass_current->type_point=1;
-//printf("%s sélectionné\n",pt_current->nom);
                         }
                         pt_current=pt_current->ptsuiv;
                     }
@@ -226,7 +205,6 @@ int cas;
                         {
                             pass_current->point=pt_current;
                             pass_current->type_point=0;
-//printf("%s sélectionné\n",pt_current->nom);
                         }
                         pt_current=pt_current->ptsuiv;
                     }
@@ -279,8 +257,8 @@ int cas;
 
 
     formulaire->nom[0]='\0'; //réinitialisation du formulaire
-    formulaire->altitude[0]='\0';
-    formulaire->vitesse[0]='\0';
+//    formulaire->altitude[0]='\0';
+//    formulaire->vitesse[0]='\0';
     formulaire->heure=0;
     formulaire->minutes=0;
     for(i=0;i<10;i++)
