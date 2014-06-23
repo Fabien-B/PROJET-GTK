@@ -569,7 +569,7 @@ void recuperer_save_chemin(GtkWidget *bouton, file_opener *donnees)
         GtkWidget *main_box;
         GtkWidget *label_alerte;
 
-        main_box = gtk_dialog_new_with_buttons("Paramètres",
+        main_box = gtk_dialog_new_with_buttons("Attention!",
         NULL,
         GTK_DIALOG_MODAL,
         GTK_STOCK_OK,GTK_RESPONSE_OK,
@@ -588,10 +588,12 @@ void recuperer_save_chemin(GtkWidget *bouton, file_opener *donnees)
             case GTK_RESPONSE_OK:
                 sauver_fichiers(donnees);
                 gtk_widget_destroy(main_box);
+                break;
 
             case GTK_RESPONSE_CANCEL:
                 creer_file_save_selection(NULL,donnees);
                 gtk_widget_destroy(main_box);
+                break;
             default:break;
         }
     }
@@ -648,6 +650,144 @@ printf("%s",donnees->ptchemin);
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void creer_file_conflit_selection(GtkWidget *bouton,file_opener *donnees)
+{
+//printf("azert\n");
+    if(donnees->debutpdv!=NULL)
+    {
+
+        donnees->file_selection = gtk_file_selection_new( g_locale_to_utf8( "Sélectionnez un fichier", -1, NULL, NULL, NULL) );
+        gtk_widget_show(donnees->file_selection);
+
+        gtk_window_set_modal(GTK_WINDOW(donnees->file_selection), TRUE);
+
+        g_signal_connect(G_OBJECT(GTK_FILE_SELECTION(donnees->file_selection)->ok_button), "clicked", G_CALLBACK(recuperer_conflit_chemin), donnees );
+
+        g_signal_connect_swapped(G_OBJECT(GTK_FILE_SELECTION(donnees->file_selection)->cancel_button), "clicked", G_CALLBACK(gtk_widget_destroy), donnees->file_selection);
+    }
+    else
+    {
+    GtkWidget* erreur_box;
+    erreur_box = gtk_message_dialog_new(NULL, GTK_DIALOG_MODAL, GTK_MESSAGE_WARNING, GTK_BUTTONS_OK, "Aucun plan de vol chargé.");
+    gtk_dialog_run(GTK_DIALOG(erreur_box));
+    gtk_widget_destroy(erreur_box);
+    }
+
+}
+
+
+void recuperer_conflit_chemin(GtkWidget *bouton, file_opener *donnees)
+{
+    const gchar* chemin_fichier;
+    chemin_fichier = gtk_file_selection_get_filename(GTK_FILE_SELECTION (donnees->file_selection) );
+
+    donnees->ptchemin = malloc (sizeof *(donnees->ptchemin) * strlen (chemin_fichier) + 1);
+    strcpy (donnees->ptchemin, chemin_fichier);
+
+    FILE *f =fopen(donnees->ptchemin,"r");
+    if(f)
+    {
+        gtk_widget_destroy(donnees->file_selection);
+
+        GtkWidget *main_box;
+        GtkWidget *label_alerte;
+
+        main_box = gtk_dialog_new_with_buttons("Attention",
+        NULL,
+        GTK_DIALOG_MODAL,
+        GTK_STOCK_OK,GTK_RESPONSE_OK,
+        GTK_STOCK_CANCEL,GTK_RESPONSE_CANCEL,
+        NULL);
+
+        char label[300];
+        sprintf(label,"Le fichier %s existe déjà voulez vous vraiment le supprimer ?",donnees->ptchemin);
+        label_alerte = gtk_label_new(label);
+        gtk_box_pack_start(GTK_BOX(GTK_DIALOG(main_box)->vbox), label_alerte,FALSE,FALSE,0);
+        gtk_widget_show_all(GTK_DIALOG(main_box)->vbox);
+
+        switch (gtk_dialog_run(GTK_DIALOG(main_box)))
+        {
+
+            case GTK_RESPONSE_OK:
+                sauver_conflits(donnees);
+                gtk_widget_destroy(main_box);
+                break;
+
+            case GTK_RESPONSE_CANCEL:
+                creer_file_conflit_selection(NULL,donnees);
+                gtk_widget_destroy(main_box);
+                break;
+            default:break;
+        }
+    }
+    else
+    {
+    gtk_widget_destroy(donnees->file_selection);
+    sauver_conflits(donnees);
+    }
+
+}
+
+
+
+void sauver_conflits(file_opener *donnees)
+{
+printf("%s",donnees->ptchemin);
+
+    FILE *fic=NULL;
+    fic=fopen(donnees->ptchemin,"w");
+    if(fic!=NULL)
+    {
+
+        if(donnees->deb_conflits!=NULL)
+        {
+            conflit* current=donnees->deb_conflits;
+
+            while(current->ptsuiv!=NULL)
+            {
+                int h=current->temps_deb/60;
+                int m=current->temps_deb-60*h;
+                fprintf(fic,"Conflit etre %s et %s à %02d:%02d, localisation approximative: %lf ; %lf",current->pdv1->nom,current->pdv2->nom,h,m,current->latitude,current->longitude);
+
+                fprintf(fic,"\n");
+
+                current=current->ptsuiv;
+            }
+        }
+        fclose(fic);
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 void integrer_temps(file_opener* donnees)
