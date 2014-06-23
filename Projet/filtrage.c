@@ -27,7 +27,7 @@ void filtres(GtkWidget* button, file_opener* donnees)
     gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(scrollbar), box1);
     gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrollbar), GTK_POLICY_NEVER, GTK_POLICY_ALWAYS); //Never: désactive la barre, Always, l'inverse
 
-
+    //création et ajout d'une boite dans la boite scrollable
     box=gtk_hbox_new(FALSE,0);
     gtk_box_pack_start(GTK_BOX(box1), box, FALSE, FALSE, 0);
 
@@ -42,110 +42,110 @@ void filtres(GtkWidget* button, file_opener* donnees)
 
 
 
-if(donnees->debutaero!=NULL)
-{
-    GtkWidget* lab;
-    GtkWidget* saa;
-    GtkWidget* is;
-
-    lab=gtk_label_new("Aérodromes"); //un label et deux boutons pour aider à la sélection
-    saa=gtk_button_new_with_label("Sélectionner/(D) tout");
-    is=gtk_button_new_with_label("Inverser la sélection");
-    gtk_box_pack_start(GTK_BOX(boxaero),lab,FALSE,FALSE,0);
-    gtk_box_pack_start(GTK_BOX(boxaero),saa,FALSE,FALSE,0);
-    gtk_box_pack_start(GTK_BOX(boxaero),is,FALSE,FALSE,0);
-    g_signal_connect(G_OBJECT(saa), "clicked", G_CALLBACK(select_all_aero), donnees);
-    g_signal_connect(G_OBJECT(is), "clicked", G_CALLBACK(invert_selection_aero), donnees);
-
-    aerodrome* pt_current=donnees->debutaero;
-    while(pt_current->ptsuiv!=NULL)             //création et initialisation des checkbox
+    if(donnees->debutaero!=NULL)
     {
-        char label[100];
-        sprintf(label,"%s :  %s\n",pt_current->oaci,pt_current->nom);
-        pt_current->coch=gtk_check_button_new_with_label(label);
-        gtk_box_pack_start(GTK_BOX(boxaero),pt_current->coch,FALSE,FALSE,0);
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pt_current->coch), (pt_current->affichage));
-        g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(check_aero), pt_current);
-        g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(redessiner), donnees->carte);
-        pt_current=pt_current->ptsuiv;
+        GtkWidget* lab;
+        GtkWidget* saa;
+        GtkWidget* is;
+
+        lab=gtk_label_new("Aérodromes"); //un label et deux boutons pour aider à la sélection
+        saa=gtk_button_new_with_label("Sélectionner/(D) tout");
+        is=gtk_button_new_with_label("Inverser la sélection");
+        gtk_box_pack_start(GTK_BOX(boxaero),lab,FALSE,FALSE,0);
+        gtk_box_pack_start(GTK_BOX(boxaero),saa,FALSE,FALSE,0);
+        gtk_box_pack_start(GTK_BOX(boxaero),is,FALSE,FALSE,0);
+        g_signal_connect(G_OBJECT(saa), "clicked", G_CALLBACK(select_all_aero), donnees);
+        g_signal_connect(G_OBJECT(is), "clicked", G_CALLBACK(invert_selection_aero), donnees);
+
+        aerodrome* pt_current=donnees->debutaero;
+        while(pt_current->ptsuiv!=NULL)             //création et initialisation des checkbox
+        {
+            char label[100];
+            sprintf(label,"%s :  %s\n",pt_current->oaci,pt_current->nom);
+            pt_current->coch=gtk_check_button_new_with_label(label);
+            gtk_box_pack_start(GTK_BOX(boxaero),pt_current->coch,FALSE,FALSE,0);
+            gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pt_current->coch), (pt_current->affichage));
+            g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(check_aero), pt_current);
+            g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(redessiner), donnees->carte);
+            pt_current=pt_current->ptsuiv;
+        }
+
+
+    }
+
+    if(donnees->debutbalises!=NULL)
+    {
+        GtkWidget* lab;
+        GtkWidget* sab;
+        GtkWidget* is;
+
+        lab=gtk_label_new("Balises");                    //un label et deux boutons pour aider à la sélection
+        sab=gtk_button_new_with_label("Sélectionner/(D) tout");
+        is=gtk_button_new_with_label("Inverser la sélection");
+        gtk_box_pack_start(GTK_BOX(boxbalises),lab,FALSE,FALSE,0);
+        gtk_box_pack_start(GTK_BOX(boxbalises),sab,FALSE,FALSE,0);
+        gtk_box_pack_start(GTK_BOX(boxbalises),is,FALSE,FALSE,0);
+        g_signal_connect(G_OBJECT(sab), "clicked", G_CALLBACK(select_all_balises), donnees);
+        g_signal_connect(G_OBJECT(is), "clicked", G_CALLBACK(invert_selection_balise), donnees);
+
+        balise* pt_current=donnees->debutbalises;
+        while(pt_current->ptsuiv!=NULL)             //création et initialisation des checkbox
+        {
+            char label[100];
+            sprintf(label,"%s\n",pt_current->nom);
+            pt_current->coch=gtk_check_button_new_with_label(label);
+            gtk_box_pack_start(GTK_BOX(boxbalises),pt_current->coch,FALSE,FALSE,0);
+            gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pt_current->coch), (pt_current->affichage));
+            g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(check_balise), pt_current);
+            g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(redessiner), donnees->carte);
+            pt_current=pt_current->ptsuiv;
+        }
+
+
+    }
+
+    if(donnees->debutpdv!=NULL)
+    {
+        GtkWidget* lab;
+        GtkWidget* sap;
+        GtkWidget* is;
+
+        lab=gtk_label_new("Plans de vols");                    //un label et deux boutons pour aider à la sélection
+        sap=gtk_button_new_with_label("Sélectionner/(D) tout");
+        is=gtk_button_new_with_label("Inverser la sélection");
+        gtk_box_pack_start(GTK_BOX(boxpdv),lab,FALSE,FALSE,0);
+        gtk_box_pack_start(GTK_BOX(boxpdv),sap,FALSE,FALSE,0);
+        gtk_box_pack_start(GTK_BOX(boxpdv),is,FALSE,FALSE,0);
+        g_signal_connect(G_OBJECT(sap), "clicked", G_CALLBACK(select_all_pdv), donnees);
+        g_signal_connect(G_OBJECT(is), "clicked", G_CALLBACK(invert_selection_pdv), donnees);
+
+        pdv* pt_current=donnees->debutpdv;
+        while(pt_current!=NULL)                 //création et initialisation des checkbox
+        {
+
+            char label[100];
+
+            sprintf(label,"%s\n",pt_current->nom);
+            pt_current->coch=gtk_check_button_new_with_label(label);
+            gtk_box_pack_start(GTK_BOX(boxpdv),pt_current->coch,FALSE,FALSE,0);
+            gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pt_current->coch), (pt_current->affichage));
+            g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(check_pdv), pt_current);
+            g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(redessiner), donnees->carte);
+            pt_current=pt_current->ptsuiv;
+        }
+
+
     }
 
 
-}
 
-if(donnees->debutbalises!=NULL)
-{
-    GtkWidget* lab;
-    GtkWidget* sab;
-    GtkWidget* is;
-
-    lab=gtk_label_new("Balises");                    //un label et deux boutons pour aider à la sélection
-    sab=gtk_button_new_with_label("Sélectionner/(D) tout");
-    is=gtk_button_new_with_label("Inverser la sélection");
-    gtk_box_pack_start(GTK_BOX(boxbalises),lab,FALSE,FALSE,0);
-    gtk_box_pack_start(GTK_BOX(boxbalises),sab,FALSE,FALSE,0);
-    gtk_box_pack_start(GTK_BOX(boxbalises),is,FALSE,FALSE,0);
-    g_signal_connect(G_OBJECT(sab), "clicked", G_CALLBACK(select_all_balises), donnees);
-    g_signal_connect(G_OBJECT(is), "clicked", G_CALLBACK(invert_selection_balise), donnees);
-
-    balise* pt_current=donnees->debutbalises;
-    while(pt_current->ptsuiv!=NULL)             //création et initialisation des checkbox
+    if(donnees->debutaero==NULL && donnees->debutbalises==NULL && donnees->debutpdv==NULL)
     {
-        char label[100];
-        sprintf(label,"%s\n",pt_current->nom);
-        pt_current->coch=gtk_check_button_new_with_label(label);
-        gtk_box_pack_start(GTK_BOX(boxbalises),pt_current->coch,FALSE,FALSE,0);
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pt_current->coch), (pt_current->affichage));
-        g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(check_balise), pt_current);
-        g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(redessiner), donnees->carte);
-        pt_current=pt_current->ptsuiv;
+        GtkWidget* lab;
+        lab=gtk_label_new("Aucun fichier n'a été chargé !");
+        gtk_box_pack_start(GTK_BOX(boxpdv),lab,FALSE,FALSE,0);
+
     }
-
-
-}
-
-if(donnees->debutpdv!=NULL)
-{
-    GtkWidget* lab;
-    GtkWidget* sap;
-    GtkWidget* is;
-
-    lab=gtk_label_new("Plans de vols");                    //un label et deux boutons pour aider à la sélection
-    sap=gtk_button_new_with_label("Sélectionner/(D) tout");
-    is=gtk_button_new_with_label("Inverser la sélection");
-    gtk_box_pack_start(GTK_BOX(boxpdv),lab,FALSE,FALSE,0);
-    gtk_box_pack_start(GTK_BOX(boxpdv),sap,FALSE,FALSE,0);
-    gtk_box_pack_start(GTK_BOX(boxpdv),is,FALSE,FALSE,0);
-    g_signal_connect(G_OBJECT(sap), "clicked", G_CALLBACK(select_all_pdv), donnees);
-    g_signal_connect(G_OBJECT(is), "clicked", G_CALLBACK(invert_selection_pdv), donnees);
-
-    pdv* pt_current=donnees->debutpdv;
-    while(pt_current!=NULL)                 //création et initialisation des checkbox
-    {
-
-        char label[100];
-
-        sprintf(label,"%s\n",pt_current->nom);
-        pt_current->coch=gtk_check_button_new_with_label(label);
-        gtk_box_pack_start(GTK_BOX(boxpdv),pt_current->coch,FALSE,FALSE,0);
-        gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pt_current->coch), (pt_current->affichage));
-        g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(check_pdv), pt_current);
-        g_signal_connect(G_OBJECT(pt_current->coch), "toggled", G_CALLBACK(redessiner), donnees->carte);
-        pt_current=pt_current->ptsuiv;
-    }
-
-
-}
-
-
-
-if(donnees->debutaero==NULL && donnees->debutbalises==NULL && donnees->debutpdv==NULL)
-{
-    GtkWidget* lab;
-    lab=gtk_label_new("Aucun fichier n'a été chargé !");
-    gtk_box_pack_start(GTK_BOX(boxpdv),lab,FALSE,FALSE,0);
-
-}
     gtk_widget_show_all(filw);  //afficher la fenètre
 
 
@@ -171,7 +171,6 @@ void select_all_aero(GtkWidget* button, file_opener* donnees)       //fonction p
             {
                 gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(pt_current->coch), (TRUE));
                 pt_current->affichage=1;
-                //printf("ok\n");
                 pt_current=pt_current->ptsuiv;
             }
     }

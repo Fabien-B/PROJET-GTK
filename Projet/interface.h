@@ -138,7 +138,6 @@ void APropos(GtkWidget* widget);
 void voir_pdv(GtkWidget *bouton, file_opener* donnees);
 void parametres(GtkWidget* bouton, form_pdv* formulaire);
 void redessiner(GtkWidget* button, GtkWidget * carte);
-void redessiner_widget(GtkWidget* button, GtkWidget * carte);
 void recup_temps(GtkAdjustment* adj, file_opener* donnees);
 void scroll_event(GtkWidget* carte,GdkEventScroll* event,file_opener* donnees);
 void press_event(GtkWidget* carte, GdkEventButton* event, file_opener* donnees);

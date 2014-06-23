@@ -19,5 +19,8 @@ void creer_file_conflit_selection(GtkWidget *bouton,file_opener *donnees);
 void recuperer_conflit_chemin(GtkWidget *bouton, file_opener *donnees);
 void sauver_conflits(file_opener *donnees);
 
+void creer_file_plots_selection(GtkWidget *bouton,file_opener *donnees);
+void recuperer_plots_chemin(GtkWidget *bouton, file_opener *donnees);
+void sauver_plots(file_opener *donnees);
 
 #endif // OUVERTURE_FICHIERS_H_INCLUDED
