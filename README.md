@@ -1,4 +1,4 @@
 PROJET-GTK
 ==========
-Made by Fabien and Tocard
+Made by Fabien Bonneval and Xavier Durand.
 
