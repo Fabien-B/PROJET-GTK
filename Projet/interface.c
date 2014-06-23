@@ -5,7 +5,7 @@
 #include "ajouts_utilisateur.h"
 #include "conflits.h"
 
-// PROTEGER 2 AVIONS IDENTIQUES, protec ouverture vide, double play.
+// PROTEGER 2 AVIONS IDENTIQUES, protec ouverture vide.
 
 //#define MIN(a,b) ((a)<(b)?(a):(b))
 //#define MAX(a,b) ((a)>(b)?(a):(b))
@@ -80,6 +80,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     GtkWidget *MI2_Charger_default;
     GtkWidget *MI2_Enregistrer;
     GtkWidget *MI2_Enregistrer_conflits;
+    GtkWidget *MI2_Enregistrer_plots;
     GtkWidget *MI2_parametres;
     GtkWidget *MI2_Quitter;
 
@@ -122,9 +123,13 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Enregistrer);
                         g_signal_connect(G_OBJECT(MI2_Enregistrer), "activate", G_CALLBACK(creer_file_save_selection), donnees);
 
-                        MI2_Enregistrer_conflits = gtk_menu_item_new_with_label("Enregistrer les conflits");
+        MI2_Enregistrer_conflits = gtk_menu_item_new_with_label("Enregistrer les conflits");
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Enregistrer_conflits);
                         g_signal_connect(G_OBJECT(MI2_Enregistrer_conflits), "activate", G_CALLBACK(creer_file_conflit_selection), donnees);
+
+        MI2_Enregistrer_plots = gtk_menu_item_new_with_label("Enregistrer les plots");
+        gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Enregistrer_plots);
+                        g_signal_connect(G_OBJECT(MI2_Enregistrer_plots), "activate", G_CALLBACK(creer_file_plots_selection), donnees);
 
         MI2_parametres = gtk_menu_item_new_with_label("Paramètres");
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_parametres);
