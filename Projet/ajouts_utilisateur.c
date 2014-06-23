@@ -4,16 +4,20 @@
 #include "filtrage.h"
 #include "conflits.h"
 
+// Ajoute un point de passage sur le menu
 void ajouter_pt_pass(GtkWidget* bouton,form_pdv* formulaire)
 {
+// On augmente le nombre de points de passage
     const gchar *text;
     formulaire->nb_pt_int++;
     text = gtk_entry_get_text(GTK_ENTRY(formulaire->nom_entry));
     strcpy(formulaire->nom,text);
 
+// On récupère toutes les infos pour détruire et reconstruire la fenêtre
     formulaire->altitude = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(formulaire->spinfl));
     formulaire->vitesse = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(formulaire->spinvi));
 
+// On récupère les points existants
 int i;
     for(i=0;i<formulaire->nb_pt_int+1;i++)
     {
@@ -24,7 +28,7 @@ int i;
     formulaire->heure=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(formulaire->spinh));
     formulaire->minutes=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(formulaire->spinm));
 
-
+// On récréer la fenêtre
     gtk_widget_destroy(formulaire->wind);
     ajouter_plan_de_vol(NULL,formulaire);
 
@@ -32,7 +36,7 @@ int i;
 
 
 
-
+// Fenêtre principale d'ajout d'un plan de vol
 void ajouter_plan_de_vol(GtkWidget* bouton,form_pdv* formulaire)
 {
     GtkWidget* box;
@@ -41,11 +45,12 @@ void ajouter_plan_de_vol(GtkWidget* bouton,form_pdv* formulaire)
     GtkWidget* ok_button;
     formulaire->wind = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
+    // Initialisation de la fenêtre
     gtk_window_set_title(GTK_WINDOW(formulaire->wind), "Ajouter un Plan de Vol");
     gtk_window_set_default_size(GTK_WINDOW(formulaire->wind), 250, 400);
     gtk_window_set_position(GTK_WINDOW(formulaire->wind),GTK_WIN_POS_CENTER);
 
-    //init scrollbar
+    //Initialisation de la scrollbar
     scrollbar = gtk_scrolled_window_new(NULL, NULL);
     gtk_container_add(GTK_CONTAINER(formulaire->wind),scrollbar);
 
@@ -56,7 +61,7 @@ void ajouter_plan_de_vol(GtkWidget* bouton,form_pdv* formulaire)
 
 
 
-
+// Construction du formulaire
     formulaire->nom_label=gtk_label_new("Indicatif de l'avion:"); //label et gtkEntry pour l'indicatif avion
     formulaire->nom_entry=gtk_entry_new();
     gtk_box_pack_start(GTK_BOX(box),formulaire->nom_label,FALSE,FALSE,0);
@@ -78,8 +83,6 @@ void ajouter_plan_de_vol(GtkWidget* bouton,form_pdv* formulaire)
     gtk_container_add(GTK_CONTAINER(formulaire->heure_label), formulaire->spinm);
     gtk_box_pack_start(GTK_BOX(formulaire->hour_box), formulaire->heure_label, FALSE, FALSE, 0);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(formulaire->spinm), formulaire->minutes);
-
-
 
     formulaire->altitude_label = gtk_frame_new("Niveau de vol (FL)");
     formulaire->spinfl = gtk_spin_button_new_with_range(0, 700, 5);
@@ -128,14 +131,17 @@ void ajouter_plan_de_vol(GtkWidget* bouton,form_pdv* formulaire)
 
 }
 
+// Fonction de validation
 void ajouter_pdv(GtkWidget* bouton,form_pdv* formulaire)
 {
 
 
 int cas;
     pdv* pdv_current;
+    // Premier plan de vol sauvegardé
     if(formulaire->donnees->finpdv!=NULL)
     {
+    // Allocation mémoire et création de la liste chainée
         formulaire->donnees->finpdv->ptsuiv=malloc(sizeof(pdv));
         pdv_current=formulaire->donnees->finpdv->ptsuiv;
         pdv_current->ptsuiv=NULL;
@@ -143,6 +149,7 @@ int cas;
     }
     else
     {
+    // Ajout à la liste chainée
         formulaire->donnees->debutpdv=malloc(sizeof(pdv));
         pdv_current=formulaire->donnees->debutpdv;
         formulaire->donnees->finpdv=pdv_current;
@@ -150,7 +157,7 @@ int cas;
         cas=1;
     }
 
-
+// Récupération des données du formulaire
     const gchar *text;
     text = gtk_entry_get_text(GTK_ENTRY(formulaire->nom_entry));
     strcpy(pdv_current->nom,text);
@@ -169,6 +176,8 @@ int cas;
     pass_current->ptsuiv=NULL;
     int i;
     int er=0;
+
+    // Sauvegarde dans la structure
     for(i=0;i<formulaire->nb_pt_int+2;i++)
     {
         text = gtk_entry_get_text(GTK_ENTRY(formulaire->pass_entry[i]));
@@ -183,6 +192,7 @@ int cas;
                 if(formulaire->donnees->debutbalises!=NULL)
                 {
                     balise* pt_current=formulaire->donnees->debutbalises;
+                    // Recherche du point de passage parmis les balises
                     while(pt_current!=NULL)
                     {
 
@@ -199,6 +209,7 @@ int cas;
                 if(formulaire->donnees->debutaero!=NULL)
                 {
                     aerodrome* pt_current=formulaire->donnees->debutaero;
+                    // Recherche du point de passage parmis les aérodromes
                     while(pt_current!=NULL)
                     {
                         if(!strcmp(text2,pt_current->oaci))
@@ -210,11 +221,10 @@ int cas;
                     }
 
                 }
-
+// Si il y a une erreur
         if(pass_current->point==NULL)
         {
             er++;
-            printf("er=%d\n",er);
         }
 
     pass_current->ptsuiv=malloc(sizeof(pt_pass));
@@ -226,6 +236,7 @@ int cas;
 
     }
 
+// En cas d'erreur destruction de la saisie
     if(er)
     {
         pass_current=pdv_current->pass_debut;
@@ -236,6 +247,7 @@ int cas;
             pass_current=pass2;
         }
         free(pdv_current);
+        // Si le plan de vol n'est pas le premier
         if(cas)
         {
             formulaire->donnees->debutpdv=NULL;
@@ -246,8 +258,10 @@ int cas;
         }
 
     }
+//  S'il n'y a pas d'erreur
     else
     {
+        // Si le plan de vol n'est pas le premier
         if(cas)
         {
             formulaire->donnees->finpdv=pdv_current;
@@ -260,12 +274,11 @@ int cas;
 
     pdv_current->affichage=0;
 
+// Destruction et réinitialisation du formulaire
     gtk_widget_destroy(formulaire->wind);
 
 
     formulaire->nom[0]='\0'; //réinitialisation du formulaire
-//    formulaire->altitude[0]='\0';
-//    formulaire->vitesse[0]='\0';
     formulaire->heure=0;
     formulaire->minutes=0;
     for(i=0;i<10;i++)

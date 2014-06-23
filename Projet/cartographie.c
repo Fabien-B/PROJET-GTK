@@ -254,7 +254,7 @@ int couleur_avion=0;
 
                 }
 
-
+            free(loc_avion);
             }
 //            else
 //            {
