@@ -50,7 +50,7 @@ void ajouter_plan_de_vol(GtkWidget* bouton,form_pdv* formulaire)
     formulaire->wind = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
     gtk_window_set_title(GTK_WINDOW(formulaire->wind), "Ajouter un Plan de Vol");
-    gtk_window_set_default_size(GTK_WINDOW(formulaire->wind), 200, 400);
+    gtk_window_set_default_size(GTK_WINDOW(formulaire->wind), 250, 400);
     gtk_window_set_position(GTK_WINDOW(formulaire->wind),GTK_WIN_POS_CENTER);
 
     //init scrollbar

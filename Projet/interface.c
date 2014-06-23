@@ -4,6 +4,8 @@
 #include "filtrage.h"
 #include "ajouts_utilisateur.h"
 
+// PROTEGER 2 AVIONS IDENTIQUES, protec ouverture vide, double play.
+
 //#define MIN(a,b) ((a)<(b)?(a):(b))
 //#define MAX(a,b) ((a)>(b)?(a):(b))
 void initialisation(int argc, char *argv[])
@@ -17,6 +19,8 @@ void initialisation(int argc, char *argv[])
         file_opener *donnees=g_malloc(sizeof(file_opener));
         memset(donnees, 0, sizeof(file_opener));
         donnees->old = malloc(sizeof(position));
+        donnees->bord = malloc(sizeof(position));
+        donnees->start = malloc(sizeof(position));
         donnees->ptchemin=NULL;
         donnees->file_selection=NULL;
         donnees->debutaero=NULL;
@@ -203,7 +207,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
 //        gtk_range_set_update_policy (GTK_RANGE (curseur), GTK_UPDATE_DISCONTINUOUS);
 
 
-    filtre_button=gtk_button_new_with_mnemonic("_Filtres");
+    filtre_button=gtk_button_new_with_mnemonic("_Filtrer l'affichage");
     gtk_box_pack_start(GTK_BOX(work_zr),filtre_button,FALSE,FALSE,0);
     g_signal_connect(GTK_BUTTON(filtre_button),"clicked",G_CALLBACK(filtres),donnees);
 
@@ -271,8 +275,7 @@ g_signal_connect(donnees->Window, "size-allocate", G_CALLBACK(my_getsize), formu
 void press_event(GtkWidget* carte, GdkEventButton* event, file_opener* donnees)
 {
 
-donnees->bord = malloc(sizeof(position));
-donnees->start = malloc(sizeof(position));
+
 
 donnees->bord->x = donnees->longitude_min;
 donnees->bord->y = donnees->latitude_max;
@@ -308,23 +311,30 @@ void drag_event(GtkWidget* carte, GdkEventMotion* event, file_opener* donnees)
  GdkModifierType state;
 state = event->state;
 
-  if (state & GDK_BUTTON1_MASK )
+//printf("test valeurs\n");
+//fflush(stdout);
+//printf("bord x : %lf, bord y : %lf",donnees->bord->x,donnees->bord->y);
+//fflush(stdout);
+
+  if (state & GDK_BUTTON1_MASK)
   {
 
     double longi = donnees->bord->x - ((event->x - donnees->start->x) * donnees->dlong / donnees->xcarte);
     double lati = donnees->bord->y + ((event->y - donnees->start->y) * donnees->dlat / donnees->ycarte);
 
-
+    //printf("passe0\n");
     donnees->longitude_min = MAX(longi,-13.75);
     donnees->latitude_max = MIN(lati,57.25);
 
     if(donnees->longitude_min + donnees->dlong > 18.25)
     {
+    //printf("passe1\n");
     donnees->longitude_min = MIN(longi + donnees->dlong,18.25) - donnees->dlong;
     }
 
     if(donnees->latitude_max - donnees->dlat < 35.25)
     {
+    //printf("passe2\n");
     donnees->latitude_max = MAX(lati - donnees->dlat,35.25) + donnees->dlat;
     }
 

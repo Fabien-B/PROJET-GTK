@@ -36,7 +36,7 @@ void recuperer_chemin(GtkWidget *bouton, file_opener *donnees)
 void lancer_boite(GtkWidget *bouton, file_opener *donnees)
 {
     GtkWidget* pBoite;
-    pBoite = gtk_dialog_new_with_buttons("sélection du fichier à charger",NULL,GTK_DIALOG_MODAL,GTK_STOCK_OK,GTK_RESPONSE_OK,NULL);
+    pBoite = gtk_dialog_new_with_buttons("Sélection du fichier à charger",NULL,GTK_DIALOG_MODAL,GTK_STOCK_OK,GTK_RESPONSE_OK,NULL);
 
 
   GtkWidget *fixed;
@@ -44,7 +44,7 @@ void lancer_boite(GtkWidget *bouton, file_opener *donnees)
   GtkWidget *label;
 
 
-    label=gtk_label_new("sélectionnez quel fichier vous voulez charger.");
+    label=gtk_label_new("Sélectionnez le type de fichier que vous souhaitez charger.");
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(pBoite)->vbox), label, TRUE, TRUE, 0);
 
   fixed = gtk_fixed_new();

@@ -40,7 +40,7 @@ sprintf(text,"%d",j);
 gdk_draw_line(carte,gc,conversion_longitude(j,donnees)*donnees->xcarte,0,conversion_longitude(j,donnees)*donnees->xcarte,donnees->ycarte);
 gdk_draw_string(carte,font,gc,conversion_longitude(j,donnees)*donnees->xcarte+5,8,text);
 }
-couleur(gc,c,-1);
+couleur(gc,c,10);
 
  /* ----------------------------------  CONTOUR FRANCE -------------------------------------- */
 
@@ -186,6 +186,7 @@ couleur(gc,c,-1);
 
  /* ----------------------------------  PLAN DE VOL -------------------------------------- */
 
+int couleur_avion=0;
 
     if(donnees->debutpdv!=NULL) // Rentre si un plan de vol est chargé
     {
@@ -210,9 +211,10 @@ couleur(gc,c,-1);
 //            g_print("%lf",loc_avion->x);
 //            g_print("%lf",loc_avion->y);
 
-            gdk_draw_point(carte,gc,loc_avion->x,loc_avion->y);
+            couleur(gc,c,couleur_avion);
             gdk_draw_rectangle(carte,gc,TRUE,loc_avion->x-2,loc_avion->y-2,5,5);
             gdk_draw_string(carte,font,gc,loc_avion->x+3,loc_avion->y-2,pt_pdv_current->nom);
+            couleur(gc,c,10);
 
 
             int x1=-9,x2=0,y1=0,y2=0; // Variables de stockage des coordonnées pour les points de passage
@@ -303,13 +305,12 @@ couleur(gc,c,-1);
 
 
 //                  Une couleur par niveau de vol
-                    couleur(gc,c,pt_pdv_current->altitude);
-
+                    couleur(gc,c,couleur_avion);
 
 //                  Trace la ligne et remet la couleur normalement.
                     gdk_draw_line(carte, gc, x1,y1,x2,y2);
 
-                    couleur(gc,c,-1);
+                    couleur(gc,c,10);
 
                     // Le point 2 devient le point 1
                     x1=x2;
@@ -324,6 +325,7 @@ couleur(gc,c,-1);
 //            {
 //            printf("affichage refusé car affichage = %d \n",pt_pdv_current->affichage);
 //            }
+        couleur_avion+=1;
         pt_pdv_current=pt_pdv_current->ptsuiv;
         }
 //    printf("\nFIN PLAN DE VOL \n\n");
@@ -347,40 +349,37 @@ couleur(gc,c,-1);
 //        g_print("debut : %lf, fin : %lf",conflit_current->temps_deb,conflit_current->temps_fin);
             if(donnees->temps > conflit_current->temps_deb && donnees->temps < conflit_current->temps_fin)
             {
-            conflit_affiche++;
                 position c0;
                 g_print("Conflit \n");
-                if(avion1->affichage)
+                if(avion1->affichage && avion2->affichage)
                 {
+                    conflit_affiche++;
+
                     get_position_avion(&c0,avion1,donnees->temps);
                     gdk_draw_rectangle(carte,gc,TRUE,conversion_longitude(c0.x,donnees)*donnees->xcarte-3,conversion_lat(c0.y,donnees)*donnees->ycarte-3,7,7);
-                }
 
-                if(avion1->affichage)
-                {
                     get_position_avion(&c0,avion2,donnees->temps);
                     gdk_draw_rectangle(carte,gc,TRUE,conversion_longitude(c0.x,donnees)*donnees->xcarte-3,conversion_lat(c0.y,donnees)*donnees->ycarte-3,7,7);
-                }
 
                     char *markup;
                     markup = g_markup_printf_escaped ("<span foreground=\"#A00000\">%s</span>", "Conflit.");
                     gtk_label_set_markup (GTK_LABEL (donnees->Msg_conflit), markup);
                     g_free (markup);
+                }
             }
-
         conflit_current = conflit_current->ptsuiv;
         }
 
     if(conflit_affiche==0)
     {
         char *markup;
-        markup = g_markup_printf_escaped ("<span foreground=\"#00A000\">%s</span>", "Pas de conflit.");
+        markup = g_markup_printf_escaped ("<span foreground=\"#00A000\">%s</span>", "Pas de conflit\n actuellement.");
         gtk_label_set_markup (GTK_LABEL (donnees->Msg_conflit), markup);
         g_free (markup);
 //        gtk_label_set_text(GTK_LABEL(donnees->Msg_conflit),"centre2");
     }
 
-    couleur(gc,c,-1);
+    couleur(gc,c,10);
     }
 
 
@@ -388,49 +387,38 @@ couleur(gc,c,-1);
 }
 
 
-void couleur(GdkGC* gc,GdkColor c,int altitude)
+void couleur(GdkGC* gc,GdkColor c,int indice)
 {
 c.pixel = 5;
 
-if(0 < altitude && altitude < 140)
+if(0 <= indice)
 {
-c.red = (150 - altitude )*5 << 8 ;
-c.green = 10 << 8;
-c.blue = 10 << 8;
-//g_print("avion en : rouge \n");
+indice = indice%11;
+
+    switch(indice)
+    {
+    case 0 : gdk_color_parse ("#007fff", &c);break;//bleu
+    case 1 : gdk_color_parse ("#e67e30", &c);break;//orange
+    case 2 : gdk_color_parse ("#7fdd4c", &c);break;//vert
+    case 3 : gdk_color_parse ("#884da7", &c);break;//violet
+    case 4 : gdk_color_parse ("#5b3c11", &c);break;//marron
+    case 5 : gdk_color_parse ("#008e8e", &c);break;//bleu-vert
+    case 6 : gdk_color_parse ("#eed153", &c);break;//jaune+
+    case 7 : gdk_color_parse ("#175732", &c);break;//vert+
+    case 8 : gdk_color_parse ("#ec3b83", &c);break;//rose
+    case 9 : gdk_color_parse ("#2e006c", &c);break;//bleu+
+    case 10 : gdk_color_parse("black",&c);break;//noir
+    }
 }
-else if(140 < altitude && altitude < 180)
+// Bleue sombre
+else if(indice==-2)
 {
-c.red = 10 << 8 ;
-c.green = (altitude -180)*5 << 8;
-c.blue = 10 << 8;
-//g_print("avion en : vert \n");
+gdk_color_parse("#9696c8",&c);
 }
-else if(180 < altitude && altitude < 300)
+// Rouge
+else if(indice==-3)
 {
-c.red = 10 << 8 ;
-c.green = 10 << 8;
-c.blue = (190 - altitude)*5 << 8;
-//g_print("avion en : bleue \n");
-}
-else if(altitude==-1)
-{
-c.red = 0 << 8 ;
-c.green = 0 << 8;
-c.blue = 0 << 8;
-//g_print("avion en : noir \n\n");
-}
-else if(altitude==-2)
-{
-c.red = 150 << 8 ;
-c.green = 150 << 8;
-c.blue = 200 << 8;
-}
-else if(altitude==-3)
-{
-c.red = 250 << 8 ;
-c.green = 0 << 8;
-c.blue = 0 << 8;
+gdk_color_parse("red",&c);
 }
 
 gdk_gc_set_rgb_fg_color (gc, &c);
