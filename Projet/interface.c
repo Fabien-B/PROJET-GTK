@@ -36,6 +36,7 @@ void initialisation(int argc, char *argv[])
         donnees->xcarte=550;//550
         donnees->ycarte=660;//660
         donnees->tag_lecture=0;
+        donnees->clic_distance=0;
 
         form_pdv* formulaire=malloc(sizeof(form_pdv));
         formulaire->donnees=donnees;
@@ -242,6 +243,9 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     donnees->Msg_conflit=gtk_label_new("");
     gtk_box_pack_start(GTK_BOX(work_zr),donnees->Msg_conflit,FALSE,FALSE,10);
 
+// Initialisation du label de distance clic
+    donnees->Distance_clic = gtk_label_new("Distance : 0 NM");
+    gtk_box_pack_start(GTK_BOX(work_zr),donnees->Distance_clic,FALSE,FALSE,10);
 
 // Gère le rafraichissement
     g_signal_connect (G_OBJECT (donnees->carte), "expose-event", G_CALLBACK (expose_cb), donnees);
@@ -267,13 +271,14 @@ position clic;
 clic.x = donnees->longitude_min + donnees->dlong * (event->x/donnees->xcarte);
 clic.y = donnees->latitude_max - donnees->dlat * (event->y/donnees->ycarte);
 
-//    double dlat=3340*3.14/180*(clic.y - donnees->old->y);
-//    double latm=(clic.y+donnees->old->y)/2;
-//    double r=3340*cos(latm*3.14/180);
-//    double dlong=r*3.14*(donnees->old->x-clic.x)/180.0;
-//    double D=sqrt(pow(dlat,2)+pow(dlong,2));
-//    g_print("Les deux derniers points précédants sont (1 : ancien): \n - x1 = %lf \n - y1 = %lf \n - x2 = %lf \n - y2 = %lf\n",donnees->old->x,donnees->old->y,clic.x,clic.y);
-//    g_print("La distance entre les 2 derniers points vaut : %lf (NM)\n\n",D);
+    double dlat=3340*3.14/180*(clic.y - donnees->old->y);
+    double latm=(clic.y+donnees->old->y)/2;
+    double r=3340*cos(latm*3.14/180);
+    double dlong=r*3.14*(donnees->old->x-clic.x)/180.0;
+//    donnees->clic_distance =sqrt(pow(dlat,2)+pow(dlong,2));
+    double D =sqrt(pow(dlat,2)+pow(dlong,2));
+    g_print("Les deux derniers points précédants sont (1 : ancien): \n - x1 = %lf \n - y1 = %lf \n - x2 = %lf \n - y2 = %lf\n",donnees->old->x,donnees->old->y,clic.x,clic.y);
+    g_print("La distance entre les 2 derniers points vaut : %lf (NM)\n\n",D);
 
 
 donnees->old->x = clic.x;
@@ -293,7 +298,6 @@ state = event->state;
 // Si le bouton cliqué est le clic gauche
   if (state & GDK_BUTTON1_MASK)
   {
-
     double longi = donnees->bord->x - ((event->x - donnees->start->x) * donnees->dlong / donnees->xcarte);
     double lati = donnees->bord->y + ((event->y - donnees->start->y) * donnees->dlat / donnees->ycarte);
 
@@ -312,6 +316,22 @@ state = event->state;
     }
 // On réactualise l'affichage
     redessiner(NULL,donnees->carte);
+  }
+// Calcul de la distance depuis le dernier clic droit
+  else if(state & GDK_BUTTON3_MASK)
+  {
+    double longi = donnees->longitude_min + ((event->x) * donnees->dlong / donnees->xcarte);
+    double lati = donnees->latitude_max - ((event->y) * donnees->dlat / donnees->ycarte);
+
+    double dlat=3340*3.14/180*(lati - donnees->old->y);
+    double latm=(lati + donnees->old->y)/2;
+    double r=3340*cos(latm*3.14/180);
+    double dlong=r*3.14*(donnees->old->x - longi)/180.0;
+    donnees->clic_distance =sqrt(pow(dlat,2)+pow(dlong,2));
+
+    char label_clic;
+    sprintf(&label_clic,"Distance : %0.1lf NM",donnees->clic_distance);
+    gtk_label_set_text(GTK_LABEL(donnees->Distance_clic),&label_clic);
   }
 }
 

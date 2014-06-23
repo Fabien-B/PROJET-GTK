@@ -94,7 +94,9 @@ typedef struct file_opener{
     position *start;
     position *bord;
     position *old;
+    double clic_distance;
     GtkWidget *Msg_conflit;
+    GtkWidget *Distance_clic;
     gint tag_lecture;
     GtkObject* adj2;
 
