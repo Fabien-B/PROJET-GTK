@@ -248,7 +248,14 @@ int cas;
     }
     else
     {
-        formulaire->donnees->finpdv=formulaire->donnees->finpdv->ptsuiv;
+        if(cas)
+        {
+            formulaire->donnees->finpdv=pdv_current;
+        }
+        else
+        {
+            formulaire->donnees->finpdv=formulaire->donnees->finpdv->ptsuiv;
+        }
     }
 
     pdv_current->affichage=0;
