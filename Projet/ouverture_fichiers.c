@@ -3,6 +3,7 @@
 #include "cartographie.h"
 #include "filtrage.h"
 #include "ajouts_utilisateur.h"
+#include "conflits.h"
 
 
 void creer_file_selection(file_opener *donnees)
@@ -460,18 +461,6 @@ void charger_fichiers(file_opener *donnees)
 }
 
 
-double conversion_lat(double latitude, file_opener *donnees)
-{
-    double r=(donnees->latitude_max-latitude)/donnees->dlat;
-    return r;
-}
-
-
-double conversion_longitude(double longitude, file_opener *donnees)
-{
-    double r=(-donnees->longitude_min+longitude)/donnees->dlong;
-    return r;
-}
 
 
 void liberer_memoire(GtkWidget *bouton, file_opener *donnees)
@@ -779,81 +768,3 @@ printf("%s",donnees->ptchemin);
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-void integrer_temps(file_opener* donnees)
-{
-
-    pdv* pdv_current=donnees->debutpdv;
-    while(pdv_current!=NULL)
-    {
-        pdv_current->temps_depart=60*pdv_current->heure+pdv_current->minute;
-        pt_pass* pass_current=pdv_current->pass_debut;
-        pass_current->temps=pdv_current->temps_depart;
-        while(pass_current->ptsuiv->ptsuiv!=NULL)
-        {
-            double lat1,lat2,long1,long2;
-            if(pass_current->type_point)
-            {
-                balise* pt=pass_current->point;
-                lat1=pt->latitude;
-                long1=pt->longitude;
-//g_print("lat,long %s",pt->nom);
-            }
-            else
-            {
-                aerodrome* pt=pass_current->point;
-
-                lat1=pt->latitude;
-                long1=pt->longitude;
-//g_print("lat,long %s",pt->oaci);
-            }
-
-            if(pass_current->ptsuiv->type_point)
-            {
-                balise* pt=pass_current->ptsuiv->point;
-                lat2=pt->latitude;
-                long2=pt->longitude;
-//g_print("  %s",pt->nom);
-            }
-            else
-            {
-                aerodrome* pt=pass_current->ptsuiv->point;
-                lat2=pt->latitude;
-                long2=pt->longitude;
-//g_print("   %s",pt->oaci);
-            }
-
-            //double D=sqrt(pow((x2-x1)*680,2)+pow((y2-y1)*660,2));
-            double dlat=3340*3.14/180*(lat2-lat1);                             //distance projeté sur un méridien en NM,  rayon de la terre = 6371km = 3340NM
-            double latm=(lat1+lat2)/2;
-            double r=3340*cos(latm*3.14/180);
-            double dlong=r*3.14*(long2-long1)/180.0;               //distance projeté sur l'autre axe en NM
-            double D=sqrt(pow(dlat,2)+pow(dlong,2));                //distance entre les 2 points en NM (approximation: rayon de la terre infini)
-
-//g_print(" = %lf   %lf   D=%lf   latm=%lf\n",dlat,dlong,D,latm);
-//g_print("%lf   %lf   r=%lf\n\n",long1,long2,r);
-//g_print("D=%lf\n",D);
-            pass_current->ptsuiv->temps=pass_current->temps+D/(pdv_current->vitesse/60);
-//g_print("t=%lf\n",pass_current->ptsuiv->temps);
-
-
-            pass_current=pass_current->ptsuiv;
-
-        }
-        pdv_current->temps_arrivee=pass_current->temps;
-//g_print("arrivée:%lf\n",pdv_current->temps_arrivee);
-        pdv_current=pdv_current->ptsuiv;
-    }
-    detection_conflits(NULL,donnees);
-
-}

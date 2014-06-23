@@ -19,7 +19,5 @@ void creer_file_conflit_selection(GtkWidget *bouton,file_opener *donnees);
 void recuperer_conflit_chemin(GtkWidget *bouton, file_opener *donnees);
 void sauver_conflits(file_opener *donnees);
 
-void integrer_temps(file_opener* donnees);
-double conversion_lat(double latitude, file_opener *donnees);
-double conversion_longitude(double longitude, file_opener *donnees);
+
 #endif // OUVERTURE_FICHIERS_H_INCLUDED

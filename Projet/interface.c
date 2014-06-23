@@ -3,6 +3,7 @@
 #include "cartographie.h"
 #include "filtrage.h"
 #include "ajouts_utilisateur.h"
+#include "conflits.h"
 
 // PROTEGER 2 AVIONS IDENTIQUES, protec ouverture vide, double play.
 
@@ -189,7 +190,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     gtk_box_pack_start(GTK_BOX(hbox_curseur), label_curseur, FALSE, FALSE, 0);
 
 //  ( depart , min , max , incrément scroll x2 , incrémentation clic en dehors du curseur , ? )
-    donnees->adj2 = gtk_adjustment_new (donnees->temps, 0.0, 1440.0, 0.5, 5.0, 0.0);
+    donnees->adj2 = gtk_adjustment_new (donnees->temps, 0.0, 1440.0, 0.1, 5.0, 0.0);
     gtk_signal_connect (GTK_OBJECT (donnees->adj2), "value_changed", GTK_SIGNAL_FUNC (recup_temps), donnees);
     curseur = gtk_hscale_new (GTK_ADJUSTMENT (donnees->adj2));
     gtk_scale_set_digits (GTK_SCALE (curseur), 0);
@@ -540,12 +541,12 @@ void voir_pdv(GtkWidget *bouton, file_opener* donnees)
 void rapide_file(GtkWidget * widget, file_opener * donnees)
 {
 donnees->what_file=0;
-donnees->ptchemin="aerodromes.txt";
+donnees->ptchemin="aerodromes_fr.txt";
 
 charger_fichiers(donnees);
 
 donnees->what_file=1;
-donnees->ptchemin="balises.txt";
+donnees->ptchemin="balises_fr.txt";
 
 charger_fichiers(donnees);
 
@@ -571,16 +572,7 @@ void parametres(GtkWidget* bouton, form_pdv* formulaire)
     GtkWidget* dist_conflits_spin;
     GtkWidget* delt_conflits_label;
     GtkWidget* delt_conflits_spin;
-    GtkWidget* dim_carte_label;
-    GtkWidget* dim_carte_spin;
-    GtkWidget* zoom_carte_label;
-    GtkWidget* zoom_carte_spin;
-    GtkWidget* lat_coin_label;
-    GtkWidget* long_coin_label;
-    GtkWidget* lat_coin_spin;
-    GtkWidget* long_coin_spin;
-    GtkWidget* pos_centre;
-    GtkWidget* default_button;
+
     file_opener* donnees=formulaire->donnees;
 
     donnees->boite = gtk_dialog_new_with_buttons("Paramètres",
@@ -590,9 +582,7 @@ void parametres(GtkWidget* bouton, form_pdv* formulaire)
         GTK_STOCK_CANCEL,GTK_RESPONSE_CANCEL,
         NULL);
 
-    default_button=gtk_button_new_with_label("Paramètres par défault");
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(donnees->boite)->vbox),default_button,FALSE,FALSE,0);
-    g_signal_connect(GTK_BUTTON(default_button),"clicked",G_CALLBACK(visu_carte_default),formulaire);
+
 
     dist_conflits_label = gtk_frame_new("Distance de détection des conflits (NM)");
     dist_conflits_spin = gtk_spin_button_new_with_range(0, 100, 1);
@@ -606,33 +596,7 @@ void parametres(GtkWidget* bouton, form_pdv* formulaire)
     gtk_box_pack_start(GTK_BOX(GTK_DIALOG(donnees->boite)->vbox), delt_conflits_label, FALSE, FALSE, 0);
     gtk_spin_button_set_value(GTK_SPIN_BUTTON(delt_conflits_spin), donnees->deltat_conflits*60);
 
-    dim_carte_label = gtk_frame_new("hauteur de la carte");
-    dim_carte_spin = gtk_spin_button_new_with_range(0, 1000, 25);
-    gtk_container_add(GTK_CONTAINER(dim_carte_label), dim_carte_spin);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(donnees->boite)->vbox), dim_carte_label, FALSE, FALSE, 0);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(dim_carte_spin), donnees->xcarte);
 
-    zoom_carte_label = gtk_frame_new("Zoom");
-    zoom_carte_spin = gtk_spin_button_new_with_range(0, 11, 0.1);
-    gtk_container_add(GTK_CONTAINER(zoom_carte_label), zoom_carte_spin);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(donnees->boite)->vbox), zoom_carte_label, FALSE, FALSE, 0);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(zoom_carte_spin), 11/donnees->dlat);
-
-
-    pos_centre=gtk_hbox_new(FALSE,0);
-    gtk_box_pack_start(GTK_BOX(GTK_DIALOG(donnees->boite)->vbox), pos_centre,FALSE,FALSE,FALSE);
-
-    lat_coin_label = gtk_frame_new("latitude du centre");
-    lat_coin_spin = gtk_spin_button_new_with_range(40, 60, 0.2);
-    gtk_container_add(GTK_CONTAINER(lat_coin_label), lat_coin_spin);
-    gtk_box_pack_start(GTK_BOX(pos_centre), lat_coin_label, FALSE, FALSE, 0);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(lat_coin_spin), donnees->latitude_max-donnees->dlat/2);
-
-    long_coin_label = gtk_frame_new("longitude du centre");
-    long_coin_spin = gtk_spin_button_new_with_range(-10, 20, 0.2);
-    gtk_container_add(GTK_CONTAINER(long_coin_label), long_coin_spin);
-    gtk_box_pack_start(GTK_BOX(pos_centre), long_coin_label, FALSE, FALSE, 0);
-    gtk_spin_button_set_value(GTK_SPIN_BUTTON(long_coin_spin), donnees->longitude_min+donnees->dlong/2);
     gtk_widget_show_all(GTK_DIALOG(donnees->boite)->vbox);
 
 
@@ -642,25 +606,14 @@ void parametres(GtkWidget* bouton, form_pdv* formulaire)
         case GTK_RESPONSE_OK:
             donnees->distance_conflit=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(dist_conflits_spin));
             donnees->deltat_conflits=gtk_spin_button_get_value(GTK_SPIN_BUTTON(delt_conflits_spin))/60;
-            donnees->xcarte=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(dim_carte_spin));
-            donnees->ycarte=donnees->xcarte*1.2;
-            donnees->dlat=11/gtk_spin_button_get_value(GTK_SPIN_BUTTON(zoom_carte_spin));
-            donnees->dlong=donnees->dlat*16/11;
-            donnees->latitude_max=gtk_spin_button_get_value(GTK_SPIN_BUTTON(lat_coin_spin))+donnees->dlat/2;
-            donnees->longitude_min=gtk_spin_button_get_value(GTK_SPIN_BUTTON(long_coin_spin))-donnees->dlong/2;
 
-            gtk_widget_destroy(donnees->mother_box);
-            creer_interface(donnees,formulaire);
-            gtk_window_resize(GTK_WINDOW(donnees->Window), 10, 10);
-            break;
-
-        case GTK_RESPONSE_CANCEL:
-        case GTK_RESPONSE_NONE:
-        default:
+            gtk_widget_destroy(donnees->boite);
 
             break;
+
+        case GTK_RESPONSE_CANCEL : gtk_widget_destroy(donnees->boite);break;
+        default : break;
     }
-//    gtk_widget_destroy(donnees->boite);
 }
 
 

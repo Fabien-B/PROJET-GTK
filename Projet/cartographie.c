@@ -3,6 +3,7 @@
 #include "cartographie.h"
 #include "filtrage.h"
 #include "ajouts_utilisateur.h"
+#include "conflits.h"
 
 
 
@@ -258,10 +259,10 @@ int couleur_avion=0;
                 pt_pass_current = pt_pass_current->ptsuiv;
 
                 }
-                else
-                {
-                printf("Parcours incorrect");
-                }
+//                else
+//                {
+//                printf("Parcours incorrect");
+//                }
 
                 while(pt_pass_current->ptsuiv!=NULL) // Parcours de tous les points de passage
                 {
@@ -350,7 +351,7 @@ int couleur_avion=0;
             if(donnees->temps > conflit_current->temps_deb && donnees->temps < conflit_current->temps_fin)
             {
                 position c0;
-                g_print("Conflit \n");
+               // g_print("Conflit \n");
                 if(avion1->affichage && avion2->affichage)
                 {
                     conflit_affiche++;

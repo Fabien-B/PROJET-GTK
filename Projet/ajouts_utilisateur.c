@@ -1,8 +1,8 @@
-#include "interface.h"
+#include "ajouts_utilisateur.h"
 #include "ouverture_fichiers.h"
 #include "cartographie.h"
 #include "filtrage.h"
-#include "ajouts_utilisateur.h"
+#include "conflits.h"
 
 void ajouter_pt_pass(GtkWidget* bouton,form_pdv* formulaire)
 {
