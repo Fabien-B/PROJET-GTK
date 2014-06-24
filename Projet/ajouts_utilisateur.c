@@ -35,6 +35,37 @@ int i;
 }
 
 
+// enleve un point de passage sur le menu
+void enlever_pt_pass(GtkWidget* bouton,form_pdv* formulaire)
+{
+// On augmente le nombre de points de passage
+    const gchar *text;
+    formulaire->nb_pt_int--;
+    text = gtk_entry_get_text(GTK_ENTRY(formulaire->nom_entry));
+    strcpy(formulaire->nom,text);
+
+// On récupère toutes les infos pour détruire et reconstruire la fenêtre
+    formulaire->altitude = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(formulaire->spinfl));
+    formulaire->vitesse = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(formulaire->spinvi));
+
+// On récupère les points existants
+int i;
+    for(i=0;i<formulaire->nb_pt_int+1;i++)
+    {
+        text = gtk_entry_get_text(GTK_ENTRY(formulaire->pass_entry[i]));
+        strcpy(formulaire->pass[i],text);
+    }
+
+    formulaire->heure=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(formulaire->spinh));
+    formulaire->minutes=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(formulaire->spinm));
+
+// On récréer la fenêtre
+    gtk_widget_destroy(formulaire->wind);
+    ajouter_plan_de_vol(NULL,formulaire);
+
+}
+
+
 
 // Fenêtre principale d'ajout d'un plan de vol
 void ajouter_plan_de_vol(GtkWidget* bouton,form_pdv* formulaire)
@@ -42,12 +73,15 @@ void ajouter_plan_de_vol(GtkWidget* bouton,form_pdv* formulaire)
     GtkWidget* box;
     GtkWidget* scrollbar;
     GtkWidget* aj_pass;
+    GtkWidget* el_pass;
     GtkWidget* ok_button;
     formulaire->wind = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
     // Initialisation de la fenêtre
     gtk_window_set_title(GTK_WINDOW(formulaire->wind), "Ajouter un Plan de Vol");
-    gtk_window_set_default_size(GTK_WINDOW(formulaire->wind), 250, 400);
+    int h=400+formulaire->nb_pt_int*42;
+    h=MIN(h,600);
+    gtk_window_set_default_size(GTK_WINDOW(formulaire->wind), 250, h);
     gtk_window_set_position(GTK_WINDOW(formulaire->wind),GTK_WIN_POS_CENTER);
 
     //Initialisation de la scrollbar
@@ -120,11 +154,15 @@ void ajouter_plan_de_vol(GtkWidget* bouton,form_pdv* formulaire)
     gtk_entry_set_text(GTK_ENTRY(formulaire->pass_entry[i]), formulaire->pass[i]);
 
     aj_pass=gtk_button_new_with_label("Ajouter un point de passage"); //bouton pour ajouter un pt de passage
-    gtk_box_pack_start(GTK_BOX(box),aj_pass,FALSE,FALSE,5);
+    gtk_box_pack_start(GTK_BOX(box),aj_pass,FALSE,FALSE,0);
     g_signal_connect(GTK_BUTTON(aj_pass),"clicked",G_CALLBACK(ajouter_pt_pass),formulaire);
 
+    el_pass=gtk_button_new_with_label("Retirer un point de passage"); //bouton pour ajouter un pt de passage
+    gtk_box_pack_start(GTK_BOX(box),el_pass,FALSE,FALSE,0);
+    g_signal_connect(GTK_BUTTON(el_pass),"clicked",G_CALLBACK(enlever_pt_pass),formulaire);
+
     ok_button=gtk_button_new_with_label("Confirmer"); //label et gtkEntry pour ajouter le plan de vol à la base de données
-    gtk_box_pack_start(GTK_BOX(box),ok_button,FALSE,FALSE,0);
+    gtk_box_pack_start(GTK_BOX(box),ok_button,FALSE,FALSE,10);
     g_signal_connect(GTK_BUTTON(ok_button),"clicked",G_CALLBACK(ajouter_pdv),formulaire);
 
     gtk_widget_show_all(formulaire->wind); //afficher la fenètre

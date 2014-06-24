@@ -288,16 +288,16 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
 // Donne la position du curseur
 void enter_event(GtkWidget* carte, GdkEventMotion* event, file_opener* donnees)
 {
-//double x,y;
-//x = donnees->longitude_min + donnees->dlong * (event->x/donnees->xcarte);
-//y = donnees->latitude_max - donnees->dlat * (event->y/donnees->ycarte);
+double x,y;
+x = donnees->longitude_min + donnees->dlong * (event->x/donnees->xcarte);
+y = donnees->latitude_max - donnees->dlat * (event->y/donnees->ycarte);
 
 //printf("test x = %lf, y = %lf\n",x,y);
 //fflush(stdout);
 
-//char label_position;
-//sprintf(&label_position,"Position du curseur :\n Latitude : %lf \n Longitude : %lf",x,y);
-//gtk_label_set_text(GTK_LABEL(donnees->Position_curseur),&label_position);
+char label_position[100];
+sprintf(label_position,"Position du curseur :\n Latitude : %lf \n Longitude : %lf",y,x);
+gtk_label_set_text(GTK_LABEL(donnees->Position_curseur),label_position);
 }
 
 

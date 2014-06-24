@@ -859,7 +859,6 @@ void recuperer_plots_chemin(GtkWidget *bouton, file_opener *donnees)
     }
     else
     {
-    g_print("ggggggggggggga");
     gtk_widget_destroy(donnees->file_selection);
     sauver_plots(donnees);
     }
@@ -881,24 +880,26 @@ void sauver_plots(file_opener *donnees)
 
             while(current->ptsuiv!=NULL)
             {
-                fprintf(fic,"%s %d kt FL%d\n",current->nom,current->vitesse,current->altitude);
-
-                double td=current->temps_depart;
-                double ta=current->temps_arrivee;
-                double t;
-                for(t=td;t<=ta;t+=donnees->deltat_conflits)
+                if(current->affichage)
                 {
-                    position* pos=malloc(sizeof(position));
-                    get_position_avion(pos,current,t);
-                    int h=t/60;
-                    int m=t-60*h;
-                    int s=(t-60*h-m)*60;
-                    fprintf(fic,"%02d:%02d:%02d\t%lf;%lf\n",h,m,s,pos->y,pos->x);
+                    fprintf(fic,"%s %d kt FL%d\n",current->nom,current->vitesse,current->altitude);
+
+                    double td=current->temps_depart;
+                    double ta=current->temps_arrivee;
+                    double t;
+                    for(t=td;t<=ta;t+=donnees->deltat_conflits)
+                    {
+                        position* pos=malloc(sizeof(position));
+                        get_position_avion(pos,current,t);
+                        int h=t/60;
+                        int m=t-60*h;
+                        int s=(t-60*h-m)*60;
+                        fprintf(fic,"%02d:%02d:%02d\t%lf;%lf\n",h,m,s,pos->y,pos->x);
 
 
+                    }
+                    fprintf(fic,"\n\n");
                 }
-                fprintf(fic,"\n\n");
-
                 current=current->ptsuiv;
             }
         }

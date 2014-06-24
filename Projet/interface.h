@@ -107,7 +107,7 @@ typedef struct file_opener{
 typedef struct form_pdv{
     GtkWidget* wind;
     GtkWidget *nom_entry;
-    char nom[10];
+    char nom[50];
     GtkWidget *nom_label;
     GtkWidget * hour_box;
     GtkWidget * heure_label;
@@ -123,8 +123,8 @@ typedef struct form_pdv{
     GtkWidget *vitesse_entry;
     GtkWidget *vitesse_label;
     GtkWidget *pass_entry[40];
-    char pass[40][10];
-    GtkWidget *pass_label[10];
+    char pass[40][40];
+    GtkWidget *pass_label[40];
     GtkWidget *ok_bouton;
     int nb_pt_int;
     file_opener* donnees;
@@ -146,12 +146,12 @@ void enter_event(GtkWidget* carte, GdkEventMotion* event, file_opener* donnees);
 
 
 void rapide_file(GtkWidget * widget, file_opener * donnees);
-void visu_carte_default(GtkWidget* button, form_pdv* formulaire);
+//void visu_carte_default(GtkWidget* button, form_pdv* formulaire);
 void voir_conflits(GtkWidget *bouton, file_opener* donnees);
 
 void my_getsize(GtkWidget *widget, GtkAllocation *allocation, form_pdv* formulaire);
-void my_getsizecarte(GtkWidget *widget, GtkAllocation *allocation, void *data);
-void my_getsizetemps(GtkWidget *widget, GtkAllocation *allocation, void *data);
+//void my_getsizecarte(GtkWidget *widget, GtkAllocation *allocation, void *data);
+//void my_getsizetemps(GtkWidget *widget, GtkAllocation *allocation, void *data);
 
 gboolean animation(file_opener* donnees);
 void play(GtkWidget* bouton,file_opener* donnees);
