@@ -134,10 +134,6 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Enregistrer_plots);
                         g_signal_connect(G_OBJECT(MI2_Enregistrer_plots), "activate", G_CALLBACK(creer_file_plots_selection), donnees);
 
-        MI2_parametres = gtk_menu_item_new_with_label("Paramètres");
-        gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_parametres);
-                        g_signal_connect(G_OBJECT(MI2_parametres), "activate", G_CALLBACK(parametres), formulaire);
-
         MI2_Quitter = gtk_menu_item_new_with_label("Quitter");
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Quitter);
             g_signal_connect(G_OBJECT(MI2_Quitter), "activate", G_CALLBACK(gtk_main_quit), NULL);
@@ -150,6 +146,11 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
         MI2_Editer_pdv = gtk_menu_item_new_with_label("Éditer les plans de vols");
         gtk_menu_shell_append(GTK_MENU_SHELL(Edition_menu), MI2_Editer_pdv);
                         g_signal_connect(G_OBJECT(MI2_Editer_pdv), "activate", G_CALLBACK(select_pdv_ed), formulaire);
+
+
+        MI2_parametres = gtk_menu_item_new_with_label("Paramètres");
+        gtk_menu_shell_append(GTK_MENU_SHELL(Edition_menu), MI2_parametres);
+                        g_signal_connect(G_OBJECT(MI2_parametres), "activate", G_CALLBACK(parametres), formulaire);
 
 
          gtk_menu_item_set_submenu(GTK_MENU_ITEM(MI1_Edition), Edition_menu);
