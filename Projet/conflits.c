@@ -95,6 +95,7 @@ void detection_conflits(GtkWidget *button, file_opener * donnees)
 
     free(pos1);
     free(pos2);
+    redessiner(NULL,donnees->carte);
 }
 
 
@@ -231,8 +232,8 @@ void integrer_temps(file_opener* donnees)
 //g_print("dlat = %lf  dlong = %lf   D=%lf   latm=%lf\n",dlat,dlong,D,latm);
 //g_print("longi1 = %lf, longi2 = %lf   r=%lf\n\n",long1,long2,r);
             pass_current->ptsuiv->temps=pass_current->temps + 60 *(D/(pdv_current->vitesse));
-g_print("D=%lf, vitesse = %d, deltatemps : %lf\n",D,pdv_current->vitesse, pass_current->ptsuiv->temps-pass_current->temps);
-g_print("td=%lf, ta=%lf\n\n",pass_current->temps,pass_current->ptsuiv->temps);
+//g_print("D=%lf, vitesse = %d, deltatemps : %lf\n",D,pdv_current->vitesse, pass_current->ptsuiv->temps-pass_current->temps);
+//g_print("td=%lf, ta=%lf\n\n",pass_current->temps,pass_current->ptsuiv->temps);
 
 
             pass_current=pass_current->ptsuiv;

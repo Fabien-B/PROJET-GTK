@@ -95,11 +95,12 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     GtkWidget *Separateur;
 
 
-// Creation et ajout de la GtkBox mère verticale
+// Création et ajout de la GtkBox mère verticale
     donnees->mother_box = gtk_vbox_new(FALSE, 0);
     gtk_container_add(GTK_CONTAINER(donnees->Window), donnees->mother_box);
 
-//creation et ajout de la barre de menu et la zone de travail
+
+// Création et ajout de la barre de menu et de la zone de travail
     menu_bar = gtk_menu_bar_new();
 
     MI1_Fichier = gtk_menu_item_new_with_label("Fichier");
@@ -151,22 +152,30 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), MI1_Fichier);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), MI1_Aide);
     gtk_box_pack_start(GTK_BOX(donnees->mother_box), menu_bar, FALSE, FALSE, 0);
-    //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+//----------------------------------------------------------------------------------------------------
 
 
 // Création et ajout des espaces de travails gauche et droite
     work_zone = gtk_hbox_new(FALSE, 0);
     gtk_box_pack_start(GTK_BOX(donnees->mother_box), work_zone, FALSE, FALSE, 0);
+
+
 // Zone de gauche
     work_zl = gtk_vbox_new(FALSE, 0);
     gtk_box_pack_start(GTK_BOX(work_zone), work_zl, TRUE, TRUE, 0);
+
+
 // Zone de droite
     work_zr = gtk_vbox_new(FALSE, 0);
     gtk_box_pack_start(GTK_BOX(work_zone), work_zr, FALSE, FALSE, 0);
 
+
 // Création de la carte
     donnees->carte = gtk_drawing_area_new ();
     gtk_drawing_area_size (GTK_DRAWING_AREA(donnees->carte), donnees->xcarte,donnees->ycarte);
+
 
 //  Ajout event box pour gérer les évenements scroll/drag
     event_box = gtk_event_box_new();
@@ -178,6 +187,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     gtk_signal_connect(GTK_OBJECT(event_box), "button_press_event",GTK_SIGNAL_FUNC(press_event), donnees);
     gtk_widget_set_events(event_box,GDK_MOTION_NOTIFY);
     gtk_signal_connect(GTK_OBJECT(event_box), "motion_notify_event",GTK_SIGNAL_FUNC(drag_event), donnees);
+
 
 // Mise en place du séparateur entre la carte et la barre temps
     Separateur = gtk_hseparator_new();
@@ -253,7 +263,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     gtk_box_pack_start(GTK_BOX(work_zr),donnees->Msg_conflit,FALSE,FALSE,10);
 
 // Initialisation du label de distance clic
-    donnees->Distance_clic = gtk_label_new("Distance : 0 NM");
+    donnees->Distance_clic = gtk_label_new("Distance clic :\n    0 NM");
     gtk_box_pack_start(GTK_BOX(work_zr),donnees->Distance_clic,FALSE,FALSE,10);
 
 // Gère le rafraichissement
@@ -329,7 +339,7 @@ state = event->state;
     donnees->clic_distance =sqrt(pow(dlat,2)+pow(dlong,2));
 
     char label_clic;
-    sprintf(&label_clic,"Distance : %0.1lf NM",donnees->clic_distance);
+    sprintf(&label_clic,"Distance clic :\n    %0.1lf NM",donnees->clic_distance);
     gtk_label_set_text(GTK_LABEL(donnees->Distance_clic),&label_clic);
   }
 }
@@ -590,9 +600,9 @@ void parametres(GtkWidget* bouton, form_pdv* formulaire)
         case GTK_RESPONSE_OK:
             donnees->distance_conflit=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(dist_conflits_spin));
             donnees->deltat_conflits=gtk_spin_button_get_value(GTK_SPIN_BUTTON(delt_conflits_spin))/60;
+            detection_conflits(NULL,donnees);
 
             gtk_widget_destroy(donnees->boite);
-
             break;
 
         case GTK_RESPONSE_CANCEL : gtk_widget_destroy(donnees->boite);break;

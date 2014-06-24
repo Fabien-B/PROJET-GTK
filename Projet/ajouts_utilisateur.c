@@ -272,7 +272,7 @@ int cas;
         }
     }
 
-    pdv_current->affichage=0;
+    pdv_current->affichage=1;
 
 // Destruction et réinitialisation du formulaire
     gtk_widget_destroy(formulaire->wind);
