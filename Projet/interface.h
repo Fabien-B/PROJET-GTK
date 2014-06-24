@@ -128,6 +128,7 @@ typedef struct form_pdv{
     GtkWidget *ok_bouton;
     int nb_pt_int;
     file_opener* donnees;
+    pdv* pdv_edit;
 }form_pdv;
 
 

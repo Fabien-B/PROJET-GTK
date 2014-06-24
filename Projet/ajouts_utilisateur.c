@@ -163,7 +163,15 @@ void ajouter_plan_de_vol(GtkWidget* bouton,form_pdv* formulaire)
 
     ok_button=gtk_button_new_with_label("Confirmer"); //label et gtkEntry pour ajouter le plan de vol à la base de données
     gtk_box_pack_start(GTK_BOX(box),ok_button,FALSE,FALSE,10);
-    g_signal_connect(GTK_BUTTON(ok_button),"clicked",G_CALLBACK(ajouter_pdv),formulaire);
+    if(formulaire->pdv_edit==NULL)
+    {
+        g_signal_connect(GTK_BUTTON(ok_button),"clicked",G_CALLBACK(ajouter_pdv),formulaire);
+    }
+    else
+    {
+        g_signal_connect(GTK_BUTTON(ok_button),"clicked",G_CALLBACK(editer_pdv),formulaire);
+    }
+
 
     gtk_widget_show_all(formulaire->wind); //afficher la fenètre
 
@@ -330,3 +338,89 @@ int cas;
 
 }
 
+
+
+void select_pdv_ed(GtkWidget *bouton, form_pdv* formulaire)
+{
+    GtkWidget* pBoite;
+    pBoite = gtk_dialog_new_with_buttons("Sélection du plan de vol à éditer",NULL,GTK_DIALOG_MODAL,GTK_STOCK_OK,GTK_RESPONSE_OK,NULL);
+
+
+    GtkWidget *fixed;
+    GtkWidget *combo;
+    GtkWidget *label;
+
+    if(formulaire->donnees->debutpdv!=NULL)
+    {
+        label=gtk_label_new("Sélectionnez le plan de vol à éditer.");
+        gtk_box_pack_start(GTK_BOX(GTK_DIALOG(pBoite)->vbox), label, TRUE, TRUE, 10);
+
+      fixed = gtk_fixed_new();
+
+      combo = gtk_combo_box_new_text();
+
+      pdv* current=formulaire->donnees->debutpdv;
+      while(current!=NULL)
+      {
+        gtk_combo_box_append_text(GTK_COMBO_BOX(combo), current->nom);
+        current=current->ptsuiv;
+      }
+
+      gtk_fixed_put(GTK_FIXED(fixed), combo, 50, 50);
+      gtk_container_add(GTK_CONTAINER(GTK_DIALOG(pBoite)->vbox), fixed);
+
+
+      g_signal_connect(G_OBJECT(combo), "changed",G_CALLBACK(combo_selected_pdv), formulaire);
+
+        gtk_combo_box_set_active(GTK_COMBO_BOX(combo),0); //mettre le 1er en choix par défault.
+
+
+    }
+    else
+    {
+        label=gtk_label_new("    Aucun plan de vol n'a été chargé!    ");
+        gtk_box_pack_start(GTK_BOX(GTK_DIALOG(pBoite)->vbox), label, TRUE, TRUE, 10);
+    }
+
+
+    gtk_widget_show_all(GTK_DIALOG(pBoite)->vbox);
+
+
+    if (gtk_dialog_run(GTK_DIALOG(pBoite))==GTK_RESPONSE_OK) //on n'édite le pdv que si l'utilisateur clique sur OK.
+    {
+        if(formulaire->donnees->debutpdv!=NULL)
+        {
+            ajouter_plan_de_vol(NULL,formulaire);
+        }
+    }
+    gtk_widget_destroy(pBoite);
+}
+
+
+
+void combo_selected_pdv(GtkWidget *widget,form_pdv* formulaire)
+{
+  gchar *text =  gtk_combo_box_get_active_text(GTK_COMBO_BOX(widget));
+
+  pdv* current=formulaire->donnees->debutpdv;
+  while(current!=NULL)
+  {
+    if(!strcmp(text,current->nom))
+    {
+        formulaire->pdv_edit=current;
+    }
+
+    current=current->ptsuiv;
+  }
+
+  g_free(text);
+}
+
+
+
+void editer_pdv(form_pdv* formulaire)
+{
+
+
+    formulaire->pdv_edit=NULL;
+}

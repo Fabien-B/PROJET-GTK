@@ -44,6 +44,7 @@ void initialisation(int argc, char *argv[])
         formulaire->altitude=100;
         formulaire->nom[0]='\0';
         formulaire->vitesse=200;
+        formulaire->pdv_edit=NULL;
         int i;
         for(i=0;i<40;i++)
         {
@@ -70,10 +71,13 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
 
     GtkWidget *menu_bar;
     GtkWidget *Fichier_menu;
+    GtkWidget *Edition_menu;
     GtkWidget *Aide_menu;
     GtkWidget *MI1_Fichier;
+    GtkWidget *MI1_Edition;
     GtkWidget *MI1_Aide;
     GtkWidget *MI2_APropos;
+    GtkWidget *MI2_Editer_pdv;
     GtkWidget *MI2_Nouveau;
     GtkWidget *MI2_Ouvrir;
     GtkWidget *MI2_Charger_default;
@@ -140,6 +144,16 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
 
         gtk_menu_item_set_submenu(GTK_MENU_ITEM(MI1_Fichier), Fichier_menu);
 
+    MI1_Edition = gtk_menu_item_new_with_label("Edition");
+    Edition_menu = gtk_menu_new();
+
+        MI2_Editer_pdv = gtk_menu_item_new_with_label("Éditer les plans de vols");
+        gtk_menu_shell_append(GTK_MENU_SHELL(Edition_menu), MI2_Editer_pdv);
+                        g_signal_connect(G_OBJECT(MI2_Editer_pdv), "activate", G_CALLBACK(select_pdv_ed), formulaire);
+
+
+         gtk_menu_item_set_submenu(GTK_MENU_ITEM(MI1_Edition), Edition_menu);
+
     MI1_Aide = gtk_menu_item_new_with_label("?");
     Aide_menu = gtk_menu_new();
 
@@ -150,6 +164,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
         gtk_menu_item_set_submenu(GTK_MENU_ITEM(MI1_Aide), Aide_menu);
 
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), MI1_Fichier);
+    gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), MI1_Edition);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu_bar), MI1_Aide);
     gtk_box_pack_start(GTK_BOX(donnees->mother_box), menu_bar, FALSE, FALSE, 0);
 
