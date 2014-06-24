@@ -163,45 +163,49 @@ void ajouter_plan_de_vol(GtkWidget* bouton,form_pdv* formulaire)
 
     ok_button=gtk_button_new_with_label("Confirmer"); //label et gtkEntry pour ajouter le plan de vol à la base de données
     gtk_box_pack_start(GTK_BOX(box),ok_button,FALSE,FALSE,10);
-    if(formulaire->pdv_edit==NULL)
-    {
-        g_signal_connect(GTK_BUTTON(ok_button),"clicked",G_CALLBACK(ajouter_pdv),formulaire);
-    }
-    else
-    {
-        g_signal_connect(GTK_BUTTON(ok_button),"clicked",G_CALLBACK(editer_pdv),formulaire);
-    }
+    g_signal_connect(GTK_BUTTON(ok_button),"clicked",G_CALLBACK(ajouter_pdv),formulaire);
+
 
 
     gtk_widget_show_all(formulaire->wind); //afficher la fenètre
 
 }
 
-// Fonction de validation
+// Fonction de validation sert aussi à l'édition des pdv
 void ajouter_pdv(GtkWidget* bouton,form_pdv* formulaire)
 {
-
-
-int cas;
     pdv* pdv_current;
-    // Premier plan de vol sauvegardé
-    if(formulaire->donnees->finpdv!=NULL)
+    pt_pass* passdeb;
+    int cas;
+    if(formulaire->pdv_edit==NULL)
     {
-    // Allocation mémoire et création de la liste chainée
-        formulaire->donnees->finpdv->ptsuiv=malloc(sizeof(pdv));
-        pdv_current=formulaire->donnees->finpdv->ptsuiv;
-        pdv_current->ptsuiv=NULL;
-        cas=0;
+        // Premier plan de vol sauvegardé
+        if(formulaire->donnees->finpdv!=NULL)
+        {
+        // Allocation mémoire et création de la liste chainée
+            formulaire->donnees->finpdv->ptsuiv=malloc(sizeof(pdv));
+            pdv_current=formulaire->donnees->finpdv->ptsuiv;
+            pdv_current->ptsuiv=NULL;
+            cas=0;
+        }
+        else
+        {
+        // Ajout à la liste chainée
+            formulaire->donnees->debutpdv=malloc(sizeof(pdv));
+            pdv_current=formulaire->donnees->debutpdv;
+            formulaire->donnees->finpdv=pdv_current;
+            pdv_current->ptsuiv=NULL;
+            cas=1;
+        }
     }
     else
     {
-    // Ajout à la liste chainée
-        formulaire->donnees->debutpdv=malloc(sizeof(pdv));
-        pdv_current=formulaire->donnees->debutpdv;
-        formulaire->donnees->finpdv=pdv_current;
-        pdv_current->ptsuiv=NULL;
-        cas=1;
+        pdv_current=formulaire->pdv_edit;
+        passdeb=pdv_current->pass_debut;
     }
+
+
+
 
 // Récupération des données du formulaire
     const gchar *text;
@@ -292,15 +296,27 @@ int cas;
             free(pass_current);
             pass_current=pass2;
         }
-        free(pdv_current);
-        // Si le plan de vol n'est pas le premier
-        if(cas)
+
+        if(formulaire->pdv_edit==NULL)
         {
-            formulaire->donnees->debutpdv=NULL;
+            free(pdv_current);
         }
         else
         {
-            formulaire->donnees->finpdv->ptsuiv=NULL;
+            pdv_current->pass_debut=passdeb;
+        }
+
+        if(formulaire->pdv_edit==NULL)
+        {
+            // Si le plan de vol n'est pas le premier
+            if(cas)
+            {
+                formulaire->donnees->debutpdv=NULL;
+            }
+            else
+            {
+                formulaire->donnees->finpdv->ptsuiv=NULL;
+            }
         }
 
     }
@@ -413,14 +429,42 @@ void combo_selected_pdv(GtkWidget *widget,form_pdv* formulaire)
     current=current->ptsuiv;
   }
 
-  g_free(text);
+
+    // On augmente le nombre de points de passage
+    strcpy(formulaire->nom,formulaire->pdv_edit->nom);
+
+    // On récupère toutes les infos pour détruire et reconstruire la fenêtre
+    formulaire->altitude = formulaire->pdv_edit->altitude;
+    formulaire->vitesse = formulaire->pdv_edit->vitesse;
+
+    pt_pass* pass=formulaire->pdv_edit->pass_debut;
+    int i=0;
+    while(pass->ptsuiv!=NULL)
+    {
+        if(pass->type_point)    //balise
+        {
+            balise* bal=pass->point;
+            strcpy(formulaire->pass[i],bal->nom);
+            i++;
+        }
+        else        //aérodrome
+        {
+            aerodrome* aero=pass->point;
+            strcpy(formulaire->pass[i],aero->oaci);
+            i++;
+        }
+        pass=pass->ptsuiv;
+    }
+    formulaire->nb_pt_int=i-2;
+
+
+    formulaire->heure=formulaire->pdv_edit->heure;
+    formulaire->minutes=formulaire->pdv_edit->minute;
+
+
+
+
+
+
 }
 
-
-
-void editer_pdv(form_pdv* formulaire)
-{
-
-
-    formulaire->pdv_edit=NULL;
-}
