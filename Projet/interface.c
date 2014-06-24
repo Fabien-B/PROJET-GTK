@@ -92,6 +92,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
 
     GtkWidget *voir_conflits_button;
     GtkWidget *event_box;
+    GtkWidget *Separateur;
 
 
 // Creation et ajout de la GtkBox mère verticale
@@ -178,6 +179,11 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     gtk_widget_set_events(event_box,GDK_MOTION_NOTIFY);
     gtk_signal_connect(GTK_OBJECT(event_box), "motion_notify_event",GTK_SIGNAL_FUNC(drag_event), donnees);
 
+// Mise en place du séparateur entre la carte et la barre temps
+    Separateur = gtk_hseparator_new();
+    gtk_box_pack_start (GTK_BOX (work_zl), Separateur, FALSE, TRUE, 5);
+
+
 // Création du curseur temp (adjustment) et de son label
     hbox_curseur = gtk_hbox_new(FALSE, 0);
     gtk_box_pack_start(GTK_BOX(work_zl), hbox_curseur, FALSE, FALSE, 0);
@@ -186,7 +192,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
 
 // Barre de temps
 //  ( depart , min , max , incrément scroll x2 , incrémentation clic en dehors du curseur , zone visible )
-    donnees->adj2 = gtk_adjustment_new (donnees->temps, 0.0, 1440.0, 0.1, 5.0, 0.0);
+    donnees->adj2 = gtk_adjustment_new (donnees->temps, 0.0, 1440.0, 0.5, 5.0, 0.0);
     gtk_signal_connect (GTK_OBJECT (donnees->adj2), "value_changed", GTK_SIGNAL_FUNC (recup_temps), donnees);
     curseur = gtk_hscale_new (GTK_ADJUSTMENT (donnees->adj2));
     gtk_scale_set_digits (GTK_SCALE (curseur), 0);
@@ -200,6 +206,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     sprintf(heure,"   %02d:%02d",h,m);
     donnees->heure_label=gtk_label_new(heure);
     gtk_box_pack_start(GTK_BOX(hbox_curseur),donnees->heure_label,FALSE,FALSE,0);
+
 
 // Boutons sur le menu de gauche
     filtre_button=gtk_button_new_with_mnemonic("_Filtrer l'affichage");
@@ -217,6 +224,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     voir_conflits_button=gtk_button_new_with_mnemonic("Voir les _conflits");
     gtk_box_pack_start(GTK_BOX(work_zr),voir_conflits_button,FALSE,FALSE,0);
     g_signal_connect(GTK_BUTTON(voir_conflits_button),"clicked",G_CALLBACK(voir_conflits),donnees);
+
 
 // Boîte pour l'animation
     GtkWidget* media_box;
@@ -238,6 +246,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     gtk_button_set_image(GTK_BUTTON(pause_b), img2);
     gtk_box_pack_start(GTK_BOX(media_box),pause_b,TRUE,TRUE,0);
     g_signal_connect(GTK_BUTTON(pause_b),"clicked",G_CALLBACK(stop),donnees);
+
 
 // Initialisation du label de conflit
     donnees->Msg_conflit=gtk_label_new("");
@@ -270,16 +279,6 @@ donnees->start->y = event->y;
 position clic;
 clic.x = donnees->longitude_min + donnees->dlong * (event->x/donnees->xcarte);
 clic.y = donnees->latitude_max - donnees->dlat * (event->y/donnees->ycarte);
-
-    double dlat=3340*3.14/180*(clic.y - donnees->old->y);
-    double latm=(clic.y+donnees->old->y)/2;
-    double r=3340*cos(latm*3.14/180);
-    double dlong=r*3.14*(donnees->old->x-clic.x)/180.0;
-//    donnees->clic_distance =sqrt(pow(dlat,2)+pow(dlong,2));
-    double D =sqrt(pow(dlat,2)+pow(dlong,2));
-    g_print("Les deux derniers points précédants sont (1 : ancien): \n - x1 = %lf \n - y1 = %lf \n - x2 = %lf \n - y2 = %lf\n",donnees->old->x,donnees->old->y,clic.x,clic.y);
-    g_print("La distance entre les 2 derniers points vaut : %lf (NM)\n\n",D);
-
 
 donnees->old->x = clic.x;
 donnees->old->y = clic.y;
@@ -537,7 +536,7 @@ charger_fichiers(donnees);
 
 
 donnees->what_file=2;
-donnees->ptchemin="PDV.txt";
+donnees->ptchemin="plan_de_vol.txt";
 
 charger_fichiers(donnees);
 

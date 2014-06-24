@@ -412,7 +412,7 @@ void charger_fichiers(file_opener *donnees)
 
                 }
 
-                nouveau->affichage=1; //non affiché par défault
+                nouveau->affichage=1; // affiché par défault
 
 
             fscanf(fic,"%[^\n]",ligne);

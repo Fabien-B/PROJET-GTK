@@ -106,18 +106,19 @@ void detection_conflits(GtkWidget *button, file_opener * donnees)
 
 void get_position_avion(position* pos, pdv* pdv_c,double t)
 {
-    if(t<pdv_c->temps_depart || t>pdv_c->temps_arrivee)     //Avion pas partis, ou déja arrivé: on met une valeur impossible
+    if(t < pdv_c->temps_depart || t > pdv_c->temps_arrivee)     //Avion pas partis, ou déja arrivé: on met une valeur impossible
     {
         pos->y=-100;
+        pos->x=-100;
     }
     else
     {
-        pt_pass* pass_c=pdv_c->pass_debut;
-        while(t>pass_c->ptsuiv->temps)      //on cherche dans quel segment on est
+        pt_pass* pass_c = pdv_c->pass_debut;
+        while(t > pass_c->ptsuiv->temps)      //on cherche dans quel segment on est
         {
-            pass_c=pass_c->ptsuiv;
+            pass_c = pass_c->ptsuiv;
         }
-        double dt=t-pass_c->temps;
+        double dt = t - pass_c->temps;
 
 
         double lat1,lat2,long1,long2;
@@ -154,12 +155,16 @@ void get_position_avion(position* pos, pdv* pdv_c,double t)
             double dlong=r*3.14*(long2-long1)/180.0;               //distance projeté sur l'autre axe en NM
             double D=sqrt(pow(dlat,2)+pow(dlong,2));
 
-        double d=pdv_c->vitesse/60*dt;
+        double d= dt * pdv_c->vitesse/60;
+//        double test = d/D;
+//printf("\ntpass = %lf, t = %lf, dt = %lf, d = %lf, D = %lf, dD = %lf, vitesse = %d\n",pass_c->temps,t,dt,d,D,test,pdv_c->vitesse);
 
-        pos->y=lat1+d/D*(lat2-lat1);
-        pos->x=long1+d/D*(long2-long1);                     //pas vraiment ça mais c'est compliqué...
+
+        pos->y=lat1 + (lat2-lat1) * (d/D);
+        pos->x=long1 + (long2-long1) * (d/D);                     //pas vraiment ça mais c'est compliqué...
 
     }
+//    printf("\n\n-------------------------------\n\n");
 }
 
 
@@ -223,11 +228,11 @@ void integrer_temps(file_opener* donnees)
             double dlong=r*3.14*(long2-long1)/180.0;               //distance projeté sur l'autre axe en NM
             double D=sqrt(pow(dlat,2)+pow(dlong,2));                //distance entre les 2 points en NM (approximation: rayon de la terre infini)
 
-//g_print(" = %lf   %lf   D=%lf   latm=%lf\n",dlat,dlong,D,latm);
-//g_print("%lf   %lf   r=%lf\n\n",long1,long2,r);
-//g_print("D=%lf\n",D);
-            pass_current->ptsuiv->temps=pass_current->temps+D/(pdv_current->vitesse/60);
-//g_print("t=%lf\n",pass_current->ptsuiv->temps);
+//g_print("dlat = %lf  dlong = %lf   D=%lf   latm=%lf\n",dlat,dlong,D,latm);
+//g_print("longi1 = %lf, longi2 = %lf   r=%lf\n\n",long1,long2,r);
+            pass_current->ptsuiv->temps=pass_current->temps + 60 *(D/(pdv_current->vitesse));
+g_print("D=%lf, vitesse = %d, deltatemps : %lf\n",D,pdv_current->vitesse, pass_current->ptsuiv->temps-pass_current->temps);
+g_print("td=%lf, ta=%lf\n\n",pass_current->temps,pass_current->ptsuiv->temps);
 
 
             pass_current=pass_current->ptsuiv;
@@ -236,6 +241,7 @@ void integrer_temps(file_opener* donnees)
         pdv_current->temps_arrivee=pass_current->temps;
 //g_print("arrivée:%lf\n",pdv_current->temps_arrivee);
         pdv_current=pdv_current->ptsuiv;
+        g_print("\n\n\n");
     }
     detection_conflits(NULL,donnees);
 
