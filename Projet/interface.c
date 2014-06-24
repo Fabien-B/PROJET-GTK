@@ -118,7 +118,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Charger_default);
                         g_signal_connect(G_OBJECT(MI2_Charger_default), "activate", G_CALLBACK(rapide_file), donnees);
 
-        MI2_Enregistrer = gtk_menu_item_new_with_label("Enregistrer le plan de vol");
+        MI2_Enregistrer = gtk_menu_item_new_with_label("Enregistrer les plan de vol");
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Enregistrer);
                         g_signal_connect(G_OBJECT(MI2_Enregistrer), "activate", G_CALLBACK(creer_file_save_selection), donnees);
 
