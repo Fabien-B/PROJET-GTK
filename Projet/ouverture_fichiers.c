@@ -671,7 +671,6 @@ printf("%s",donnees->ptchemin);
 
 void creer_file_conflit_selection(GtkWidget *bouton,file_opener *donnees)
 {
-//printf("azert\n");
     if(donnees->debutpdv!=NULL)
     {
 
@@ -767,7 +766,7 @@ printf("%s",donnees->ptchemin);
             {
                 int h=current->temps_deb/60;
                 int m=current->temps_deb-60*h;
-                fprintf(fic,"Conflit etre %s et %s à %02d:%02d, localisation approximative: %lf ; %lf",current->pdv1->nom,current->pdv2->nom,h,m,current->latitude,current->longitude);
+                fprintf(fic,"Conflit entre %s et %s à %02d:%02d, localisation approximative: %lf ; %lf",current->pdv1->nom,current->pdv2->nom,h,m,current->latitude,current->longitude);
 
                 fprintf(fic,"\n");
 
@@ -791,7 +790,6 @@ printf("%s",donnees->ptchemin);
 
 void creer_file_plots_selection(GtkWidget *bouton,file_opener *donnees)
 {
-printf("azert\n");
     if(donnees->debutpdv!=NULL)
     {
 
@@ -816,7 +814,7 @@ printf("azert\n");
 
 
 void recuperer_plots_chemin(GtkWidget *bouton, file_opener *donnees)
-{printf("tooacrd!");
+{
     const gchar* chemin_fichier;
     chemin_fichier = gtk_file_selection_get_filename(GTK_FILE_SELECTION (donnees->file_selection) );
 
@@ -895,7 +893,7 @@ void sauver_plots(file_opener *donnees)
                     int h=t/60;
                     int m=t-60*h;
                     int s=(t-60*h-m)*60;
-                    fprintf(fic,"%02d:%02d:%02d\t%lf;%lf\n",h,m,s,pos->x,pos->y);
+                    fprintf(fic,"%02d:%02d:%02d\t%lf;%lf\n",h,m,s,pos->y,pos->x);
 
 
                 }

@@ -116,7 +116,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Charger_default);
                         g_signal_connect(G_OBJECT(MI2_Charger_default), "activate", G_CALLBACK(rapide_file), donnees);
 
-        MI2_Enregistrer = gtk_menu_item_new_with_label("Enregistrer le plan de vol");
+        MI2_Enregistrer = gtk_menu_item_new_with_label("Enregistrer les plan de vol");
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Enregistrer);
                         g_signal_connect(G_OBJECT(MI2_Enregistrer), "activate", G_CALLBACK(creer_file_save_selection), donnees);
 
@@ -271,14 +271,14 @@ position clic;
 clic.x = donnees->longitude_min + donnees->dlong * (event->x/donnees->xcarte);
 clic.y = donnees->latitude_max - donnees->dlat * (event->y/donnees->ycarte);
 
-    double dlat=3340*3.14/180*(clic.y - donnees->old->y);
-    double latm=(clic.y+donnees->old->y)/2;
-    double r=3340*cos(latm*3.14/180);
-    double dlong=r*3.14*(donnees->old->x-clic.x)/180.0;
+    //double dlat=3340*3.14/180*(clic.y - donnees->old->y);
+    //double latm=(clic.y+donnees->old->y)/2;
+    //double r=3340*cos(latm*3.14/180);
+    //double dlong=r*3.14*(donnees->old->x-clic.x)/180.0;
 //    donnees->clic_distance =sqrt(pow(dlat,2)+pow(dlong,2));
-    double D =sqrt(pow(dlat,2)+pow(dlong,2));
-    g_print("Les deux derniers points précédants sont (1 : ancien): \n - x1 = %lf \n - y1 = %lf \n - x2 = %lf \n - y2 = %lf\n",donnees->old->x,donnees->old->y,clic.x,clic.y);
-    g_print("La distance entre les 2 derniers points vaut : %lf (NM)\n\n",D);
+    //double D =sqrt(pow(dlat,2)+pow(dlong,2));
+    //g_print("Les deux derniers points précédants sont (1 : ancien): \n - x1 = %lf \n - y1 = %lf \n - x2 = %lf \n - y2 = %lf\n",donnees->old->x,donnees->old->y,clic.x,clic.y);
+    //g_print("La distance entre les 2 derniers points vaut : %lf (NM)\n\n",D);
 
 
 donnees->old->x = clic.x;
