@@ -187,6 +187,9 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     gtk_signal_connect(GTK_OBJECT(event_box), "button_press_event",GTK_SIGNAL_FUNC(press_event), donnees);
     gtk_widget_set_events(event_box,GDK_MOTION_NOTIFY);
     gtk_signal_connect(GTK_OBJECT(event_box), "motion_notify_event",GTK_SIGNAL_FUNC(drag_event), donnees);
+    gtk_widget_set_events(event_box,GDK_POINTER_MOTION_MASK);
+    gtk_signal_connect(GTK_OBJECT(event_box), "motion_notify_event",GTK_SIGNAL_FUNC(enter_event), donnees);
+
 
 
 // Mise en place du séparateur entre la carte et la barre temps
@@ -266,6 +269,10 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     donnees->Distance_clic = gtk_label_new("Distance clic :\n    0 NM");
     gtk_box_pack_start(GTK_BOX(work_zr),donnees->Distance_clic,FALSE,FALSE,10);
 
+// Initialisation du label de position du curseur
+    donnees->Position_curseur = gtk_label_new("Position du curseur : \nLatitude : \nLongitude");
+    gtk_box_pack_start(GTK_BOX(work_zr),donnees->Position_curseur,FALSE,FALSE,10);
+
 // Gère le rafraichissement
     g_signal_connect (G_OBJECT (donnees->carte), "expose-event", G_CALLBACK (expose_cb), donnees);
 
@@ -277,19 +284,40 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
 
 }
 
+
+// Donne la position du curseur
+void enter_event(GtkWidget* carte, GdkEventMotion* event, file_opener* donnees)
+{
+//double x,y;
+//x = donnees->longitude_min + donnees->dlong * (event->x/donnees->xcarte);
+//y = donnees->latitude_max - donnees->dlat * (event->y/donnees->ycarte);
+
+//printf("test x = %lf, y = %lf\n",x,y);
+//fflush(stdout);
+
+//char label_position;
+//sprintf(&label_position,"Position du curseur :\n Latitude : %lf \n Longitude : %lf",x,y);
+//gtk_label_set_text(GTK_LABEL(donnees->Position_curseur),&label_position);
+}
+
+
 // Premier évenement du déplacement de la carte, on y récupère la position du curseur et le coordonnées de l'angle haut gauche
 void press_event(GtkWidget* carte, GdkEventButton* event, file_opener* donnees)
 {
+// On sauvegarde le coin haut gauche
 donnees->bord->x = donnees->longitude_min;
 donnees->bord->y = donnees->latitude_max;
 
+// On mémorise la position du curseur au moment du clic initiale
 donnees->start->x = event->x;
 donnees->start->y = event->y;
 
+// On transforme la position en longitude/latitude
 position clic;
 clic.x = donnees->longitude_min + donnees->dlong * (event->x/donnees->xcarte);
 clic.y = donnees->latitude_max - donnees->dlat * (event->y/donnees->ycarte);
 
+// Utilisé pour le calcul des longueurs
 donnees->old->x = clic.x;
 donnees->old->y = clic.y;
 
@@ -300,7 +328,6 @@ donnees->old->y = clic.y;
 // Second évènement de déplacement à partir de la différence entre la position actuelle du curseur et celle enregistrer par la fonction précédante on calcule le déplacement de la fenêtre
 void drag_event(GtkWidget* carte, GdkEventMotion* event, file_opener* donnees)
 {
-
 GdkModifierType state;
 state = event->state;
 
@@ -396,6 +423,7 @@ else
 }
 redessiner(NULL,donnees->carte);
 }
+
 
 // Appelé lors de la modification du curseur temps
 void recup_temps(GtkAdjustment *adj, file_opener *donnees)
@@ -747,7 +775,25 @@ gboolean animation(file_opener* donnees)
         }
         else
         {
+        int a=0;
+        pdv* pdv_current = donnees->debutpdv;
+
+            while(pdv_current!=NULL)
+            {
+                if(pdv_current->temps_depart < donnees->temps + 10 && pdv_current->temps_arrivee > donnees->temps - 10)
+                {
+                    a=1;
+                }
+            pdv_current = pdv_current->ptsuiv;
+            }
+        if(a)
+        {
             donnees->temps+=1;
+        }
+        else
+        {
+            donnees->temps+=5;
+        }
         }
 
 //      On réatribut la valeur du temps

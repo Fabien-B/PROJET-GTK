@@ -97,6 +97,7 @@ typedef struct file_opener{
     double clic_distance;
     GtkWidget *Msg_conflit;
     GtkWidget *Distance_clic;
+    GtkWidget *Position_curseur;
     gint tag_lecture;
     GtkObject* adj2;
 
@@ -141,6 +142,8 @@ void recup_temps(GtkAdjustment* adj, file_opener* donnees);
 void scroll_event(GtkWidget* carte,GdkEventScroll* event,file_opener* donnees);
 void press_event(GtkWidget* carte, GdkEventButton* event, file_opener* donnees);
 void drag_event(GtkWidget* carte, GdkEventMotion* event, file_opener* donnees);
+void enter_event(GtkWidget* carte, GdkEventMotion* event, file_opener* donnees);
+
 
 void rapide_file(GtkWidget * widget, file_opener * donnees);
 void visu_carte_default(GtkWidget* button, form_pdv* formulaire);
