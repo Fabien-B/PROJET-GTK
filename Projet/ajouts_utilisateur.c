@@ -323,15 +323,19 @@ void ajouter_pdv(GtkWidget* bouton,form_pdv* formulaire)
 //  S'il n'y a pas d'erreur
     else
     {
-        // Si le plan de vol n'est pas le premier
-        if(cas)
+        if(formulaire->pdv_edit==NULL)
         {
-            formulaire->donnees->finpdv=pdv_current;
+            // Si le plan de vol n'est pas le premier
+            if(cas)
+            {
+                formulaire->donnees->finpdv=pdv_current;
+            }
+            else
+            {
+                formulaire->donnees->finpdv=formulaire->donnees->finpdv->ptsuiv;
+            }
         }
-        else
-        {
-            formulaire->donnees->finpdv=formulaire->donnees->finpdv->ptsuiv;
-        }
+
     }
 
     pdv_current->affichage=1;
@@ -348,7 +352,7 @@ void ajouter_pdv(GtkWidget* bouton,form_pdv* formulaire)
     formulaire->pass[i][0]='\0';
     }
     formulaire->nb_pt_int=0;
-
+    formulaire->pdv_edit=NULL;
 
     integrer_temps(formulaire->donnees);
 
