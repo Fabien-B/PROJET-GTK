@@ -204,7 +204,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     gtk_widget_set_events(event_box,GDK_MOTION_NOTIFY);
     gtk_signal_connect(GTK_OBJECT(event_box), "motion_notify_event",GTK_SIGNAL_FUNC(drag_event), donnees);
     gtk_widget_set_events(event_box,GDK_POINTER_MOTION_MASK);
-    gtk_signal_connect(GTK_OBJECT(event_box), "motion_notify_event",GTK_SIGNAL_FUNC(enter_event), donnees);
+    gtk_signal_connect(GTK_OBJECT(event_box), "motion_notify_event",GTK_SIGNAL_FUNC(move_event), donnees);
 
 
 
@@ -302,7 +302,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
 
 
 // Donne la position du curseur
-void enter_event(GtkWidget* carte, GdkEventMotion* event, file_opener* donnees)
+void move_event(GtkWidget* carte, GdkEventMotion* event, file_opener* donnees)
 {
 double x,y;
 x = donnees->longitude_min + donnees->dlong * (event->x/donnees->xcarte);
@@ -384,6 +384,13 @@ state = event->state;
     char label_clic;
     sprintf(&label_clic,"Distance clic :\n    %0.1lf NM",donnees->clic_distance);
     gtk_label_set_text(GTK_LABEL(donnees->Distance_clic),&label_clic);
+
+    //printf("test x = %lf, y = %lf\n",x,y);
+    //fflush(stdout);
+
+    char label_position[100];
+    sprintf(label_position,"Position du curseur :\n Latitude : %lf \n Longitude : %lf",lati,longi);
+    gtk_label_set_text(GTK_LABEL(donnees->Position_curseur),label_position);
   }
 }
 

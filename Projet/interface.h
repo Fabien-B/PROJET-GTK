@@ -143,7 +143,7 @@ void recup_temps(GtkAdjustment* adj, file_opener* donnees);
 void scroll_event(GtkWidget* carte,GdkEventScroll* event,file_opener* donnees);
 void press_event(GtkWidget* carte, GdkEventButton* event, file_opener* donnees);
 void drag_event(GtkWidget* carte, GdkEventMotion* event, file_opener* donnees);
-void enter_event(GtkWidget* carte, GdkEventMotion* event, file_opener* donnees);
+void move_event(GtkWidget* carte, GdkEventMotion* event, file_opener* donnees);
 
 
 void rapide_file(GtkWidget * widget, file_opener * donnees);
