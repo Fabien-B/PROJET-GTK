@@ -65,7 +65,17 @@ int i;
 
 }
 
-
+    static gboolean
+    on_match_select(GtkEntryCompletion *widget, GtkTreeModel *model,GtkTreeIter *iter,char * tableau)
+    {
+      GValue value = {0, };
+      gtk_tree_model_get_value(model, iter, compl_recup, &value);
+      strcpy(tableau,g_value_get_string(&value));
+//printf("%s",tableau);
+//fprintf(stdout, "You have selected %s\n", g_value_get_string(&value));
+      g_value_unset(&value);
+      return FALSE;
+    }
 
 // Fenêtre principale d'ajout d'un plan de vol
 void ajouter_plan_de_vol(GtkWidget* bouton,form_pdv* formulaire)
@@ -140,9 +150,12 @@ void ajouter_plan_de_vol(GtkWidget* bouton,form_pdv* formulaire)
 
     formulaire->pass_label[0]=gtk_label_new("Point de départ:"); //label et gtkEntry pour le pt de départ
     formulaire->pass_entry[0]=gtk_entry_new();
+
+
     gtk_box_pack_start(GTK_BOX(box),formulaire->pass_label[0],FALSE,FALSE,0);
     gtk_box_pack_start(GTK_BOX(box),formulaire->pass_entry[0],FALSE,FALSE,0);
     gtk_entry_set_text(GTK_ENTRY(formulaire->pass_entry[0]), formulaire->pass[0]);
+
 
     int i=1;
     while(i<formulaire->nb_pt_int+1) //label et gtkEntry pour les pts intermédiaires
@@ -160,6 +173,63 @@ void ajouter_plan_de_vol(GtkWidget* bouton,form_pdv* formulaire)
     gtk_box_pack_start(GTK_BOX(box),formulaire->pass_label[i],FALSE,FALSE,0);
     gtk_box_pack_start(GTK_BOX(box),formulaire->pass_entry[i],FALSE,FALSE,0);
     gtk_entry_set_text(GTK_ENTRY(formulaire->pass_entry[i]), formulaire->pass[i]);
+
+
+{
+//code pour la completion
+    GtkEntryCompletion *completion[formulaire->nb_pt_int+2];
+    GtkListStore *model;
+    GtkTreeIter iter;
+    int j;
+
+    for(j=0;j<formulaire->nb_pt_int+2;j++)
+    {
+        completion[j] = gtk_entry_completion_new();
+        gtk_entry_completion_set_text_column(completion[j], compl_recherche);
+    }
+
+    for(j=0;j<formulaire->nb_pt_int+2;j++)
+    {
+    gtk_entry_set_completion(GTK_ENTRY(formulaire->pass_entry[j]), completion[j]);
+    g_signal_connect(G_OBJECT (completion[j]), "match-selected",G_CALLBACK (on_match_select), formulaire->pt_pass[j]);
+    model = gtk_list_store_new(3, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING);
+    }
+
+
+
+
+    if(formulaire->donnees->debutaero!=NULL)
+    {
+        aerodrome *pt_aero = formulaire->donnees->debutaero;
+        while(pt_aero!=NULL)
+        {
+          gtk_list_store_append(model, &iter);
+          gtk_list_store_set(model, &iter, compl_recherche, pt_aero->nom,compl_affiche, pt_aero->oaci,compl_recup,  pt_aero->oaci, -1);
+        pt_aero = pt_aero->ptsuiv;
+        }
+
+    }
+
+    if(formulaire->donnees->debutbalises!=NULL)
+    {
+        balise* pt_balise=formulaire->donnees->debutbalises;
+        while(pt_balise->ptsuiv!=NULL)
+        {
+          gtk_list_store_append(model, &iter);
+          gtk_list_store_set(model, &iter, compl_recherche, pt_balise->nom,compl_affiche, pt_balise->nom,compl_recup,  pt_balise->nom, -1);
+        pt_balise = pt_balise->ptsuiv;
+        }
+    }
+
+    for(j=0;j<formulaire->nb_pt_int+2;j++)
+    {
+        gtk_entry_completion_set_model(completion[j], GTK_TREE_MODEL(model));
+    }
+
+//end code completion
+}
+
+
 
     aj_pass=gtk_button_new_with_label("Ajouter un point de passage"); //bouton pour ajouter un pt de passage
     gtk_box_pack_start(GTK_BOX(box),aj_pass,FALSE,FALSE,0);
@@ -238,9 +308,21 @@ void ajouter_pdv(GtkWidget* bouton,form_pdv* formulaire)
     // Sauvegarde dans la structure
     for(i=0;i<formulaire->nb_pt_int+2;i++)
     {
-        text = gtk_entry_get_text(GTK_ENTRY(formulaire->pass_entry[i]));
         char text2[40];
-        strcpy(text2,text);
+
+        if(formulaire->pt_pass[i][0]=='\0')
+        {
+            text = gtk_entry_get_text(GTK_ENTRY(formulaire->pass_entry[i]));
+            strcpy(text2,text);
+
+        }
+        else
+        {
+            strcpy(text2,formulaire->pt_pass[i]);
+            formulaire->pt_pass[i][0]='\0';
+        }
+
+//g_print("%s\n",text2);
         int i=0;
         while(text2[i]!='\0')
         {

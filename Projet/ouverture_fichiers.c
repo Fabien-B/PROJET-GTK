@@ -909,5 +909,3 @@ void sauver_plots(file_opener *donnees)
 
 
 }
-
-

@@ -49,6 +49,7 @@ void initialisation(int argc, char *argv[])
         for(i=0;i<40;i++)
         {
             formulaire->pass[i][0]='\0';
+            formulaire->pt_pass[i][0]='\0';
         }
 
     // Initialisation de la fenêtre
@@ -849,5 +850,3 @@ void stop(GtkWidget* bouton,file_opener* donnees)
     }
 
 }
-
-

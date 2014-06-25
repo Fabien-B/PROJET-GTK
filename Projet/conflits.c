@@ -242,7 +242,7 @@ void integrer_temps(file_opener* donnees)
         pdv_current->temps_arrivee=pass_current->temps;
 //g_print("arrivée:%lf\n",pdv_current->temps_arrivee);
         pdv_current=pdv_current->ptsuiv;
-        g_print("\n\n\n");
+//        g_print("\n\n\n");
     }
     detection_conflits(NULL,donnees);
 

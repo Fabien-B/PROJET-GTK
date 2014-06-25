@@ -9,6 +9,19 @@
 #define YCARTE 660
 #define DISTANCE_CONFLIT 20
 
+typedef struct completion_struct {
+  char *recherche;
+  char *affiche;
+  char *recup;
+} completion_struct;
+
+typedef enum {
+  compl_recherche = 0,
+  compl_affiche,
+  compl_recup
+} compl_enum;
+
+
 typedef struct aerodrome{
     double latitude;
     double longitude;
@@ -125,6 +138,7 @@ typedef struct form_pdv{
     GtkWidget *pass_entry[40];
     char pass[40][40];
     GtkWidget *pass_label[40];
+    char pt_pass [40][40];
     GtkWidget *ok_bouton;
     int nb_pt_int;
     file_opener* donnees;
@@ -144,6 +158,9 @@ void scroll_event(GtkWidget* carte,GdkEventScroll* event,file_opener* donnees);
 void press_event(GtkWidget* carte, GdkEventButton* event, file_opener* donnees);
 void drag_event(GtkWidget* carte, GdkEventMotion* event, file_opener* donnees);
 void move_event(GtkWidget* carte, GdkEventMotion* event, file_opener* donnees);
+
+int tentative_completion(GtkWidget* button, file_opener* donnees);
+//static gboolean on_match_select(GtkEntryCompletion *widget, GtkTreeModel *model,GtkTreeIter *iter,gpointer user_data);
 
 
 void rapide_file(GtkWidget * widget, file_opener * donnees);
