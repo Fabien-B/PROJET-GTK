@@ -756,10 +756,10 @@ void my_getsize(GtkWidget *widget, GtkAllocation *allocation, form_pdv* formulai
 {
 //    printf("W: width = %d, height = %d\n", allocation->width, allocation->height);
     file_opener* donnees=formulaire->donnees;
-    gtk_widget_set_size_request(donnees->carte, allocation->width-180, allocation->height-40);
+    gtk_widget_set_size_request(donnees->carte, allocation->width-180, allocation->height-50);
     if((allocation->height)<(allocation->width))
     {
-        donnees->ycarte=allocation->height-27;
+        donnees->ycarte=allocation->height-30;
         donnees->xcarte=donnees->ycarte/1.2;
     }
     else
