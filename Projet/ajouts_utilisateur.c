@@ -78,7 +78,15 @@ void ajouter_plan_de_vol(GtkWidget* bouton,form_pdv* formulaire)
     formulaire->wind = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
     // Initialisation de la fenêtre
-    gtk_window_set_title(GTK_WINDOW(formulaire->wind), "Ajouter un Plan de Vol");
+    if(formulaire->pdv_edit==NULL)
+    {
+        gtk_window_set_title(GTK_WINDOW(formulaire->wind), "Ajouter un Plan de Vol");
+    }
+    else
+    {
+        gtk_window_set_title(GTK_WINDOW(formulaire->wind), "Editer un Plan de Vol");
+    }
+
     int h=400+formulaire->nb_pt_int*42;
     h=MIN(h,600);
     gtk_window_set_default_size(GTK_WINDOW(formulaire->wind), 250, h);
