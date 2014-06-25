@@ -10,4 +10,8 @@ void enlever_pt_pass(GtkWidget* bouton,form_pdv* formulaire);
 void ajouter_pdv(GtkWidget* bouton,form_pdv* formulaire);
 void select_pdv_ed(GtkWidget *bouton, form_pdv* formulaire);
 void combo_selected_pdv(GtkWidget *widget,form_pdv* formulaire);
+
+void select_pdv_rm(GtkWidget *bouton, form_pdv* formulaire);
+void combo_rm_pdv(GtkWidget *widget,form_pdv* formulaire);
+void rm_pdv(form_pdv* formulaire);
 #endif // OUVERTURE_FICHIERS_H_INCLUDED

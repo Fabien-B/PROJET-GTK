@@ -143,6 +143,8 @@ typedef struct form_pdv{
     int nb_pt_int;
     file_opener* donnees;
     pdv* pdv_edit;
+    pdv* pdv_rm;
+    pdv* pdv_prec_rm;
 }form_pdv;
 
 

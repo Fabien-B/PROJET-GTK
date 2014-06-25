@@ -65,17 +65,16 @@ int i;
 
 }
 
-    static gboolean
-    on_match_select(GtkEntryCompletion *widget, GtkTreeModel *model,GtkTreeIter *iter,char * tableau)
-    {
-      GValue value = {0, };
-      gtk_tree_model_get_value(model, iter, compl_recup, &value);
-      strcpy(tableau,g_value_get_string(&value));
+static gboolean on_match_select(GtkEntryCompletion *widget, GtkTreeModel *model,GtkTreeIter *iter,char * tableau)
+{
+  GValue value = {0, };
+  gtk_tree_model_get_value(model, iter, compl_recup, &value);
+  strcpy(tableau,g_value_get_string(&value));
 //printf("%s",tableau);
 //fprintf(stdout, "You have selected %s\n", g_value_get_string(&value));
-      g_value_unset(&value);
-      return FALSE;
-    }
+  g_value_unset(&value);
+  return FALSE;
+}
 
 // Fenêtre principale d'ajout d'un plan de vol
 void ajouter_plan_de_vol(GtkWidget* bouton,form_pdv* formulaire)
@@ -562,3 +561,130 @@ void combo_selected_pdv(GtkWidget *widget,form_pdv* formulaire)
 
 }
 
+
+
+void select_pdv_rm(GtkWidget *bouton, form_pdv* formulaire)
+{
+    GtkWidget* pBoite;
+    pBoite = gtk_dialog_new_with_buttons("Sélection du plan de vol à supprimer",NULL,GTK_DIALOG_MODAL,GTK_STOCK_OK,GTK_RESPONSE_OK,NULL);
+
+
+    GtkWidget *fixed;
+    GtkWidget *combo;
+    GtkWidget *label;
+
+    if(formulaire->donnees->debutpdv!=NULL)
+    {
+        label=gtk_label_new("Sélectionnez le plan de vol à supprimer.");
+        gtk_box_pack_start(GTK_BOX(GTK_DIALOG(pBoite)->vbox), label, TRUE, TRUE, 10);
+
+      fixed = gtk_fixed_new();
+
+      combo = gtk_combo_box_new_text();
+
+      pdv* current=formulaire->donnees->debutpdv;
+      while(current!=NULL)
+      {
+        gtk_combo_box_append_text(GTK_COMBO_BOX(combo), current->nom);
+        current=current->ptsuiv;
+      }
+
+      gtk_fixed_put(GTK_FIXED(fixed), combo, 50, 50);
+      gtk_container_add(GTK_CONTAINER(GTK_DIALOG(pBoite)->vbox), fixed);
+
+
+      g_signal_connect(G_OBJECT(combo), "changed",G_CALLBACK(combo_rm_pdv), formulaire);
+
+        gtk_combo_box_set_active(GTK_COMBO_BOX(combo),0); //mettre le 1er en choix par défault.
+
+
+    }
+    else
+    {
+        label=gtk_label_new("    Aucun plan de vol n'a été chargé!    ");
+        gtk_box_pack_start(GTK_BOX(GTK_DIALOG(pBoite)->vbox), label, TRUE, TRUE, 10);
+    }
+
+
+    gtk_widget_show_all(GTK_DIALOG(pBoite)->vbox);
+
+
+    if (gtk_dialog_run(GTK_DIALOG(pBoite))==GTK_RESPONSE_OK) //on n'édite le pdv que si l'utilisateur clique sur OK.
+    {
+        if(formulaire->donnees->debutpdv!=NULL)
+        {
+            rm_pdv(formulaire);
+        }
+    }
+    gtk_widget_destroy(pBoite);
+}
+
+
+
+
+void combo_rm_pdv(GtkWidget *widget,form_pdv* formulaire)
+{
+  gchar *text =  gtk_combo_box_get_active_text(GTK_COMBO_BOX(widget));
+  pdv* current=formulaire->donnees->debutpdv;
+  while(current!=NULL)
+  {
+    if(!strcmp(text,current->nom))
+    {
+        formulaire->pdv_rm=current;
+    }
+    current=current->ptsuiv;
+  }
+  current=formulaire->donnees->debutpdv;
+  while(current!=NULL)
+  {
+    if(current->ptsuiv==formulaire->pdv_rm)
+    {
+        formulaire->pdv_prec_rm=current;
+    }
+
+    current=current->ptsuiv;
+  }
+  if(formulaire->pdv_prec_rm==NULL)
+  {
+    formulaire->pdv_prec_rm=formulaire->donnees->debutpdv;
+  }
+
+
+}
+
+
+void rm_pdv(form_pdv* formulaire)
+{
+    if(formulaire->pdv_rm!=formulaire->donnees->debutpdv)
+    {
+        formulaire->pdv_prec_rm->ptsuiv=formulaire->pdv_rm->ptsuiv;
+    }
+    else
+    {
+        formulaire->donnees->debutpdv=formulaire->pdv_rm->ptsuiv;
+    }
+
+
+    if(formulaire->pdv_rm==formulaire->donnees->finpdv)
+    {
+        formulaire->donnees->finpdv=formulaire->pdv_prec_rm;
+    }
+
+    if(formulaire->donnees->debutpdv==formulaire->donnees->finpdv->ptsuiv)
+    {
+        formulaire->donnees->finpdv=NULL;
+        formulaire->donnees->debutpdv=NULL;
+    }
+
+    pt_pass* pass_current=formulaire->pdv_rm->pass_debut;
+    while(pass_current!=NULL)
+    {
+        pt_pass* pass2=pass_current->ptsuiv;
+        free(pass_current);
+        pass_current=pass2;
+    }
+    free(formulaire->pdv_rm);
+
+    detection_conflits(NULL,formulaire->donnees);
+    redessiner(NULL,formulaire->donnees->carte);
+}

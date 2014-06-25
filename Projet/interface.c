@@ -79,6 +79,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     GtkWidget *MI1_Aide;
     GtkWidget *MI2_APropos;
     GtkWidget *MI2_Editer_pdv;
+    GtkWidget *MI2_RM_pdv;
     GtkWidget *MI2_Nouveau;
     GtkWidget *MI2_Ouvrir;
     GtkWidget *MI2_Charger_default;
@@ -144,9 +145,13 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     MI1_Edition = gtk_menu_item_new_with_label("Edition");
     Edition_menu = gtk_menu_new();
 
-        MI2_Editer_pdv = gtk_menu_item_new_with_label("Éditer les plans de vols");
+        MI2_Editer_pdv = gtk_menu_item_new_with_label("Éditer un plans de vols");
         gtk_menu_shell_append(GTK_MENU_SHELL(Edition_menu), MI2_Editer_pdv);
                         g_signal_connect(G_OBJECT(MI2_Editer_pdv), "activate", G_CALLBACK(select_pdv_ed), formulaire);
+
+        MI2_RM_pdv = gtk_menu_item_new_with_label("Supprimer un plans de vols");
+        gtk_menu_shell_append(GTK_MENU_SHELL(Edition_menu), MI2_RM_pdv);
+                        g_signal_connect(G_OBJECT(MI2_RM_pdv), "activate", G_CALLBACK(select_pdv_rm), formulaire);
 
 
         MI2_parametres = gtk_menu_item_new_with_label("Paramètres");
