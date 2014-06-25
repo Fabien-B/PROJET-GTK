@@ -6,3 +6,7 @@ Pour exécuter le programme, lancez le fichier "GATI".
 
 Ce programme est placé sous la licence GNU GENERAL PUBLIC LICENSE Version 3.
 Une copie de cette licence est fournie dans le fichier "Licence.txt".
+
+Si l'exécutable ne fonctionne pas merci de recompiler le projet sur votre machine.
+
+En cas de problème sur la dernière version merci d'utiliser la version zippé nomé OLD, la dernière version comporte de nouvelles fonctions non éprouvées (complétion, suppression des plans de vols), surtout pour la complétion.
