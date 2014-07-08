@@ -827,6 +827,79 @@ void valider_pdv_interactif(GtkWidget* button, form_pdv* formulaire)
     gtk_widget_destroy(formulaire->wind);
 
     formulaire->donnees->creation_pdv=0;
-    integrer_temps(formulaire->donnees);
+    associer_POI(formulaire->newpdv->pass_debut, formulaire->donnees);
 
+}
+
+void associer_POI(pt_pass* pass_deb, file_opener* donnees)
+{
+    pt_pass* pass_current=pass_deb;
+
+    while(pass_current->ptsuiv!=NULL)
+    {
+        double D=DISTANCE_ATTRIBUTION_AUTO;
+        void* point=pass_current->point;
+        int type=pass_current->type_point;
+        if(pass_current->type_point==2)
+        {
+            ptgpx* pt=pass_current->point;
+            double lat1=pt->latitude;
+            double long1=pt->longitude;
+
+            if(donnees->debutaero!=NULL)
+            {
+                aerodrome* aero=donnees->debutaero;
+                while(aero->ptsuiv!=NULL)
+                {
+                    double lat2=aero->latitude;
+                    double long2=aero->longitude;
+
+                    double dlat=3340*3.14/180*(lat2-lat1);                             //distance projeté sur un méridien en NM,  rayon de la terre = 6371km = 3340NM
+                    double latm=(lat1+lat2)/2;
+                    double r=3340*cos(latm*3.14/180);
+                    double dlong=r*3.14*(long2-long1)/180.0;               //distance projeté sur l'autre axe en NM
+                    double d=sqrt(pow(dlat,2)+pow(dlong,2));
+
+                    if(d<D)
+                    {
+                        D=d;
+                        point=aero;
+                        type=0;
+                    }
+
+                    aero=aero->ptsuiv;
+                }
+            }
+
+            if(donnees->debutbalises!=NULL)
+            {
+                balise* bal=donnees->debutbalises;
+                while(bal->ptsuiv!=NULL)
+                {
+                    double lat2=bal->latitude;
+                    double long2=bal->longitude;
+
+                    double dlat=3340*3.14/180*(lat2-lat1);                             //distance projeté sur un méridien en NM,  rayon de la terre = 6371km = 3340NM
+                    double latm=(lat1+lat2)/2;
+                    double r=3340*cos(latm*3.14/180);
+                    double dlong=r*3.14*(long2-long1)/180.0;               //distance projeté sur l'autre axe en NM
+                    double d=sqrt(pow(dlat,2)+pow(dlong,2));
+
+                    if(d<D)
+                    {
+                        D=d;
+                        point=bal;
+                        type=1;
+                    }
+
+                    bal=bal->ptsuiv;
+                }
+            }
+
+            pass_current->point=point;
+            pass_current->type_point=type;
+        }
+        pass_current=pass_current->ptsuiv;
+    }
+    integrer_temps(donnees);
 }
