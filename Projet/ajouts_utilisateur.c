@@ -688,3 +688,145 @@ void rm_pdv(form_pdv* formulaire)
     detection_conflits(NULL,formulaire->donnees);
     redessiner(NULL,formulaire->donnees->carte);
 }
+
+
+
+
+void creer_pdv_interactif(GtkWidget* but, form_pdv* formulaire)
+{
+    file_opener *donnees=formulaire->donnees;
+    donnees->creation_pdv=1;
+    GtkWidget* box;
+    GtkWidget* ok_button;
+
+
+//création du nouveau pdv////////////////////////////////////////////////////////////////////////////;
+        //int cas;
+        if(formulaire->donnees->finpdv!=NULL)
+        {
+        // Allocation mémoire et création de la liste chainée
+            formulaire->donnees->finpdv->ptsuiv=malloc(sizeof(pdv));
+            formulaire->newpdv=formulaire->donnees->finpdv->ptsuiv;
+            formulaire->newpdv->ptsuiv=NULL;
+            //cas=0;
+        }
+        else
+        {
+        // Ajout à la liste chainée
+            formulaire->donnees->debutpdv=malloc(sizeof(pdv));
+            formulaire->newpdv=formulaire->donnees->debutpdv;
+            formulaire->donnees->finpdv=formulaire->newpdv;
+            formulaire->newpdv->ptsuiv=NULL;
+            //cas=1;
+        }
+
+        formulaire->pass_current_interactif=malloc(sizeof(pt_pass));
+        formulaire->newpdv->pass_debut=formulaire->pass_current_interactif;
+        formulaire->pass_current_interactif->ptsuiv=NULL;
+        formulaire->newpdv->affichage=1;
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    formulaire->wind = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+    gtk_window_set_title(GTK_WINDOW(formulaire->wind), "Ajouter pdv à la volée");
+    gtk_window_set_default_size(GTK_WINDOW(formulaire->wind), 250, 400);
+    gtk_window_set_position(GTK_WINDOW(formulaire->wind),GTK_WIN_POS_CENTER);
+
+    box=gtk_vbox_new(FALSE,0);
+    gtk_container_add(GTK_CONTAINER(formulaire->wind),box);
+
+
+
+// Construction du formulaire
+    formulaire->nom_label=gtk_label_new("Indicatif de l'avion:"); //label et gtkEntry pour l'indicatif avion
+    formulaire->nom_entry=gtk_entry_new();
+    gtk_box_pack_start(GTK_BOX(box),formulaire->nom_label,FALSE,FALSE,0);
+    gtk_box_pack_start(GTK_BOX(box),formulaire->nom_entry,FALSE,FALSE,0);
+    //gtk_entry_set_text(GTK_ENTRY(entrynom), formulaire->nom);
+
+
+    formulaire->hour_box=gtk_hbox_new(FALSE,0);
+    gtk_box_pack_start(GTK_BOX(box), formulaire->hour_box,FALSE,FALSE,FALSE);
+
+    formulaire->heure_label = gtk_frame_new("Heures");
+    formulaire->spinh = gtk_spin_button_new_with_range(0, 23, 1);
+    gtk_container_add(GTK_CONTAINER(formulaire->heure_label), formulaire->spinh);
+    gtk_box_pack_start(GTK_BOX(formulaire->hour_box), formulaire->heure_label, FALSE, FALSE, 0);
+    //gtk_spin_button_set_value(GTK_SPIN_BUTTON(spinh), heure);
+
+    formulaire->heure_label = gtk_frame_new("Minutes");
+    formulaire->spinm = gtk_spin_button_new_with_range(0, 59, 1);
+    gtk_container_add(GTK_CONTAINER(formulaire->heure_label), formulaire->spinm);
+    gtk_box_pack_start(GTK_BOX(formulaire->hour_box), formulaire->heure_label, FALSE, FALSE, 0);
+   // gtk_spin_button_set_value(GTK_SPIN_BUTTON(fspinm), minutes);
+
+    formulaire->altitude_label = gtk_frame_new("Niveau de vol (FL)");
+    formulaire->spinfl = gtk_spin_button_new_with_range(0, 700, 5);
+    gtk_container_add(GTK_CONTAINER(formulaire->altitude_label), formulaire->spinfl);
+    gtk_box_pack_start(GTK_BOX(box), formulaire->altitude_label, FALSE, FALSE, 0);
+    //gtk_spin_button_set_value(GTK_SPIN_BUTTON(spinfl), altitude);
+
+    formulaire->vitesse_label = gtk_frame_new("Vitesse de vol (kt)");
+    formulaire->spinvi = gtk_spin_button_new_with_range(0, 700, 10);
+    gtk_container_add(GTK_CONTAINER(formulaire->vitesse_label), formulaire->spinvi);
+    gtk_box_pack_start(GTK_BOX(box), formulaire->vitesse_label, FALSE, FALSE, 0);
+    //gtk_spin_button_set_value(GTK_SPIN_BUTTON(formulaire->spinvi), formulaire->vitesse);
+
+//    demarrer=gtk_button_new_with_label("Démarrer");
+//    gtk_box_pack_start(GTK_BOX(box),demarrer,FALSE,FALSE,0);
+
+    ok_button=gtk_button_new_with_label("OK!");
+    gtk_box_pack_start(GTK_BOX(box),ok_button,FALSE,FALSE,0);
+    g_signal_connect(GTK_BUTTON(ok_button),"clicked",G_CALLBACK(valider_pdv_interactif),formulaire);
+
+
+
+
+
+
+
+    gtk_widget_show_all(formulaire->wind);
+
+
+
+}
+
+void ajout_pt_pdv_interactif(form_pdv* formulaire,double x, double y)
+{
+    formulaire->pass_current_interactif->point=malloc(sizeof(ptgpx));
+    formulaire->pass_current_interactif->type_point=2;
+    ptgpx* pt_current=formulaire->pass_current_interactif->point;
+
+    pt_current->latitude=y;
+    pt_current->longitude=x;
+
+    formulaire->pass_current_interactif->ptsuiv=malloc(sizeof(pt_pass));
+    formulaire->pass_current_interactif=formulaire->pass_current_interactif->ptsuiv;
+    formulaire->pass_current_interactif->ptsuiv=NULL;
+
+    dessiner(formulaire->donnees);
+}
+
+void valider_pdv_interactif(GtkWidget* button, form_pdv* formulaire)
+{
+    formulaire->newpdv->affichage=1;
+
+    const gchar *text;
+    text = gtk_entry_get_text(GTK_ENTRY(formulaire->nom_entry));
+    strcpy(formulaire->newpdv->nom,text);
+
+    formulaire->newpdv->heure=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(formulaire->spinh));
+    formulaire->newpdv->minute=gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(formulaire->spinm));
+
+
+    formulaire->newpdv->altitude = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(formulaire->spinfl));
+    formulaire->newpdv->vitesse = gtk_spin_button_get_value_as_int(GTK_SPIN_BUTTON(formulaire->spinvi));
+
+
+    gtk_widget_destroy(formulaire->wind);
+
+    formulaire->donnees->creation_pdv=0;
+    integrer_temps(formulaire->donnees);
+
+}

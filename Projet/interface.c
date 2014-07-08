@@ -14,6 +14,11 @@ void initialisation(int argc, char *argv[])
 
         //initialisation des paramètres/donnees du programme
         file_opener *donnees=g_malloc(sizeof(file_opener));
+        if(donnees==NULL)
+        {
+            g_print("erreur d'allocation mémoire\n");
+            gtk_main_quit();
+        }
         memset(donnees, 0, sizeof(file_opener));
         donnees->old = malloc(sizeof(position));
         donnees->bord = malloc(sizeof(position));
@@ -37,8 +42,14 @@ void initialisation(int argc, char *argv[])
         donnees->ycarte=660;//660
         donnees->tag_lecture=0;
         donnees->clic_distance=0;
+        donnees->creation_pdv=0;
 
         form_pdv* formulaire=malloc(sizeof(form_pdv));
+        if(formulaire==NULL)
+        {
+            g_print("erreur d'allocation mémoire\n");
+            gtk_main_quit();
+        }
         formulaire->donnees=donnees;
         formulaire->nb_pt_int=0;
         formulaire->altitude=100;
@@ -56,7 +67,7 @@ void initialisation(int argc, char *argv[])
     donnees->Window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
     gtk_window_set_title(GTK_WINDOW(donnees->Window), "GATI");
     gtk_window_set_default_size(GTK_WINDOW(donnees->Window), 32, 40);
-    g_signal_connect(G_OBJECT(donnees->Window), "destroy", G_CALLBACK(gtk_main_quit), NULL);
+    g_signal_connect(G_OBJECT(donnees->Window), "destroy", G_CALLBACK(quitter), donnees);
 
     // Lancement de l'interface
     creer_interface(donnees,formulaire);
@@ -97,6 +108,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     GtkWidget *ajouter_pdv_button;
 
     GtkWidget *voir_conflits_button;
+    GtkWidget *creer_pdv_interactif_but;
     GtkWidget *event_box;
     GtkWidget *Separateur;
 
@@ -138,7 +150,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
 
         MI2_Quitter = gtk_menu_item_new_with_label("Quitter");
         gtk_menu_shell_append(GTK_MENU_SHELL(Fichier_menu), MI2_Quitter);
-            g_signal_connect(G_OBJECT(MI2_Quitter), "activate", G_CALLBACK(gtk_main_quit), NULL);
+            g_signal_connect(G_OBJECT(MI2_Quitter), "activate", G_CALLBACK(quitter), donnees);
 
         gtk_menu_item_set_submenu(GTK_MENU_ITEM(MI1_Fichier), Fichier_menu);
 
@@ -206,7 +218,7 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     gtk_widget_set_events(event_box,GDK_SCROLL_UP);
     gtk_signal_connect(GTK_OBJECT(event_box), "scroll_event",GTK_SIGNAL_FUNC(scroll_event), donnees);
     gtk_widget_set_events(event_box,GDK_BUTTON_PRESS);
-    gtk_signal_connect(GTK_OBJECT(event_box), "button_press_event",GTK_SIGNAL_FUNC(press_event), donnees);
+    gtk_signal_connect(GTK_OBJECT(event_box), "button_press_event",GTK_SIGNAL_FUNC(press_event), formulaire);
     gtk_widget_set_events(event_box,GDK_MOTION_NOTIFY);
     gtk_signal_connect(GTK_OBJECT(event_box), "motion_notify_event",GTK_SIGNAL_FUNC(drag_event), donnees);
     gtk_widget_set_events(event_box,GDK_POINTER_MOTION_MASK);
@@ -259,6 +271,10 @@ void creer_interface(file_opener* donnees,form_pdv* formulaire)
     voir_conflits_button=gtk_button_new_with_mnemonic("Voir les _conflits");
     gtk_box_pack_start(GTK_BOX(work_zr),voir_conflits_button,FALSE,FALSE,0);
     g_signal_connect(GTK_BUTTON(voir_conflits_button),"clicked",G_CALLBACK(voir_conflits),donnees);
+
+    creer_pdv_interactif_but=gtk_button_new_with_mnemonic("Créer pdv sur carte");
+    gtk_box_pack_start(GTK_BOX(work_zr),creer_pdv_interactif_but,FALSE,FALSE,0);
+    g_signal_connect(GTK_BUTTON(creer_pdv_interactif_but),"clicked",G_CALLBACK(creer_pdv_interactif),formulaire);
 
 
 // Boîte pour l'animation
@@ -324,8 +340,9 @@ gtk_label_set_text(GTK_LABEL(donnees->Position_curseur),label_position);
 
 
 // Premier évenement du déplacement de la carte, on y récupère la position du curseur et le coordonnées de l'angle haut gauche
-void press_event(GtkWidget* carte, GdkEventButton* event, file_opener* donnees)
+void press_event(GtkWidget* carte, GdkEventButton* event, form_pdv* formulaire)
 {
+    file_opener* donnees=formulaire->donnees;
 // On sauvegarde le coin haut gauche
 donnees->bord->x = donnees->longitude_min;
 donnees->bord->y = donnees->latitude_max;
@@ -344,6 +361,12 @@ donnees->old->x = clic.x;
 donnees->old->y = clic.y;
 
 //g_print("Clic en : lat = %lf, long = %lf\n",clic.y,clic.x);
+
+if(donnees->creation_pdv)
+{
+    ajout_pt_pdv_interactif(formulaire,clic.x,clic.y);
+}
+
 
 }
 
@@ -556,6 +579,28 @@ void voir_pdv(GtkWidget *bouton, file_opener* donnees)
                     {
                         sprintf(texte,"%s\nPoint introuvable  ",texte);
                     }
+
+                }
+
+                //ptgpx
+                if(passage->type_point==2)
+                {
+                    if(passage->point!=NULL)
+                    {
+                    // On remplie la ligne du point de passage.
+                        ptgpx* pt=passage->point;
+                        int k=(passage->temps/60);
+                        int h=k%24;
+                        int m=passage->temps-k*60;
+                    sprintf(texte,"%s\n\tlat=%lf  lon=%lf  %02d:%02d    ",texte,pt->latitude,pt->longitude,h,m);
+//printf("aero:  %s\n",pdvae->nom);
+                    }
+                    else
+                    {
+                        sprintf(texte,"%s\n\tPoint introuvable  ",texte);
+                    }
+
+
 
                 }
 
@@ -854,4 +899,10 @@ void stop(GtkWidget* bouton,file_opener* donnees)
         donnees->tag_lecture=0;
     }
 
+}
+
+void quitter(GtkWidget* button, file_opener* donnees)
+{
+        liberer_memoire(NULL,donnees);
+        gtk_main_quit();
 }

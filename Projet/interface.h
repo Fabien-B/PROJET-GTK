@@ -44,6 +44,16 @@ typedef struct balise{
     struct balise * ptsuiv;
 }balise;
 
+typedef struct ptgpx{
+    double latitude;
+    double longitude;
+    double elevation;
+    double time;
+    double speed;
+//    int affichage;      //1 si affichage activé, 0 sinon
+//    GtkWidget* coch;
+   // struct ptgpx * ptsuiv;
+}ptgpx;
 
 typedef struct pt_pass{
     void *point;
@@ -113,6 +123,13 @@ typedef struct file_opener{
     GtkWidget *Position_curseur;
     gint tag_lecture;
     GtkObject* adj2;
+    int creation_pdv;
+
+    //pour la carte:
+    GdkGC *gc;
+    GdkColor c;
+    int couleur_avion;
+    GdkFont * font;
 
 }file_opener;
 
@@ -145,6 +162,8 @@ typedef struct form_pdv{
     pdv* pdv_edit;
     pdv* pdv_rm;
     pdv* pdv_prec_rm;
+    pdv* newpdv;
+    pt_pass* pass_current_interactif;
 }form_pdv;
 
 
@@ -157,7 +176,7 @@ void parametres(GtkWidget* bouton, form_pdv* formulaire);
 void redessiner(GtkWidget* button, GtkWidget * carte);
 void recup_temps(GtkAdjustment* adj, file_opener* donnees);
 void scroll_event(GtkWidget* carte,GdkEventScroll* event,file_opener* donnees);
-void press_event(GtkWidget* carte, GdkEventButton* event, file_opener* donnees);
+void press_event(GtkWidget* carte, GdkEventButton* event, form_pdv* formulaire);
 void drag_event(GtkWidget* carte, GdkEventMotion* event, file_opener* donnees);
 void move_event(GtkWidget* carte, GdkEventMotion* event, file_opener* donnees);
 
@@ -176,5 +195,6 @@ void my_getsize(GtkWidget *widget, GtkAllocation *allocation, form_pdv* formulai
 gboolean animation(file_opener* donnees);
 void play(GtkWidget* bouton,file_opener* donnees);
 void stop(GtkWidget* bouton,file_opener* donnees);
+void quitter(GtkWidget* button, file_opener* donnees);
 
 #endif // INTERFACE_H_INCLUDED

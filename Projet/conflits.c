@@ -124,28 +124,40 @@ void get_position_avion(position* pos, pdv* pdv_c,double t)
 
         double lat1,lat2,long1,long2;
 
-            if(pass_c->type_point)//
+            if(pass_c->type_point==1)
             {
                 balise* pt=pass_c->point;
                 lat1=pt->latitude;
                 long1=pt->longitude;
             }
-            else
+            if(pass_c->type_point==0)
             {
                 aerodrome* pt=pass_c->point;
                 lat1=pt->latitude;
                 long1=pt->longitude;
             }
+            if(pass_c->type_point==2)
+            {
+                ptgpx* pt=pass_c->point;
+                lat1=pt->latitude;
+                long1=pt->longitude;
+            }
 
-            if(pass_c->ptsuiv->type_point)
+            if(pass_c->ptsuiv->type_point==1)
             {
                 balise* pt=pass_c->ptsuiv->point;
                 lat2=pt->latitude;
                 long2=pt->longitude;
             }
-            else
+            if(pass_c->ptsuiv->type_point==0)
             {
                 aerodrome* pt=pass_c->ptsuiv->point;
+                lat2=pt->latitude;
+                long2=pt->longitude;
+            }
+            if(pass_c->ptsuiv->type_point==2)
+            {
+                ptgpx* pt=pass_c->ptsuiv->point;
                 lat2=pt->latitude;
                 long2=pt->longitude;
             }
@@ -191,14 +203,14 @@ void integrer_temps(file_opener* donnees)
         while(pass_current->ptsuiv->ptsuiv!=NULL)
         {
             double lat1,lat2,long1,long2;
-            if(pass_current->type_point)
+            if(pass_current->type_point==1)
             {
                 balise* pt=pass_current->point;
                 lat1=pt->latitude;
                 long1=pt->longitude;
 //g_print("lat,long %s",pt->nom);
             }
-            else
+            if(pass_current->type_point==0)
             {
                 aerodrome* pt=pass_current->point;
 
@@ -206,20 +218,32 @@ void integrer_temps(file_opener* donnees)
                 long1=pt->longitude;
 //g_print("lat,long %s",pt->oaci);
             }
+            if(pass_current->type_point==2)
+            {
+                ptgpx* pt=pass_current->point;
+                lat1=pt->latitude;
+                long1=pt->longitude;
+            }
 
-            if(pass_current->ptsuiv->type_point)
+            if(pass_current->ptsuiv->type_point==1)
             {
                 balise* pt=pass_current->ptsuiv->point;
                 lat2=pt->latitude;
                 long2=pt->longitude;
 //g_print("  %s",pt->nom);
             }
-            else
+            if(pass_current->ptsuiv->type_point==0)
             {
                 aerodrome* pt=pass_current->ptsuiv->point;
                 lat2=pt->latitude;
                 long2=pt->longitude;
 //g_print("   %s",pt->oaci);
+            }
+            if(pass_current->ptsuiv->type_point==2)
+            {
+                ptgpx* pt=pass_current->ptsuiv->point;
+                lat2=pt->latitude;
+                long2=pt->longitude;
             }
 
             //double D=sqrt(pow((x2-x1)*680,2)+pow((y2-y1)*660,2));
